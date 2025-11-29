@@ -54,6 +54,34 @@ public class SAINBotSettingsClass : BasePreset
         }
     }
 
+    public void AddBotTypeToSettings(BotType botType, float defaultDifficultyModifier)
+    {
+        DefaultDifficultyModifier.Add(botType.WildSpawnType, defaultDifficultyModifier);
+
+        string name = botType.Name;
+        WildSpawnType wildSpawnType = botType.WildSpawnType;
+
+        BotDifficulty[] Difficulties = EnumValues.Difficulties;
+        SAINSettingsGroupClass sainSettingsGroup;
+        if (Preset.Info.IsCustom == false || !SAINPresetClass.Import(out sainSettingsGroup, Preset.Info.Name, name, "BotSettings"))
+        {
+            sainSettingsGroup = new SAINSettingsGroupClass(Difficulties)
+            {
+                Name = name,
+                WildSpawnType = wildSpawnType,
+                DifficultyModifier = DefaultDifficultyModifier[wildSpawnType]
+            };
+
+            UpdateSAINSettingsToEFTDefault(wildSpawnType, sainSettingsGroup);
+
+            if (Preset.Info.IsCustom == true)
+            {
+                SAINPresetClass.Export(sainSettingsGroup, Preset.Info.Name, name, "BotSettings");
+            }
+        }
+        SAINSettings.Add(wildSpawnType, sainSettingsGroup);
+    }
+
     private void LoadSAINSettings()
     {
         BotDifficulty[] Difficulties = EnumValues.Difficulties;

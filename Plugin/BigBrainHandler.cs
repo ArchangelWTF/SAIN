@@ -290,6 +290,46 @@ public static class BigBrainHandler
             ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
         }
 
+        public static void ToggleVanillaLayersForBrains(List<string> brainList, List<string> layersToToggle, bool useVanillaLayers)
+        {
+            ToggleVanillaLayers(brainList, layersToToggle, useVanillaLayers);
+        }
+
+        public static void ToggleVanillaLayersForBrainsAndRoles(List<string> brainList, List<WildSpawnType> roles, List<string> layersToToggle, bool useVanillaLayers)
+        {
+            ToggleVanillaLayers(brainList, layersToToggle, roles, useVanillaLayers);
+        }
+
+        public static void AddCustomLayersToBrains(List<string> brainList, bool withExtract)
+        {
+            var settings = SAINPlugin.LoadedPreset.GlobalSettings.General.Layers;
+
+            BrainManager.AddCustomLayer(typeof(DebugLayer), brainList, 99);
+            BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), brainList, 80);
+            BrainManager.AddCustomLayer(typeof(CombatSquadLayer), brainList, settings.SAINCombatSquadLayerPriority);
+            BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, settings.SAINCombatSoloLayerPriority);
+
+            if (withExtract)
+            {
+                BrainManager.AddCustomLayer(typeof(ExtractLayer), brainList, settings.SAINExtractLayerPriority);
+            }
+        }
+
+        public static void AddCustomLayersToBrainsAndRoles(List<string> brainList, List<WildSpawnType> roles, bool withExtract)
+        {
+            var settings = SAINPlugin.LoadedPreset.GlobalSettings.General.Layers;
+
+            BrainManager.AddCustomLayer(typeof(DebugLayer), brainList, 99, roles);
+            BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), brainList, 80, roles);
+            BrainManager.AddCustomLayer(typeof(CombatSquadLayer), brainList, settings.SAINCombatSquadLayerPriority, roles);
+            BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, settings.SAINCombatSoloLayerPriority, roles);
+
+            if (withExtract)
+            {
+                BrainManager.AddCustomLayer(typeof(ExtractLayer), brainList, settings.SAINExtractLayerPriority, roles);
+            }
+        }
+
         private static void ToggleVanillaLayers(List<string> brainNames, List<string> layerNames, bool useVanillaLayers)
         {
             if (useVanillaLayers)

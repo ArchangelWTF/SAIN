@@ -185,6 +185,7 @@ public class SAINPlugin : BaseUnityPlugin
                 new Patches.Vision.BotLightTurnOnPatch(),
                 new Patches.Vision.VisionSpeedPatch(),
                 new Patches.Vision.WeatherVisionPatch(),
+                new Patches.Vision.CheckLookEnemyContextPatch(),
                 new Patches.Vision.IsPointInVisibleSectorPatch(),
                 new Patches.Vision.VisionDistancePatch(),
                 new Patches.Vision.CheckFlashlightPatch(),

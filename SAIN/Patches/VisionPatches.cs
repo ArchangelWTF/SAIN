@@ -399,6 +399,28 @@ public class WeatherVisionPatch : ModulePatch
 //    }
 //}
 
+public class CheckLookEnemyContextPatch : ModulePatch
+{
+    public static EnemyInfo CurrentEnemyInfo;
+
+    protected override MethodBase GetTargetMethod()
+    {
+        return AccessTools.Method(typeof(EnemyInfo), nameof(EnemyInfo.CheckLookEnemy));
+    }
+
+    [PatchPrefix]
+    public static void Prefix(EnemyInfo __instance)
+    {
+        CurrentEnemyInfo = __instance;
+    }
+
+    [PatchPostfix]
+    public static void Postfix()
+    {
+        CurrentEnemyInfo = null;
+    }
+}
+
 public class IsPointInVisibleSectorPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
@@ -409,9 +431,11 @@ public class IsPointInVisibleSectorPatch : ModulePatch
     [PatchPrefix]
     public static bool PatchPrefix(LookSensor __instance, ref bool __result)
     {
+        EnemyInfo enemyInfo = CheckLookEnemyContextPatch.CurrentEnemyInfo;
+
         if (SAINEnableClass.GetSAIN(__instance.BotOwner.ProfileId, out var sain))
         {
-            Enemy enemy = sain.EnemyController.GetEnemy(__instance.BotOwner.ProfileId, false);
+            Enemy enemy = sain.EnemyController.GetEnemy(enemyInfo.ProfileId, false);
             if (enemy != null)
             {
                 __result = enemy.Vision.Angles.CanBeSeen && enemy.Vision.EnemyParts.CanBeSeen;

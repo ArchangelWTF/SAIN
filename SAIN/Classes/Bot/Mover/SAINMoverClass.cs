@@ -373,6 +373,14 @@ public class SAINMoverClass : BotComponentClassBase, IBotPathFinder
         return WalkToPoint(_activePath.Destination, true, -1, false);
     }
 
+    private bool WantsPatrolStance()
+    {
+        return !Player.MovementContext.IsSprintEnabled
+            && Bot.GoalEnemy == null
+            && (BotOwner.Mover.CurrentState != EBotMoverState.NearDoor && !BotOwner.DoorOpener.Interacting) // Door interact animations won't play
+            && (Player.HandsController is Player.FirearmController fireCont && !fireCont.IsInRemoveOperation()); // Gets stuck indefinitely in operation
+    }
+
     private bool CanSetPatrol()
     {
         if (BotOwner.WeaponManager?.Reload?.Reloading == true)
@@ -561,9 +569,7 @@ public class SAINMoverClass : BotComponentClassBase, IBotPathFinder
             MovementContext movementContext = Player.MovementContext;
             if (movementContext != null)
             {
-                LeftStanceController leftStanceController = movementContext.LeftStanceController;
-
-                bool wantToPatrolStance = !movementContext.IsSprintEnabled && Bot.GoalEnemy == null;
+                bool wantToPatrolStance = WantsPatrolStance();
                 if (wantToPatrolStance != movementContext.IsInPatrol)
                 {
                     // If we are in left stance and want to patrol, reset back to normal  before setting patrol next update.
@@ -576,6 +582,7 @@ public class SAINMoverClass : BotComponentClassBase, IBotPathFinder
                     return;
                 }
 
+                LeftStanceController leftStanceController = movementContext.LeftStanceController;
                 if (leftStanceController != null && leftStanceController.LeftStance != _wantLeftStance)
                 {
                     leftStanceController.ToggleLeftStance();

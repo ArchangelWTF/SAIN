@@ -60,6 +60,11 @@ public class EnemyHearing(EnemyData enemyData) : EnemyBase(enemyData, enemyData.
 
     public EnemyPlace SetHeard(SAINHearingReport report, float currentTime)
     {
+        if (Bot.Hearing.SoundInput.IsIgnoringSounds(report.soundType.IsGunShot()))
+        {
+            return null;
+        }
+
         if (Enemy.IsVisible)
         {
             report.position = Enemy.EnemyPosition;

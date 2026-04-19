@@ -50,14 +50,15 @@ public class SAINHearingSensorClass : BotComponentClassBase
 
     public void ReactToBulletFlyBy(AISoundData sound, float FlyByDistance)
     {
-        Vector3 EstimatedPosition;
         bool underFire = FlyByDistance <= SAINPlugin.LoadedPreset.GlobalSettings.Mind.MaxUnderFireDistance;
-        if (!SoundInput.IgnoreHearing || underFire)
+        if (SoundInput.IsIgnoringSounds(underFire))
         {
-            EstimatedPosition = Dispersion.CalcRandomizedPosition(sound, 1f);
-            ReactToBulletFlyBy(sound, FlyByDistance, EstimatedPosition, underFire);
-            OnEnemySoundHeard?.Invoke(sound, sound.Enemy);
+            return;
         }
+
+        Vector3 EstimatedPosition = Dispersion.CalcRandomizedPosition(sound, 1f);
+        ReactToBulletFlyBy(sound, FlyByDistance, EstimatedPosition, underFire);
+        OnEnemySoundHeard?.Invoke(sound, sound.Enemy);
     }
 
     public void ReactToHeardSound(AISoundData sound)

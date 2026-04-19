@@ -23,8 +23,8 @@ public class HearingInputClass : BotSubClass<SAINHearingSensorClass>, IBotClass
     private const float IMPACT_MAX_HEAR_DISTANCE = 50f * 50f;
     private const float IMPACT_DISPERSION = 5f * 5f;
 
-    public bool IgnoreUnderFire { get; private set; }
-    public bool IgnoreHearing { get; private set; }
+    private bool IgnoreUnderFire = false;
+    private bool IgnoreHearing = false;
 
     public bool IsBotDeafened
     {
@@ -81,9 +81,26 @@ public class HearingInputClass : BotSubClass<SAINHearingSensorClass>, IBotClass
     public readonly List<AISoundData> AISoundCachedEvents_Gunshots = [];
     public readonly List<AISoundData> AISoundCachedEvents_Gunshots_Suppressed = [];
 
+    public bool IsIgnoringSounds(bool includingGunfire = true)
+    {
+        if (!Bot.BotActive)
+        {
+            return true;
+        }
+        if (Bot.GameEnding)
+        {
+            return true;
+        }
+        if (IgnoreHearing && (IgnoreUnderFire || !includingGunfire))
+        {
+            return true;
+        }
+        return false;
+    }
+
     public void CheckAddSoundToCache(SoundEvent Sound, float PlayerDistance)
     {
-        if (!Sound.SoundType.IsGunShot() && IgnoreHearing)
+        if (Bot.Hearing.SoundInput.IsIgnoringSounds(Sound.SoundType.IsGunShot()))
         {
             return;
         }
@@ -283,7 +300,7 @@ public class HearingInputClass : BotSubClass<SAINHearingSensorClass>, IBotClass
 
     private void bulletImpacted(EftBulletClass bullet)
     {
-        if (!canHearSounds())
+        if (IsIgnoringSounds(true))
         {
             return;
         }
@@ -337,19 +354,6 @@ public class HearingInputClass : BotSubClass<SAINHearingSensorClass>, IBotClass
             shallReportToSquad = true,
         };
         enemy.Hearing.SetHeard(report, currentTime);
-    }
-
-    private bool canHearSounds()
-    {
-        if (!Bot.BotActive)
-        {
-            return false;
-        }
-        if (Bot.GameEnding)
-        {
-            return false;
-        }
-        return true;
     }
 
     private bool soundListenerStarted(PlayerComponent player)

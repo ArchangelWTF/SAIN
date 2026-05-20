@@ -260,6 +260,15 @@ public class MindSettings : SAINSettingsBase<MindSettings>, ISAINSettings
         { ECaliber.Caliber127x99, 5f },
         { ECaliber.Caliber127x108, 5f },
         { ECaliber.Caliber725, 10f },
+        { ECaliber.Caliber1036x77, 10f },
+        { ECaliber.Caliber11x33R, 2f },
+        { ECaliber.Caliber25x59, 10f },
+        { ECaliber.Caliber762x67B, 2.5f },
+        { ECaliber.Caliber784x49, 2.65f },
+        { ECaliber.Caliber792x57, 2.75f },
+        { ECaliber.Caliber86x43, 2.65f },
+        { ECaliber.Caliber86x63, 5f },
+        { ECaliber.Caliber93x64, 4f },
         { ECaliber.Default, 2f },
     };
 
@@ -297,6 +306,15 @@ public class MindSettings : SAINSettingsBase<MindSettings>, ISAINSettings
         { ECaliber.Caliber127x99, 5f },
         { ECaliber.Caliber127x108, 5f },
         { ECaliber.Caliber725, 10f },
+        { ECaliber.Caliber1036x77, 10f },
+        { ECaliber.Caliber11x33R, 2f },
+        { ECaliber.Caliber25x59, 10f },
+        { ECaliber.Caliber762x67B, 2.5f },
+        { ECaliber.Caliber784x49, 2.65f },
+        { ECaliber.Caliber792x57, 2.75f },
+        { ECaliber.Caliber86x43, 2.65f },
+        { ECaliber.Caliber86x63, 5f },
+        { ECaliber.Caliber93x64, 4f },
         { ECaliber.Default, 2f },
     };
 

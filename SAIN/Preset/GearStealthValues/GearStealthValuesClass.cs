@@ -25,7 +25,7 @@ public class GearStealthValuesClass
 
     private void import(SAINPresetDefinition preset)
     {
-        if (!preset.IsCustom)
+        if (preset == null || !preset.IsCustom)
         {
             return;
         }
@@ -41,7 +41,7 @@ public class GearStealthValuesClass
             var itemList = getList(type);
             foreach (var item in list)
             {
-                if (item.EquipmentType != type)
+                if (item == null || item.EquipmentType != type)
                 {
                     continue;
                 }
@@ -132,7 +132,7 @@ public class GearStealthValuesClass
     {
         foreach (var item in list)
         {
-            if (item.Name == name)
+            if (item != null && item.Name == name)
             {
                 return true;
             }

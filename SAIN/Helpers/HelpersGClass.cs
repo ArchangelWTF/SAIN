@@ -77,7 +77,7 @@ public class EFTCoreSettings
 {
     static EFTCoreSettings()
     {
-        if (!JsonUtility.Load.LoadObject<CoreOverrides>(out _overrides, nameof(CoreOverrides)))
+        if (!JsonUtility.Load.LoadObject(out _overrides, nameof(CoreOverrides)) || _overrides == null)
         {
             _overrides = new CoreOverrides();
             JsonUtility.SaveObjectToJson(_overrides, nameof(CoreOverrides));

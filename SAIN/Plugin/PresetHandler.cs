@@ -44,13 +44,13 @@ internal class PresetHandler
         for (int i = 0; i < CustomPresetOptions.Count; i++)
         {
             var preset = CustomPresetOptions[i];
-            if (preset.IsCustom == true && preset.Name == presetKey)
+            if (preset != null && preset.IsCustom == true && preset.Name == presetKey)
             {
                 definition = preset;
                 return true;
             }
         }
-        if (Load.LoadObject(out definition, "Info", PresetsFolder, presetKey))
+        if (Load.LoadObject(out definition, "Info", PresetsFolder, presetKey) && definition != null)
         {
             if (definition.IsCustom == true)
             {
@@ -138,7 +138,7 @@ internal class PresetHandler
 
     public static void ImportEditorDefaults()
     {
-        if (Load.LoadObject(out PresetEditorDefaults editorDefaults, Settings, PresetsFolder))
+        if (Load.LoadObject(out PresetEditorDefaults editorDefaults, Settings, PresetsFolder) && editorDefaults != null)
         {
             EditorDefaults = editorDefaults;
         }
@@ -166,7 +166,7 @@ internal class PresetHandler
         for (int i = 0; i < CustomPresetOptions.Count; i++)
         {
             var presetDef = CustomPresetOptions[i];
-            if (presetDef.Name.Contains(presetName) || presetDef.Name == presetName)
+            if (presetDef != null && (presetDef.Name.Contains(presetName) || presetDef.Name == presetName))
             {
                 definition = presetDef;
                 return true;

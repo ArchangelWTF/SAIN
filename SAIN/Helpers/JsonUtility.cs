@@ -71,6 +71,24 @@ public static class JsonUtility
 
     public static class Load
     {
+        private static bool IsValidJsonContent(string json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                return false;
+            }
+
+            for (int i = 0; i < json.Length; i++)
+            {
+                if (json[i] != '\0')
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public static void LoadCustomPresetOptions(List<SAINPresetDefinition> list)
         {
             list.Clear();
@@ -82,18 +100,28 @@ public static class JsonUtility
             foreach (var item in array)
             {
                 string path = Path.Combine(item, Info + JsonExtension);
-                if (File.Exists(path))
+                if (!File.Exists(path))
+                {
+                    Logger.LogError($"Could not Import Info.json at path [{path}]. Is the file missing?");
+                    continue;
+                }
+
+                try
                 {
                     string json = File.ReadAllText(path);
                     var obj = DeserializeObject<SAINPresetDefinition>(json);
-                    if (obj.IsCustom)
+                    if (obj != null && obj.IsCustom)
                     {
                         list.Add(obj);
                     }
+                    else if (obj == null)
+                    {
+                        Logger.LogWarning($"Skipping invalid preset Info.json at [{path}]");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Logger.LogError($"Could not Import Info.json at path [{path}]. Is the file missing?");
+                    Logger.LogWarning($"Failed to load preset Info.json at [{path}]: {ex.Message}");
                 }
             }
         }
@@ -106,14 +134,41 @@ public static class JsonUtility
             }
             foreach (var file in Directory.GetFiles(foldersPath, "*.json"))
             {
-                string jsonContent = File.ReadAllText(file);
-                list.Add(JsonConvert.DeserializeObject<ItemStealthValue>(jsonContent));
+                try
+                {
+                    var item = DeserializeObject<ItemStealthValue>(File.ReadAllText(file));
+                    if (item != null)
+                    {
+                        list.Add(item);
+                    }
+                    else
+                    {
+                        Logger.LogWarning($"Skipping invalid stealth value file [{file}]");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning($"Failed to load stealth value file [{file}]: {ex.Message}");
+                }
             }
         }
 
-        public static T DeserializeObject<T>(string file)
+        public static T DeserializeObject<T>(string json)
         {
-            return JsonConvert.DeserializeObject<T>(file);
+            if (!IsValidJsonContent(json))
+            {
+                return default;
+            }
+
+            try
+            {
+                return JsonConvert.DeserializeObject<T>(json);
+            }
+            catch (JsonException ex)
+            {
+                Logger.LogWarning($"JSON deserialize failed for [{typeof(T).Name}]: {ex.Message}");
+                return default;
+            }
         }
 
         public static string LoadTextFile(string fileExtension, string fileName, params string[] folders)
@@ -126,7 +181,8 @@ public static class JsonUtility
 
                 if (File.Exists(filePath))
                 {
-                    return File.ReadAllText(filePath);
+                    string json = File.ReadAllText(filePath);
+                    return IsValidJsonContent(json) ? json : null;
                 }
             }
             return null;
@@ -140,16 +196,17 @@ public static class JsonUtility
 
         public static bool LoadObject<T>(out T obj, string fileName, params string[] folders)
         {
-            try
+            if (LoadJsonFile(out string json, fileName, folders))
             {
-                string json = LoadTextFile(JsonExtension, fileName, folders);
-                if (json != null)
+                obj = DeserializeObject<T>(json);
+                if (obj != null)
                 {
-                    obj = DeserializeObject<T>(json);
                     return true;
                 }
+
+                Logger.LogWarning($"Failed to load [{fileName}]: deserialized object was null");
             }
-            catch (JsonSerializationException) { }
+
             obj = default;
             return false;
         }

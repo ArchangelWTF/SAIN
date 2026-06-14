@@ -215,10 +215,9 @@ public class SAINPresetClass
         string[] folders = Folders(presetName, subFolder);
         if (Load.LoadJsonFile(out string json, fileName, folders))
         {
-            try
+            result = Load.DeserializeObject<T>(json);
+            if (result != null)
             {
-                result = Load.DeserializeObject<T>(json);
-
                 string debugFolders = string.Empty;
                 for (int i = 0; i < folders.Length; i++)
                 {
@@ -227,11 +226,8 @@ public class SAINPresetClass
                 Logger.LogDebug($"Successfully Imported [{typeof(T).Name}] File Name: [{fileName}] To Path: [{debugFolders}]");
                 return true;
             }
-            catch (Exception ex)
-            {
-                Logger.LogError($"Failed import Item of Type {typeof(T)}");
-                LogExportError(ex);
-            }
+
+            Logger.LogWarning($"Failed import [{typeof(T).Name}] file [{fileName}]: deserialized object was null");
         }
         result = default;
         return false;

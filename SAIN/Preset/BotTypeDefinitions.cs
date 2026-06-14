@@ -28,6 +28,11 @@ public class BotTypeDefinitions
         for (int i = 0; i < BotTypesList.Count; i++)
         {
             BotType botType = BotTypesList[i];
+            if (botType == null)
+            {
+                continue;
+            }
+
             WildSpawnType wildSpawn = botType.WildSpawnType;
 
             BotTypesNames.Add(botType.Name);
@@ -42,16 +47,29 @@ public class BotTypeDefinitions
         List<BotType> defaultList = CreateBotTypes();
         removeExcluded(defaultList, out _);
 
-        if (JsonUtility.Load.LoadObject(out List<BotType> importedList, FileName))
+        if (JsonUtility.Load.LoadObject(out List<BotType> importedList, FileName) && importedList != null)
         {
-            // Check that the imported list contains each entry created, to account for BotTypes being added with newer versions of EFT
-            CheckImportedList(importedList, defaultList);
-            return importedList;
+            RemoveInvalidBotTypes(importedList);
+            if (importedList.Count > 0)
+            {
+                // Check that the imported list contains each entry created, to account for BotTypes being added with newer versions of EFT
+                CheckImportedList(importedList, defaultList);
+                return importedList;
+            }
         }
-        else
+
+        JsonUtility.SaveObjectToJson(defaultList, FileName);
+        return defaultList;
+    }
+
+    private static void RemoveInvalidBotTypes(List<BotType> list)
+    {
+        for (int i = list.Count - 1; i >= 0; i--)
         {
-            JsonUtility.SaveObjectToJson(defaultList, FileName);
-            return defaultList;
+            if (list[i] == null)
+            {
+                list.RemoveAt(i);
+            }
         }
     }
 
@@ -62,6 +80,13 @@ public class BotTypeDefinitions
         // Remove items from importedList that no longer exist in defaultList
         for (int i = importedList.Count - 1; i >= 0; i--)
         {
+            if (importedList[i] == null)
+            {
+                importedList.RemoveAt(i);
+                modified = true;
+                continue;
+            }
+
             bool existsInDefault = false;
             for (int j = 0; j < defaultList.Count; j++)
             {
@@ -85,7 +110,7 @@ public class BotTypeDefinitions
             bool alreadyExists = false;
             for (int j = 0; j < importedList.Count; j++)
             {
-                if (defaultList[i].WildSpawnType == importedList[j].WildSpawnType)
+                if (importedList[j] != null && defaultList[i].WildSpawnType == importedList[j].WildSpawnType)
                 {
                     alreadyExists = true;
                     break;
@@ -112,7 +137,7 @@ public class BotTypeDefinitions
         removed = false;
         for (int i = list.Count - 1; i >= 0; i--)
         {
-            if (BotSpawnController.StrictExclusionList.Contains(list[i].WildSpawnType))
+            if (list[i] == null || BotSpawnController.StrictExclusionList.Contains(list[i].WildSpawnType))
             {
                 list.RemoveAt(i);
                 removed = true;

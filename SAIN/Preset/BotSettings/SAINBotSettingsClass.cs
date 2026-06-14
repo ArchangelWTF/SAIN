@@ -282,7 +282,7 @@ public class SAINBotSettingsClass : BasePreset
 
             if (!EFTSettings.ContainsKey(wildSpawnType))
             {
-                if (!Load.LoadObject(out EFTBotSettings eftSettings, name, "Default Bot Config Values"))
+                if (!Load.LoadObject(out EFTBotSettings eftSettings, name, "Default Bot Config Values") || eftSettings == null)
                 {
                     Logger.LogError($"Failed to Import EFT Bot Settings for {name}");
                     eftSettings = new EFTBotSettings(name, wildSpawnType, Difficulties);

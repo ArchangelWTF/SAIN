@@ -179,9 +179,6 @@ public static class BigBrainHandler
             List<string> LayersToToggle =
             [
                 "ObdolbosFight", // Used by crazy event Scavs
-                //"ZombieSlow",
-                //"InfectedWait",
-                //"InfectedTarget",
                 .. _commonVanillaLayersToRemove,
             ];
 

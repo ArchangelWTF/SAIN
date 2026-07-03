@@ -41,6 +41,7 @@ public enum EBrain
     Killa,
     KillaAgro,
     Marksman,
+    BoarSniper,
     PMC,
     SectantPriest,
     SctPredvst,
@@ -130,7 +131,7 @@ public static class AIBrains
 
     public static readonly List<EBrain> Goons = [EBrain.Knight, EBrain.BirdEye, EBrain.BigPipe];
 
-    public static readonly List<EBrain> Others = [EBrain.Obdolbs]; //, EBrain.InfectedSlow];
+    public static readonly List<EBrain> Others = [EBrain.Obdolbs, EBrain.Gifter]; //, EBrain.InfectedSlow];
 
     public static readonly List<EBrain> Cultists =
     [
@@ -150,7 +151,6 @@ public static class AIBrains
         EBrain.Tagilla,
         EBrain.TagillaAgro,
         EBrain.BossTest,
-        EBrain.Gifter,
         EBrain.Killa,
         EBrain.KillaAgro,
         EBrain.BossBoar,

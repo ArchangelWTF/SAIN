@@ -20,31 +20,35 @@ public static class BigBrainHandler
     [
         //"FightReqNull",
         //"PeacecReqNull",
-        //"HideHW",
-        "Help",
-        "GroupForce",
+        //"Follow Player",
+        //"HideHW", // Used by Scavs, Raiders, and Bloodhounds when zombies spawn
+        //"Khorovod",
+        //"GeneratorDef", // Used by Scavs and Killa
+        "GroupForce", // Used by Cursed Scavs, Rogues, and Oni (event) Cultist
         "AdvAssaultTarget",
-        "AssaultEnemyFar",
         "Simple Target",
-        "Pmc",
+        "Pmc", // Used by Raiders, Bloodhounds, and Scav groups
         "AssaultHaveEnemy",
-        "Assault Building",
-        "Enemy Building",
-        "PushAndSup",
+        "PushAndSup", // Used by Scavs and Shadow of Tagilla's followers
         "Pursuit",
         "Kill logic",
     ];
 
-    private static readonly string[] _commonVanillaBossLayersToRemove =
+    private static readonly string[] _commonVanillaBossAndFollowerLayersToRemove =
     [
-        "TagillaAmbush",
-        "TagillaMain",
-        "BoarGrenadeDanger",
-        "HoldOrCoverF",
-        "HoldNearBoss",
-        "Kln_NIMH",
-        "KlnTrg",
-        "Kojaniy Target",
+        //"ExURequest", // Used by Rogues and Kaban's followers to warn neutral players/bots
+        "BirdEyeFight", // Used by Birdeye and Ghost (event) Cultist
+        "BossSanitarFight", // Used by Sanitar and Harbinger (event) Cultist
+        "SanitarGoal", // Used by Sanitar and his followers
+        "TagillaAmbush", // Used by Tagilla and his followers
+        "TagillaMain", // Used by Tagilla and his followers
+        "BoarGrenadeDanger", // Used by Kaban and his followers
+        "HoldOrCoverF", // Used by Cultists and Gluhar's followers
+        "SecurityGluhar", // Used by Gluhar and his followers
+        "HoldNearBoss", // Used by Gluhar's and Kollontay's followers
+        "Kln_NIMH", // Used by Kollontay and his followers
+        "KlnTrg", // Used by Kollontay and his followers
+        "Kojaniy Target", // Used by Shturman and his followers
     ];
 
     private static readonly List<Type> _SAINLayers = [];
@@ -145,8 +149,8 @@ public static class BigBrainHandler
 
             List<string> LayersToToggle =
             [
-                //"GeneratorDef",
-                //"Khorovod",
+                "Help",
+                "AssaultEnemyFar",
                 .. _commonVanillaLayersToRemove,
             ];
 
@@ -161,8 +165,8 @@ public static class BigBrainHandler
 
             List<string> LayersToToggle =
             [
+                "AssaultEnemyFar", // Used by Raiders and Scav groups
                 .. _commonVanillaLayersToRemove,
-                .. _commonVanillaBossLayersToRemove,
             ];
 
             ToggleVanillaLayers(brainList, LayersToToggle, roles, useVanillaLayers);
@@ -174,11 +178,11 @@ public static class BigBrainHandler
 
             List<string> LayersToToggle =
             [
+                "ObdolbosFight", // Used by crazy event Scavs
                 //"ZombieSlow",
                 //"InfectedWait",
                 //"InfectedTarget",
                 .. _commonVanillaLayersToRemove,
-                .. _commonVanillaBossLayersToRemove,
             ];
 
             ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
@@ -191,7 +195,6 @@ public static class BigBrainHandler
             List<string> LayersToToggle =
             [
                 .. _commonVanillaLayersToRemove,
-                .. _commonVanillaBossLayersToRemove,
             ];
 
             ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
@@ -204,10 +207,11 @@ public static class BigBrainHandler
             List<string> LayersToToggle =
             [
                 .. _commonVanillaLayersToRemove,
-                .. _commonVanillaBossLayersToRemove,
             ];
 
             ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
+
+            ToggleVanillaLayersForRaiders([WildSpawnType.arenaFighterEvent], useVanillaLayers);
         }
 
         public static void ToggleVanillaLayersForCultists(bool useVanillaLayers)
@@ -216,12 +220,13 @@ public static class BigBrainHandler
 
             List<string> LayersToToggle =
             [
-                //"GrenSuicide",
-                "MeleeS_IN",
-                "R&H_OUT",
-                "SupShootSect_IN",
+                //"GrenSuicide", // Used by Cultist priests
+                "Run&Strike", // Used by Cultist followers
+                "MeleeS_IN", // Used by Cultist followers
+                "R&H_OUT", // Used by Cultist priests
+                "SupShootSect_IN", // Used by Cultist followers
                 .. _commonVanillaLayersToRemove,
-                .. _commonVanillaBossLayersToRemove,
+                .. _commonVanillaBossAndFollowerLayersToRemove,
             ];
 
             ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
@@ -233,30 +238,26 @@ public static class BigBrainHandler
 
             List<string> LayersToToggle =
             [
-                //"PartisanMine",
-                //"PartMineAll",
-                "PrtFMN",
-                "PrtPst",
-                "PrtZrSvg",
-                "PrtFight",
-                "PrtBadTrg",
-                "PrtMany",
-                "PrtStalk",
-                "BirdEyeFight",
-                "BossBoarFight",
-                "BossGlFight",
-                "PrtFight",
-                "KojaniyB_Enemy",
-                "Bully Layer",
-                "KlnSolo",
-                "KolontayFight",
-                "BossSanitarFight",
-                "ATag search",
-                "HoldOrCoverT",
-                "KillaAgro",
-                "TagillaAgro",
+                //"PartisanMine", // Used by Partisan
+                //"PartMineAll", // Used by Partisan
+                "PrtFMN", // Used by Partisan
+                "PrtPst", // Used by Partisan
+                "PrtZrSvg", // Used by Partisan
+                "PrtFight", // Used by Partisan
+                "PrtBadTrg", // Used by Partisan
+                "PrtMany", // Used by Partisan
+                "PrtStalk", // Used by Partisan
+                "HoldOrCoverT", // Used by Partisan
+                "BossBoarFight", // Used by Kaban
+                "BossGlFight", // Used by Gluhar
+                "KojaniyB_Enemy", // Used by Shturman
+                "Bully Layer", // Used by Reshala
+                "KlnSolo", // Used by Kollontay
+                "KolontayFight", // Used by Kollontay
+                "KillaAgro", // Used by Vengeful Killa
+                "TagillaAgro", // Used by Shadow of Tagilla
                 .. _commonVanillaLayersToRemove,
-                .. _commonVanillaBossLayersToRemove,
+                .. _commonVanillaBossAndFollowerLayersToRemove,
             ];
             ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
         }
@@ -267,20 +268,23 @@ public static class BigBrainHandler
 
             List<string> LayersToToggle =
             [
-                "BoarStationary",
-                "BoarPatrol",
-                "BoarClPatrol",
-                "FBoarFght",
-                "SecurityKln",
-                "FolKojEnemy",
-                "KlnForceAtk",
-                "KolontayAP",
-                "GluharKilla",
-                "GluhAssKilla",
-                "FlSanFight",
-                "TagillaFollower",
+                "BoarStationary", // Used by Kaban's followers
+                "BoarPatrol", // Used by Kaban's followers
+                "BoarClPatrol", // Used by Kaban's followers
+                "FBoarFght", // Used by Kaban's followers
+                "SecurityKln", // Used by Kollontay's followers
+                "KlnForceAtk", // Used by Kollontay's followers
+                "KolontayAP", // Used by Kollontay's followers
+                "FolKojEnemy", // Used by Shturman's followers
+                "GluharKilla", // Used by Gluhar's followers
+                "GluhAssKilla", // Used by Gluhar's followers
+                "FlGlScout", // Used by Gluhar's followers
+                "GlGoal", // Used by Gluhar's followers
+                "FlSanFight", // Used by Sanitar's followers
+                "TagillaFollower", // Used by Tagilla's followers
+                "Follower bully", // Used by Reshala's followers
                 .. _commonVanillaLayersToRemove,
-                .. _commonVanillaBossLayersToRemove,
+                .. _commonVanillaBossAndFollowerLayersToRemove,
             ];
 
             ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
@@ -292,10 +296,12 @@ public static class BigBrainHandler
 
             List<string> LayersToToggle =
             [
-                "KnightFight",
-                "BirdEyeFight",
+                "KnightFight", // Used by Knight
+                "Assault Building", // Used by Knight, Big Pipe, and Birdeye
+                "Enemy Building", // Used by Knight, Big Pipe, and Birdeye
+                "BirdHold", // Used by Birdeye
                 .. _commonVanillaLayersToRemove,
-                .. _commonVanillaBossLayersToRemove,
+                .. _commonVanillaBossAndFollowerLayersToRemove,
             ];
 
             ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
@@ -307,11 +313,9 @@ public static class BigBrainHandler
 
             List<string> LayersToToggle =
             [
-                //"Follow Player",
                 "PmcBear",
                 "PmcUsec",
                 .. _commonVanillaLayersToRemove,
-                .. _commonVanillaBossLayersToRemove,
             ];
 
             ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);

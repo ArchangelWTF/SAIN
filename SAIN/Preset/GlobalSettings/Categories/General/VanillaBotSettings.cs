@@ -32,6 +32,10 @@ public class VanillaBotSettings : SAINSettingsBase<VanillaBotSettings>, ISAINSet
     [Description("REQUIRES RESTART OF GAME")]
     public bool VanillaRogues = false;
 
+    [Name("Vanilla Raiders")]
+    [Description("REQUIRES RESTART OF GAME")]
+    public bool VanillaRaiders = false;
+
     [Name("Vanilla Cultists")]
     [Description("REQUIRES RESTART OF GAME")]
     public bool VanillaCultists = false;

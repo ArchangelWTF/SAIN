@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SAIN.Preset.GlobalSettings.Categories;
 
@@ -17,7 +19,6 @@ public enum EBrain
     TagillaAgro,
     BossTest,
 
-    //BossZryachiy,
     Obdolbs,
     ExUsec,
     BigPipe,
@@ -28,31 +29,29 @@ public enum EBrain
     FollowerGluharScout,
     FollowerKojaniy,
     FollowerSanitar,
-    FollowerBoar,
-    FollowerBoarClose1,
-    FollowerBoarClose2,
-    BossBoarSniper,
-    FollowerKolontayAssault,
-    FollowerKolontaySecurity,
+    FlBoar,
+    FlBoarCl,
+    FlBoarSt,
+    FlKlnAslt,
+    KolonSec,
     TagillaFollower,
-    TagillaHelperAgro,
+    HelperAgro,
 
-    //Fl_Zraychiy,
     Gifter,
     Killa,
     KillaAgro,
     Marksman,
     PMC,
     SectantPriest,
+    SctPredvst,
+    PrizrakSt,
+    Oni,
     SectantWarrior,
     CursAssault,
     Assault,
     PmcBear,
     PmcUsec,
-    FlBoarCl,
-    FlBoarSt,
-    FlKlnAslt,
-    KolonSec,
+    InfectedSlow,
 }
 
 public static class AIBrains
@@ -131,7 +130,16 @@ public static class AIBrains
 
     public static readonly List<EBrain> Goons = [EBrain.Knight, EBrain.BirdEye, EBrain.BigPipe];
 
-    public static readonly List<EBrain> Others = [EBrain.Obdolbs];
+    public static readonly List<EBrain> Others = [EBrain.Obdolbs]; //, EBrain.InfectedSlow];
+
+    public static readonly List<EBrain> Cultists =
+    [
+        EBrain.SectantWarrior,
+        EBrain.SectantPriest,
+        EBrain.SctPredvst,
+        EBrain.PrizrakSt,
+        EBrain.Oni,
+    ];
 
     public static readonly List<EBrain> Bosses =
     [
@@ -142,11 +150,9 @@ public static class AIBrains
         EBrain.Tagilla,
         EBrain.TagillaAgro,
         EBrain.BossTest,
-        //Brain.BossZryachiy,
         EBrain.Gifter,
         EBrain.Killa,
         EBrain.KillaAgro,
-        EBrain.SectantPriest,
         EBrain.BossBoar,
         EBrain.BossKolontay,
         EBrain.BossPartisan,
@@ -161,15 +167,13 @@ public static class AIBrains
         EBrain.FollowerKojaniy,
         EBrain.FollowerSanitar,
         EBrain.TagillaFollower,
-        EBrain.TagillaHelperAgro,
-        //Brain.Fl_Zraychiy,
-        EBrain.FollowerBoar,
-        EBrain.FollowerBoarClose1,
-        EBrain.FollowerBoarClose2,
-        EBrain.BossBoarSniper,
-        EBrain.FollowerKolontayAssault,
-        EBrain.FollowerKolontaySecurity,
+        EBrain.HelperAgro,
+        EBrain.FlBoar,
         EBrain.FlBoarCl,
         EBrain.FlBoarSt,
+        EBrain.FlKlnAslt,
+        EBrain.KolonSec,
     ];
+
+    public static readonly EBrain[] AllBrains = Enum.GetValues(typeof(EBrain)).Cast<EBrain>().ToArray();
 }

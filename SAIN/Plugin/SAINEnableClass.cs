@@ -206,12 +206,10 @@ public static class SAINEnableClass
         {
             return true;
         }
-        // Raiders have the same brain type as PMCs, so I'll need a new solution to have them excluded
-        //if (SAINEnabled.VanillaRaiders &&
-        //    wildSpawnType == WildSpawnType.pmcBot)
-        //{
-        //    return true;
-        //}
+        if (SAINEnabled.VanillaRaiders && wildSpawnType == WildSpawnType.pmcBot)
+        {
+            return true;
+        }
         if (SAINEnabled.VanillaBloodHounds)
         {
             if (wildSpawnType == WildSpawnType.arenaFighter || wildSpawnType == WildSpawnType.arenaFighterEvent)

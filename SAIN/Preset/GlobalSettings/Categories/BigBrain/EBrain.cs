@@ -131,6 +131,8 @@ public static class AIBrains
 
     public static readonly List<EBrain> Goons = [EBrain.Knight, EBrain.BirdEye, EBrain.BigPipe];
 
+    public static readonly List<EBrain> LabyrinthBots = [EBrain.TagillaAgro, EBrain.KillaAgro, EBrain.HelperAgro];
+
     public static readonly List<EBrain> Others = [EBrain.Obdolbs, EBrain.Gifter];
 
     public static readonly List<EBrain> Cultists =
@@ -142,23 +144,21 @@ public static class AIBrains
         EBrain.Oni,
     ];
 
-    public static readonly List<EBrain> Bosses =
+    public static readonly List<EBrain> NormalBosses =
     [
         EBrain.BossBully,
         EBrain.BossGluhar,
         EBrain.BossKojaniy,
         EBrain.BossSanitar,
         EBrain.Tagilla,
-        EBrain.TagillaAgro,
         EBrain.BossTest,
         EBrain.Killa,
-        EBrain.KillaAgro,
         EBrain.BossBoar,
         EBrain.BossKolontay,
         EBrain.BossPartisan,
     ];
 
-    public static readonly List<EBrain> Followers =
+    public static readonly List<EBrain> NormalFollowers =
     [
         EBrain.FollowerBully,
         EBrain.FollowerGluharAssault,
@@ -167,7 +167,6 @@ public static class AIBrains
         EBrain.FollowerKojaniy,
         EBrain.FollowerSanitar,
         EBrain.TagillaFollower,
-        EBrain.HelperAgro,
         EBrain.FlBoar,
         EBrain.FlBoarCl,
         EBrain.FlBoarSt,

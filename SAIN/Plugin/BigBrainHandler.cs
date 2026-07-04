@@ -120,9 +120,10 @@ public static class BigBrainHandler
             AddCustomLayersToRaiders([WildSpawnType.pmcBot]);
             AddCustomLayersToRogues();
             AddCustomLayersToBloodHounds();
-            AddCustomLayersToBosses();
-            AddCustomLayersToFollowers();
+            AddCustomLayersToNormalBosses();
+            AddCustomLayersToNormalFollowers();
             AddCustomLayersToGoons();
+            AddCustomLayersToLabyrinthBots();
             AddCustomLayersToCultists();
             AddCustomLayersToOthers();
 
@@ -137,9 +138,10 @@ public static class BigBrainHandler
             ToggleVanillaLayersForRogues(VanillaBotSettings.VanillaRogues);
             ToggleVanillaLayersForRaiders([WildSpawnType.pmcBot], VanillaBotSettings.VanillaRaiders);
             ToggleVanillaLayersForBloodHounds(VanillaBotSettings.VanillaBloodHounds);
-            ToggleVanillaLayersForBosses(VanillaBotSettings.VanillaBosses);
-            ToggleVanillaLayersForFollowers(VanillaBotSettings.VanillaFollowers);
+            ToggleVanillaLayersForNormalBosses(VanillaBotSettings.VanillaBosses);
+            ToggleVanillaLayersForNormalFollowers(VanillaBotSettings.VanillaFollowers);
             ToggleVanillaLayersForGoons(VanillaBotSettings.VanillaGoons);
+            ToggleVanillaLayersForLaybrinthBots(VanillaBotSettings.VanillaLabyrinthBots);
             ToggleVanillaLayersForCultists(VanillaBotSettings.VanillaCultists);
         }
 
@@ -211,6 +213,20 @@ public static class BigBrainHandler
             ToggleVanillaLayersForRaiders([WildSpawnType.arenaFighterEvent], useVanillaLayers);
         }
 
+        public static void ToggleVanillaLayersForLaybrinthBots(bool useVanillaLayers)
+        {
+            List<string> brainList = GetBrainList(AIBrains.LabyrinthBots);
+
+            List<string> LayersToToggle =
+            [
+                "KillaAgro", // Used by Vengeful Killa
+                "TagillaAgro", // Used by Shadow of Tagilla
+                .. _commonVanillaLayersToRemove,
+            ];
+
+            ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
+        }
+
         public static void ToggleVanillaLayersForCultists(bool useVanillaLayers)
         {
             List<string> brainList = GetBrainList(AIBrains.Cultists);
@@ -229,9 +245,9 @@ public static class BigBrainHandler
             ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
         }
 
-        public static void ToggleVanillaLayersForBosses(bool useVanillaLayers)
+        public static void ToggleVanillaLayersForNormalBosses(bool useVanillaLayers)
         {
-            List<string> brainList = GetBrainList(AIBrains.Bosses);
+            List<string> brainList = GetBrainList(AIBrains.NormalBosses);
 
             List<string> LayersToToggle =
             [
@@ -251,17 +267,15 @@ public static class BigBrainHandler
                 "Bully Layer", // Used by Reshala
                 "KlnSolo", // Used by Kollontay
                 "KolontayFight", // Used by Kollontay
-                "KillaAgro", // Used by Vengeful Killa
-                "TagillaAgro", // Used by Shadow of Tagilla
                 .. _commonVanillaLayersToRemove,
                 .. _commonVanillaBossAndFollowerLayersToRemove,
             ];
             ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
         }
 
-        public static void ToggleVanillaLayersForFollowers(bool useVanillaLayers)
+        public static void ToggleVanillaLayersForNormalFollowers(bool useVanillaLayers)
         {
-            List<string> brainList = GetBrainList(AIBrains.Followers);
+            List<string> brainList = GetBrainList(AIBrains.NormalFollowers);
 
             List<string> LayersToToggle =
             [
@@ -457,6 +471,19 @@ public static class BigBrainHandler
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, settings.SAINCombatSoloLayerPriority);
         }
 
+        private static void AddCustomLayersToLabyrinthBots()
+        {
+            List<string> brainList = GetBrainList(AIBrains.LabyrinthBots);
+            var settings = SAINPlugin.LoadedPreset.GlobalSettings.General.Layers;
+
+            //BrainManager.AddCustomLayer(typeof(BotUnstuckLayer), stringList, 98);
+            BrainManager.AddCustomLayer(typeof(DebugLayer), brainList, 99);
+            BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), brainList, 80);
+            BrainManager.AddCustomLayer(typeof(ExtractLayer), brainList, settings.SAINExtractLayerPriority);
+            BrainManager.AddCustomLayer(typeof(CombatSquadLayer), brainList, settings.SAINCombatSquadLayerPriority);
+            BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, settings.SAINCombatSoloLayerPriority);
+        }
+
         private static void AddCustomLayersToCultists()
         {
             List<string> brainList = GetBrainList(AIBrains.Cultists);
@@ -496,9 +523,9 @@ public static class BigBrainHandler
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, settings.SAINCombatSoloLayerPriority);
         }
 
-        private static void AddCustomLayersToBosses()
+        private static void AddCustomLayersToNormalBosses()
         {
-            List<string> brainList = GetBrainList(AIBrains.Bosses);
+            List<string> brainList = GetBrainList(AIBrains.NormalBosses);
 
             //var settings = SAINPlugin.LoadedPreset.GlobalSettings.General;
             //BrainManager.AddCustomLayer(typeof(BotUnstuckLayer), stringList, 98);
@@ -508,9 +535,9 @@ public static class BigBrainHandler
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, 69);
         }
 
-        private static void AddCustomLayersToFollowers()
+        private static void AddCustomLayersToNormalFollowers()
         {
-            List<string> brainList = GetBrainList(AIBrains.Followers);
+            List<string> brainList = GetBrainList(AIBrains.NormalFollowers);
 
             //var settings = SAINPlugin.LoadedPreset.GlobalSettings.General;
             //BrainManager.AddCustomLayer(typeof(BotUnstuckLayer), stringList, 98);

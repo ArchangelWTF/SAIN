@@ -39,4 +39,8 @@ public class VanillaBotSettings : SAINSettingsBase<VanillaBotSettings>, ISAINSet
     [Name("Vanilla Cultists")]
     [Description("REQUIRES RESTART OF GAME")]
     public bool VanillaCultists = false;
+
+    [Name("Vanilla Labyrinth Bots")]
+    [Description("REQUIRES RESTART OF GAME. Shadow of Tagilla, Vengeful Killa, and their followers on Labyrinth will have vanilla behavior.")]
+    public bool VanillaLabyrinthBots = false;
 }

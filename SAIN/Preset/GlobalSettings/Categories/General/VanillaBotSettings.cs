@@ -11,11 +11,11 @@ public class VanillaBotSettings : SAINSettingsBase<VanillaBotSettings>, ISAINSet
     public bool VanillaScavs = false;
 
     [Name("Vanilla Bosses")]
-    [Description("REQUIRES RESTART OF GAME. Bosses other than the goons will have vanilla ai behavior.")]
+    [Description("REQUIRES RESTART OF GAME. Bosses (other than those with separate config options) will have vanilla ai behavior.")]
     public bool VanillaBosses = false;
 
     [Name("Vanilla Boss Followers")]
-    [Description("REQUIRES RESTART OF GAME. Boss Followers other than the goons will have vanilla ai behavior.")]
+    [Description("REQUIRES RESTART OF GAME. Boss Followers (other than those with separate config options) will have vanilla ai behavior.")]
     public bool VanillaFollowers = false;
 
     [Name("Vanilla Goons")]
@@ -43,4 +43,8 @@ public class VanillaBotSettings : SAINSettingsBase<VanillaBotSettings>, ISAINSet
     [Name("Vanilla Labyrinth Bots")]
     [Description("REQUIRES RESTART OF GAME. Shadow of Tagilla, Vengeful Killa, and their followers on Labyrinth will have vanilla behavior.")]
     public bool VanillaLabyrinthBots = false;
+
+    [Name("Vanilla Special Bots")]
+    [Description("REQUIRES RESTART OF GAME. Obdolbs (crazy) Scavs and Santa will have vanilla behavior.")]
+    public bool VanillaSpecialBots = false;
 }

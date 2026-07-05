@@ -125,10 +125,9 @@ public static class BigBrainHandler
             AddCustomLayersToGoons();
             AddCustomLayersToLabyrinthBots();
             AddCustomLayersToCultists();
-            AddCustomLayersToOthers();
+            AddCustomLayersToSpecialBots();
 
             ToggleVanillaLayersForPMCs(false);
-            ToggleVanillaLayersForOthers(false);
             ToggleVanillaLayersForAllBots();
         }
 
@@ -143,6 +142,7 @@ public static class BigBrainHandler
             ToggleVanillaLayersForGoons(VanillaBotSettings.VanillaGoons);
             ToggleVanillaLayersForLaybrinthBots(VanillaBotSettings.VanillaLabyrinthBots);
             ToggleVanillaLayersForCultists(VanillaBotSettings.VanillaCultists);
+            ToggleVanillaLayersForSpecialBots(VanillaBotSettings.VanillaSpecialBots);
         }
 
         public static void ToggleVanillaLayersForScavs(bool useVanillaLayers)
@@ -174,9 +174,9 @@ public static class BigBrainHandler
             ToggleVanillaLayers(brainList, LayersToToggle, roles, useVanillaLayers);
         }
 
-        public static void ToggleVanillaLayersForOthers(bool useVanillaLayers)
+        public static void ToggleVanillaLayersForSpecialBots(bool useVanillaLayers)
         {
-            List<string> brainList = GetBrainList(AIBrains.Others);
+            List<string> brainList = GetBrainList(AIBrains.SpecialBots);
 
             List<string> LayersToToggle =
             [
@@ -458,9 +458,9 @@ public static class BigBrainHandler
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), raiderBrain, settings.SAINCombatSoloLayerPriority, roles);
         }
 
-        private static void AddCustomLayersToOthers()
+        private static void AddCustomLayersToSpecialBots()
         {
-            List<string> brainList = GetBrainList(AIBrains.Others);
+            List<string> brainList = GetBrainList(AIBrains.SpecialBots);
 
             var settings = SAINPlugin.LoadedPreset.GlobalSettings.General.Layers;
             //BrainManager.AddCustomLayer(typeof(BotUnstuckLayer), stringList, 98);
@@ -488,13 +488,12 @@ public static class BigBrainHandler
         {
             List<string> brainList = GetBrainList(AIBrains.Cultists);
 
-            var settings = SAINPlugin.LoadedPreset.GlobalSettings.General.Layers;
-            //BrainManager.AddCustomLayer(typeof(BotUnstuckLayer), stringList, 98);
-            BrainManager.AddCustomLayer(typeof(DebugLayer), brainList, 99);
-            BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), brainList, 80);
-            BrainManager.AddCustomLayer(typeof(ExtractLayer), brainList, settings.SAINExtractLayerPriority);
-            BrainManager.AddCustomLayer(typeof(CombatSquadLayer), brainList, settings.SAINCombatSquadLayerPriority);
-            BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, settings.SAINCombatSoloLayerPriority);
+            //BrainManager.AddCustomLayer(typeof(BotUnstuckLayer), stringList, 146);
+            BrainManager.AddCustomLayer(typeof(DebugLayer), brainList, 150);
+            BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), brainList, 118);
+            BrainManager.AddCustomLayer(typeof(ExtractLayer), brainList, 108);
+            BrainManager.AddCustomLayer(typeof(CombatSquadLayer), brainList, 104);
+            BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, 102);
         }
 
         private static void AddCustomLayersToRogues()

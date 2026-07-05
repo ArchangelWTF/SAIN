@@ -164,11 +164,16 @@ public static class SAINEnableClass
 
     public static bool ShallExludeByWildSpawnType(WildSpawnType wildSpawnType, BotOwner botOwner)
     {
-        return ExcludeOthers(wildSpawnType)
-            || ExcludeScav(wildSpawnType, botOwner)
-            || ExcludeBoss(wildSpawnType)
-            || ExcludeFollower(wildSpawnType)
-            || ExcludeGoons(wildSpawnType);
+        return ExcludeScav(wildSpawnType, botOwner)
+            || ExcludeNormalBoss(wildSpawnType)
+            || ExcludeNormalFollower(wildSpawnType)
+            || ExcludeGoons(wildSpawnType)
+            || ExcludeCultists(wildSpawnType)
+            || ExcludeRogues(wildSpawnType)
+            || ExcludeRaiders(wildSpawnType)
+            || ExcludeBloodHounds(wildSpawnType)
+            || ExcludeLabyrinthBots(wildSpawnType)
+            || ExcludeSpecialBots(wildSpawnType);
     }
 
     private static bool IsAlwaysEnabled(WildSpawnType wildSpawnType, BotOwner botOwner)
@@ -176,9 +181,19 @@ public static class SAINEnableClass
         return wildSpawnType.IsPmcBot() || BotManagerComponent.Instance?.Bots?.ContainsKey(botOwner.ProfileId) == true;
     }
 
-    private static bool ExcludeBoss(WildSpawnType wildSpawnType)
+    private static bool ExcludeScav(WildSpawnType wildSpawnType, BotOwner botOwner)
     {
-        return SAINEnabled.VanillaBosses && !WildSpawn.IsGoons(wildSpawnType) && wildSpawnType.IsBoss();
+        return SAINEnabled.VanillaScavs && WildSpawn.IsScav(wildSpawnType) && !IsPlayerScav(botOwner.Profile);
+    }
+
+    private static bool ExcludeNormalBoss(WildSpawnType wildSpawnType)
+    {
+        return SAINEnabled.VanillaBosses && WildSpawn.IsNormalBoss(wildSpawnType);
+    }
+
+    private static bool ExcludeNormalFollower(WildSpawnType wildSpawnType)
+    {
+        return SAINEnabled.VanillaFollowers && WildSpawn.IsNormalFollower(wildSpawnType);
     }
 
     private static bool ExcludeGoons(WildSpawnType wildSpawnType)
@@ -186,38 +201,34 @@ public static class SAINEnableClass
         return SAINEnabled.VanillaGoons && WildSpawn.IsGoons(wildSpawnType);
     }
 
-    private static bool ExcludeFollower(WildSpawnType wildSpawnType)
+    private static bool ExcludeCultists(WildSpawnType wildSpawnType)
     {
-        return SAINEnabled.VanillaFollowers && !WildSpawn.IsGoons(wildSpawnType) && wildSpawnType.IsFollower();
+        return SAINEnabled.VanillaCultists && wildSpawnType.IsSectant();
     }
 
-    private static bool ExcludeScav(WildSpawnType wildSpawnType, BotOwner botOwner)
+    private static bool ExcludeRogues(WildSpawnType wildSpawnType)
     {
-        return SAINEnabled.VanillaScavs && WildSpawn.IsScav(wildSpawnType) && !IsPlayerScav(botOwner.Profile);
+        return SAINEnabled.VanillaRogues && wildSpawnType == WildSpawnType.exUsec;
     }
 
-    private static bool ExcludeOthers(WildSpawnType wildSpawnType)
+    private static bool ExcludeRaiders(WildSpawnType wildSpawnType)
     {
-        if (SAINEnabled.VanillaCultists && wildSpawnType.IsSectant())
-        {
-            return true;
-        }
-        if (SAINEnabled.VanillaRogues && wildSpawnType == WildSpawnType.exUsec)
-        {
-            return true;
-        }
-        if (SAINEnabled.VanillaRaiders && wildSpawnType == WildSpawnType.pmcBot)
-        {
-            return true;
-        }
-        if (SAINEnabled.VanillaBloodHounds)
-        {
-            if (wildSpawnType == WildSpawnType.arenaFighter || wildSpawnType == WildSpawnType.arenaFighterEvent)
-            {
-                return true;
-            }
-        }
-        return false;
+        return SAINEnabled.VanillaRaiders && wildSpawnType == WildSpawnType.pmcBot;
+    }
+
+    private static bool ExcludeBloodHounds(WildSpawnType wildSpawnType)
+    {
+        return SAINEnabled.VanillaBloodHounds && (wildSpawnType == WildSpawnType.arenaFighter || wildSpawnType == WildSpawnType.arenaFighterEvent);
+    }
+
+    private static bool ExcludeLabyrinthBots(WildSpawnType wildSpawnType)
+    {
+        return SAINEnabled.VanillaLabyrinthBots && WildSpawn.IsLabyrinthBot(wildSpawnType);
+    }
+
+    private static bool ExcludeSpecialBots(WildSpawnType wildSpawnType)
+    {
+        return SAINEnabled.VanillaSpecialBots && WildSpawn.IsSpecialBot(wildSpawnType);
     }
 
     public static bool IsPlayerScav(Profile profile)

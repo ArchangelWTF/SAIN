@@ -133,7 +133,7 @@ public static class AIBrains
 
     public static readonly List<EBrain> LabyrinthBots = [EBrain.TagillaAgro, EBrain.KillaAgro, EBrain.HelperAgro];
 
-    public static readonly List<EBrain> Others = [EBrain.Obdolbs, EBrain.Gifter];
+    public static readonly List<EBrain> SpecialBots = [EBrain.Obdolbs, EBrain.Gifter];
 
     public static readonly List<EBrain> Cultists =
     [

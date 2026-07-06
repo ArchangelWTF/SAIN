@@ -18,17 +18,37 @@ public static class BigBrainHandler
 
     private static readonly string[] _commonVanillaLayersToRemove =
     [
-        "Help",
+        //"FightReqNull",
+        //"PeacecReqNull",
+        //"Follow Player",
+        //"HideHW", // Used by Scavs, Raiders, and Bloodhounds when zombies spawn
+        //"Khorovod",
+        //"GeneratorDef", // Used by Scavs and Killa
+        "GroupForce", // Used by Cursed Scavs, Rogues, and Oni (event) Cultist
         "AdvAssaultTarget",
-        "AssaultEnemyFar",
-        "Hit",
         "Simple Target",
-        "Pmc",
+        "Pmc", // Used by Raiders, Bloodhounds, and Scav groups
         "AssaultHaveEnemy",
-        "Assault Building",
-        "Enemy Building",
-        "PushAndSup",
+        "PushAndSup", // Used by Scavs and Shadow of Tagilla's followers
         "Pursuit",
+        "Kill logic",
+    ];
+
+    private static readonly string[] _commonVanillaBossAndFollowerLayersToRemove =
+    [
+        //"ExURequest", // Used by Rogues and Kaban's followers to warn neutral players/bots
+        "BirdEyeFight", // Used by Birdeye and Ghost (event) Cultist
+        "BossSanitarFight", // Used by Sanitar and Harbinger (event) Cultist
+        "SanitarGoal", // Used by Sanitar and his followers
+        "TagillaAmbush", // Used by Tagilla and his followers
+        "TagillaMain", // Used by Tagilla and his followers
+        "BoarGrenadeDanger", // Used by Kaban and his followers
+        "HoldOrCoverF", // Used by Cultists and Gluhar's followers
+        "SecurityGluhar", // Used by Gluhar and his followers
+        "HoldNearBoss", // Used by Gluhar's and Kollontay's followers
+        "Kln_NIMH", // Used by Kollontay and his followers
+        "KlnTrg", // Used by Kollontay and his followers
+        "Kojaniy Target", // Used by Shturman and his followers
     ];
 
     private static readonly List<Type> _SAINLayers = [];
@@ -100,13 +120,14 @@ public static class BigBrainHandler
             AddCustomLayersToRaiders([WildSpawnType.pmcBot]);
             AddCustomLayersToRogues();
             AddCustomLayersToBloodHounds();
-            AddCustomLayersToBosses();
-            AddCustomLayersToFollowers();
+            AddCustomLayersToNormalBosses();
+            AddCustomLayersToNormalFollowers();
             AddCustomLayersToGoons();
-            AddCustomLayersToOthers();
+            AddCustomLayersToLabyrinthBots();
+            AddCustomLayersToCultists();
+            AddCustomLayersToSpecialBots();
 
             ToggleVanillaLayersForPMCs(false);
-            ToggleVanillaLayersForOthers(false);
             ToggleVanillaLayersForAllBots();
         }
 
@@ -114,35 +135,14 @@ public static class BigBrainHandler
         {
             ToggleVanillaLayersForScavs(VanillaBotSettings.VanillaScavs);
             ToggleVanillaLayersForRogues(VanillaBotSettings.VanillaRogues);
-            ToggleVanillaLayersForRaiders([WildSpawnType.pmcBot], false); // _vanillaBotSettings.VanillaRaiders);
+            ToggleVanillaLayersForRaiders([WildSpawnType.pmcBot], VanillaBotSettings.VanillaRaiders);
             ToggleVanillaLayersForBloodHounds(VanillaBotSettings.VanillaBloodHounds);
-            ToggleVanillaLayersForBosses(VanillaBotSettings.VanillaBosses);
-            ToggleVanillaLayersForFollowers(VanillaBotSettings.VanillaFollowers);
+            ToggleVanillaLayersForNormalBosses(VanillaBotSettings.VanillaBosses);
+            ToggleVanillaLayersForNormalFollowers(VanillaBotSettings.VanillaFollowers);
             ToggleVanillaLayersForGoons(VanillaBotSettings.VanillaGoons);
-        }
-
-        public static void ToggleVanillaLayersForPMCs(bool useVanillaLayers)
-        {
-            List<string> brainList = GetBrainList(AIBrains.PMCs);
-
-            List<string> LayersToToggle =
-            [
-                "Request",
-                //"FightReqNull",
-                //"PeacecReqNull",
-                "KnightFight",
-                //"PtrlBirdEye",
-                "PmcBear",
-                "PmcUsec",
-                .. _commonVanillaLayersToRemove,
-            ];
-
-            ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
-
-            if (INCLUDE_RAIDER_BRAIN_FOR_PMCS)
-            {
-                ToggleVanillaLayersForRaiders([WildSpawnType.pmcBEAR, WildSpawnType.pmcUSEC], useVanillaLayers);
-            }
+            ToggleVanillaLayersForLaybrinthBots(VanillaBotSettings.VanillaLabyrinthBots);
+            ToggleVanillaLayersForCultists(VanillaBotSettings.VanillaCultists);
+            ToggleVanillaLayersForSpecialBots(VanillaBotSettings.VanillaSpecialBots);
         }
 
         public static void ToggleVanillaLayersForScavs(bool useVanillaLayers)
@@ -151,10 +151,8 @@ public static class BigBrainHandler
 
             List<string> LayersToToggle =
             [
-                //"FightReqNull",
-                //"PeacecReqNull",
-                "PmcBear",
-                "PmcUsec",
+                "Help",
+                "AssaultEnemyFar",
                 .. _commonVanillaLayersToRemove,
             ];
 
@@ -169,24 +167,22 @@ public static class BigBrainHandler
 
             List<string> LayersToToggle =
             [
-                "Request",
-                //"FightReqNull",
-                //"PeacecReqNull",
-                "KnightFight",
-                //"PtrlBirdEye",
-                "PmcBear",
-                "PmcUsec",
+                "AssaultEnemyFar", // Used by Raiders and Scav groups
                 .. _commonVanillaLayersToRemove,
             ];
 
             ToggleVanillaLayers(brainList, LayersToToggle, roles, useVanillaLayers);
         }
 
-        public static void ToggleVanillaLayersForOthers(bool useVanillaLayers)
+        public static void ToggleVanillaLayersForSpecialBots(bool useVanillaLayers)
         {
-            List<string> brainList = GetBrainList(AIBrains.Others);
+            List<string> brainList = GetBrainList(AIBrains.SpecialBots);
 
-            List<string> LayersToToggle = ["Request", "KnightFight", "PmcBear", "PmcUsec", .. _commonVanillaLayersToRemove];
+            List<string> LayersToToggle =
+            [
+                "ObdolbosFight", // Used by crazy event Scavs
+                .. _commonVanillaLayersToRemove,
+            ];
 
             ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
         }
@@ -197,13 +193,6 @@ public static class BigBrainHandler
 
             List<string> LayersToToggle =
             [
-                "Request",
-                //"FightReqNull",
-                //"PeacecReqNull",
-                "KnightFight",
-                //"PtrlBirdEye",
-                "PmcBear",
-                "PmcUsec",
                 .. _commonVanillaLayersToRemove,
             ];
 
@@ -216,59 +205,97 @@ public static class BigBrainHandler
 
             List<string> LayersToToggle =
             [
-                "Request",
-                //"FightReqNull",
-                //"PeacecReqNull",
-                "KnightFight",
-                //"PtrlBirdEye",
-                "PmcBear",
-                "PmcUsec",
+                .. _commonVanillaLayersToRemove,
+            ];
+
+            ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
+
+            ToggleVanillaLayersForRaiders([WildSpawnType.arenaFighterEvent], useVanillaLayers);
+        }
+
+        public static void ToggleVanillaLayersForLaybrinthBots(bool useVanillaLayers)
+        {
+            List<string> brainList = GetBrainList(AIBrains.LabyrinthBots);
+
+            List<string> LayersToToggle =
+            [
+                "KillaAgro", // Used by Vengeful Killa
+                "TagillaAgro", // Used by Shadow of Tagilla
                 .. _commonVanillaLayersToRemove,
             ];
 
             ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
         }
 
-        public static void ToggleVanillaLayersForBosses(bool useVanillaLayers)
+        public static void ToggleVanillaLayersForCultists(bool useVanillaLayers)
         {
-            List<string> brainList = GetBrainList(AIBrains.Bosses);
+            List<string> brainList = GetBrainList(AIBrains.Cultists);
 
             List<string> LayersToToggle =
             [
-                "KnightFight",
-                "BirdEyeFight",
-                "BossBoarFight",
-                "BossGlFight",
-                "PrtFight",
-                "KojaniyB_Enemy",
-                "Bully Layer",
-                "KlnSolo",
-                "KolontayFight",
-                "KlnTrg",
-                "BossSanitarFight",
+                //"GrenSuicide", // Used by Cultist priests
+                "Run&Strike", // Used by Cultist followers
+                "MeleeS_IN", // Used by Cultist followers
+                "R&H_OUT", // Used by Cultist priests
+                "SupShootSect_IN", // Used by Cultist followers
                 .. _commonVanillaLayersToRemove,
+                .. _commonVanillaBossAndFollowerLayersToRemove,
+            ];
+
+            ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
+        }
+
+        public static void ToggleVanillaLayersForNormalBosses(bool useVanillaLayers)
+        {
+            List<string> brainList = GetBrainList(AIBrains.NormalBosses);
+
+            List<string> LayersToToggle =
+            [
+                //"PartisanMine", // Used by Partisan
+                //"PartMineAll", // Used by Partisan
+                "PrtFMN", // Used by Partisan
+                "PrtPst", // Used by Partisan
+                "PrtZrSvg", // Used by Partisan
+                "PrtFight", // Used by Partisan
+                "PrtBadTrg", // Used by Partisan
+                "PrtMany", // Used by Partisan
+                "PrtStalk", // Used by Partisan
+                "HoldOrCoverT", // Used by Partisan
+                "BossBoarFight", // Used by Kaban
+                "BossGlFight", // Used by Gluhar
+                "KojaniyB_Enemy", // Used by Shturman
+                "Bully Layer", // Used by Reshala
+                "KlnSolo", // Used by Kollontay
+                "KolontayFight", // Used by Kollontay
+                .. _commonVanillaLayersToRemove,
+                .. _commonVanillaBossAndFollowerLayersToRemove,
             ];
             ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
         }
 
-        public static void ToggleVanillaLayersForFollowers(bool useVanillaLayers)
+        public static void ToggleVanillaLayersForNormalFollowers(bool useVanillaLayers)
         {
-            List<string> brainList = GetBrainList(AIBrains.Followers);
+            List<string> brainList = GetBrainList(AIBrains.NormalFollowers);
 
             List<string> LayersToToggle =
             [
-                "KnightFight",
-                "BoarGrenadeDanger",
-                "FBoarFght",
-                "SecurityKln",
-                "Kln_NIMH",
-                "FolKojEnemy",
-                "KlnForceAtk",
-                "KolontayAP",
-                "GluhAssKilla",
-                "KlnTrg",
-                "FlSanFight",
+                "BoarStationary", // Used by Kaban's followers
+                "BoarPatrol", // Used by Kaban's followers
+                "BoarClPatrol", // Used by Kaban's followers
+                "FBoarFght", // Used by Kaban's followers
+                "SecurityKln", // Used by Kollontay's followers
+                "KlnForceAtk", // Used by Kollontay's followers
+                "KolontayAP", // Used by Kollontay's followers
+                "FolKojEnemy", // Used by Shturman's followers
+                "GluharKilla", // Used by Gluhar's followers
+                "GluhAssKilla", // Used by Gluhar's followers
+                "FlGlScout", // Used by Gluhar's followers
+                "GlGoal", // Used by Gluhar's followers
+                "FlSanFight", // Used by Sanitar's followers
+                "TagillaFollower", // Used by Tagilla's followers
+                "Follower bully", // Used by Reshala's followers
                 .. _commonVanillaLayersToRemove,
+                .. _commonVanillaBossAndFollowerLayersToRemove,
             ];
 
             ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
@@ -280,15 +307,34 @@ public static class BigBrainHandler
 
             List<string> LayersToToggle =
             [
-                //"FightReqNull",
-                //"PeacecReqNull",
-                "KnightFight",
-                "BirdEyeFight",
-                "Kill logic",
+                "KnightFight", // Used by Knight
+                "Assault Building", // Used by Knight, Big Pipe, and Birdeye
+                "Enemy Building", // Used by Knight, Big Pipe, and Birdeye
+                "BirdHold", // Used by Birdeye
+                .. _commonVanillaLayersToRemove,
+                .. _commonVanillaBossAndFollowerLayersToRemove,
+            ];
+
+            ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
+        }
+
+        public static void ToggleVanillaLayersForPMCs(bool useVanillaLayers)
+        {
+            List<string> brainList = GetBrainList(AIBrains.PMCs);
+
+            List<string> LayersToToggle =
+            [
+                "PmcBear",
+                "PmcUsec",
                 .. _commonVanillaLayersToRemove,
             ];
 
             ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
+
+            if (INCLUDE_RAIDER_BRAIN_FOR_PMCS)
+            {
+                ToggleVanillaLayersForRaiders([WildSpawnType.pmcBEAR, WildSpawnType.pmcUSEC], useVanillaLayers);
+            }
         }
 
         public static void ToggleVanillaLayersForBrains(List<string> brainList, List<string> layersToToggle, bool useVanillaLayers)
@@ -412,9 +458,9 @@ public static class BigBrainHandler
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), raiderBrain, settings.SAINCombatSoloLayerPriority, roles);
         }
 
-        private static void AddCustomLayersToOthers()
+        private static void AddCustomLayersToSpecialBots()
         {
-            List<string> brainList = GetBrainList(AIBrains.Others);
+            List<string> brainList = GetBrainList(AIBrains.SpecialBots);
 
             var settings = SAINPlugin.LoadedPreset.GlobalSettings.General.Layers;
             //BrainManager.AddCustomLayer(typeof(BotUnstuckLayer), stringList, 98);
@@ -423,6 +469,31 @@ public static class BigBrainHandler
             BrainManager.AddCustomLayer(typeof(ExtractLayer), brainList, settings.SAINExtractLayerPriority);
             BrainManager.AddCustomLayer(typeof(CombatSquadLayer), brainList, settings.SAINCombatSquadLayerPriority);
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, settings.SAINCombatSoloLayerPriority);
+        }
+
+        private static void AddCustomLayersToLabyrinthBots()
+        {
+            List<string> brainList = GetBrainList(AIBrains.LabyrinthBots);
+            var settings = SAINPlugin.LoadedPreset.GlobalSettings.General.Layers;
+
+            //BrainManager.AddCustomLayer(typeof(BotUnstuckLayer), stringList, 98);
+            BrainManager.AddCustomLayer(typeof(DebugLayer), brainList, 99);
+            BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), brainList, 80);
+            BrainManager.AddCustomLayer(typeof(ExtractLayer), brainList, settings.SAINExtractLayerPriority);
+            BrainManager.AddCustomLayer(typeof(CombatSquadLayer), brainList, settings.SAINCombatSquadLayerPriority);
+            BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, settings.SAINCombatSoloLayerPriority);
+        }
+
+        private static void AddCustomLayersToCultists()
+        {
+            List<string> brainList = GetBrainList(AIBrains.Cultists);
+
+            //BrainManager.AddCustomLayer(typeof(BotUnstuckLayer), stringList, 146);
+            BrainManager.AddCustomLayer(typeof(DebugLayer), brainList, 150);
+            BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), brainList, 118);
+            BrainManager.AddCustomLayer(typeof(ExtractLayer), brainList, 108);
+            BrainManager.AddCustomLayer(typeof(CombatSquadLayer), brainList, 104);
+            BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, 102);
         }
 
         private static void AddCustomLayersToRogues()
@@ -451,9 +522,9 @@ public static class BigBrainHandler
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, settings.SAINCombatSoloLayerPriority);
         }
 
-        private static void AddCustomLayersToBosses()
+        private static void AddCustomLayersToNormalBosses()
         {
-            List<string> brainList = GetBrainList(AIBrains.Bosses);
+            List<string> brainList = GetBrainList(AIBrains.NormalBosses);
 
             //var settings = SAINPlugin.LoadedPreset.GlobalSettings.General;
             //BrainManager.AddCustomLayer(typeof(BotUnstuckLayer), stringList, 98);
@@ -463,9 +534,9 @@ public static class BigBrainHandler
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, 69);
         }
 
-        private static void AddCustomLayersToFollowers()
+        private static void AddCustomLayersToNormalFollowers()
         {
-            List<string> brainList = GetBrainList(AIBrains.Followers);
+            List<string> brainList = GetBrainList(AIBrains.NormalFollowers);
 
             //var settings = SAINPlugin.LoadedPreset.GlobalSettings.General;
             //BrainManager.AddCustomLayer(typeof(BotUnstuckLayer), stringList, 98);

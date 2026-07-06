@@ -39,6 +39,26 @@ internal static class EnumValues
             return Goons.Contains(type);
         }
 
+        public static bool IsNormalBoss(WildSpawnType type)
+        {
+            return NormalBosses.Contains(type);
+        }
+
+        public static bool IsNormalFollower(WildSpawnType type)
+        {
+            return NormalFollowers.Contains(type);
+        }
+
+        public static bool IsLabyrinthBot(WildSpawnType type)
+        {
+            return LabyrinthBots.Contains(type);
+        }
+
+        public static bool IsSpecialBot(WildSpawnType type)
+        {
+            return SpecialBots.Contains(type);
+        }
+
         public static WildSpawnType[] Scavs =
         [
             WildSpawnType.assault,
@@ -50,8 +70,42 @@ internal static class EnumValues
 
         public static WildSpawnType[] Goons = [WildSpawnType.bossKnight, WildSpawnType.followerBigPipe, WildSpawnType.followerBirdEye];
 
+        public static WildSpawnType[] LabyrinthBots = [WildSpawnType.bossTagillaAgro, WildSpawnType.bossKillaAgro, WildSpawnType.tagillaHelperAgro];
+
+        public static WildSpawnType[] SpecialBots = [WildSpawnType.crazyAssaultEvent, WildSpawnType.gifter];
+
         public static List<WildSpawnType> Bosses;
         public static List<WildSpawnType> Followers;
+
+        public static WildSpawnType[] NormalBosses =
+        [
+            WildSpawnType.bossBully,
+            WildSpawnType.bossGluhar,
+            WildSpawnType.bossKojaniy,
+            WildSpawnType.bossSanitar,
+            WildSpawnType.bossTagilla,
+            WildSpawnType.bossTest,
+            WildSpawnType.bossKilla,
+            WildSpawnType.bossBoar,
+            WildSpawnType.bossKolontay,
+            WildSpawnType.bossPartisan
+        ];
+
+        public static WildSpawnType[] NormalFollowers =
+        [
+            WildSpawnType.followerBully,
+            WildSpawnType.followerGluharAssault,
+            WildSpawnType.followerGluharSecurity,
+            WildSpawnType.followerGluharScout,
+            WildSpawnType.followerKojaniy,
+            WildSpawnType.followerSanitar,
+            WildSpawnType.followerTagilla,
+            WildSpawnType.followerBoar,
+            WildSpawnType.followerBoarClose1,
+            WildSpawnType.followerBoarClose2,
+            WildSpawnType.followerKolontayAssault,
+            WildSpawnType.followerKolontaySecurity
+        ];
     }
 
     public static T Parse<T>(string value)

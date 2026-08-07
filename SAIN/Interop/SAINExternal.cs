@@ -251,7 +251,7 @@ public static class SAINExternal
             reason = ECombatReason.EnemyHeardRecently;
             return true;
         }
-        BotMemoryClass memory = component.BotOwner.Memory;
+        BotMemory memory = component.BotOwner.Memory;
         if (memory.IsUnderFire)
         {
             reason = ECombatReason.UnderFireNow;

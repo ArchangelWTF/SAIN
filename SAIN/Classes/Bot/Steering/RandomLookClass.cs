@@ -70,7 +70,7 @@ public class RandomLookClass : BotSubClass<SAINSteeringClass>
         const int MaxIterations = 6;
         const float RaycastDistance = 12f;
 
-        LayerMask Mask = LayerMaskClass.HighPolyWithTerrainMaskAI;
+        LayerMask Mask = LayersMaskController.HighPolyWithTerrainMaskAI;
         var headPos = Bot.Transform.EyePosition;
 
         bool randomDirFound = false;

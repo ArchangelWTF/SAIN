@@ -9,9 +9,9 @@ using SAIN.Components.PlayerComponentSpace;
 using SAIN.Helpers;
 using SPT.Reflection.Patching;
 using UnityEngine;
-using FoodAndMedsEquipCallbackType = GInterface203;
-using QuickGrenadeUseCallbackType = GInterface206;
-using SetInHandsMedsStruct = GStruct382<EBodyPart>;
+using FoodAndMedsEquipCallbackType = EFT.IMedsController;
+using QuickGrenadeUseCallbackType = EFT.IQuickGrenadeThrowController;
+using SetInHandsMedsStruct = EFT.NetworkPackets.OneAndList<EBodyPart>;
 
 namespace SAIN.Patches.Generic
 {
@@ -93,12 +93,12 @@ namespace SAIN.Patches.Generic
         {
             protected override MethodBase GetTargetMethod()
             {
-                System.Type[] Params = [typeof(ThrowWeapItemClass), typeof(Callback<IHandsThrowController>)];
+                System.Type[] Params = [typeof(ThrowWeap), typeof(Callback<IGrenadeController>)];
                 return AccessTools.Method(typeof(Player), nameof(Player.SetInHands), Params);
             }
 
             [PatchPrefix]
-            public static void PatchPrefix(Player __instance, ThrowWeapItemClass throwWeap)
+            public static void PatchPrefix(Player __instance, ThrowWeap throwWeap)
             {
                 float range = SAINPlugin.LoadedPreset.GlobalSettings.Hearing.BaseSoundRange_GrenadePinDraw;
                 BotManagerComponent.Instance?.BotHearing.PlayAISound(
@@ -118,7 +118,7 @@ namespace SAIN.Patches.Generic
             {
                 System.Type[] Params =
                 [
-                    typeof(FoodDrinkItemClass),
+                    typeof(FoodDrink),
                     typeof(float),
                     typeof(int),
                     typeof(Callback<FoodAndMedsEquipCallbackType>),
@@ -127,7 +127,7 @@ namespace SAIN.Patches.Generic
             }
 
             [PatchPrefix]
-            public static void PatchPrefix(Player __instance, FoodDrinkItemClass foodDrink)
+            public static void PatchPrefix(Player __instance, FoodDrink foodDrink)
             {
                 float range = SAINPlugin.LoadedPreset.GlobalSettings.Hearing.BaseSoundRange_EatDrink;
                 BotManagerComponent.Instance?.BotHearing.PlayAISound(
@@ -147,7 +147,7 @@ namespace SAIN.Patches.Generic
             {
                 System.Type[] Params =
                 [
-                    typeof(MedsItemClass),
+                    typeof(Meds),
                     typeof(EBodyPart),
                     typeof(int),
                     typeof(Callback<FoodAndMedsEquipCallbackType>),
@@ -156,7 +156,7 @@ namespace SAIN.Patches.Generic
             }
 
             [PatchPrefix]
-            public static void PatchPrefix(MedsItemClass meds, Player __instance)
+            public static void PatchPrefix(Meds meds, Player __instance)
             {
                 SAINSoundType soundType;
                 float range;
@@ -181,7 +181,7 @@ namespace SAIN.Patches.Generic
             {
                 System.Type[] Params =
                 [
-                    typeof(MedsItemClass),
+                    typeof(Meds),
                     typeof(SetInHandsMedsStruct),
                     typeof(int),
                     typeof(Callback<FoodAndMedsEquipCallbackType>),
@@ -190,7 +190,7 @@ namespace SAIN.Patches.Generic
             }
 
             [PatchPrefix]
-            public static void PatchPrefix(MedsItemClass meds, Player __instance)
+            public static void PatchPrefix(Meds meds, Player __instance)
             {
                 SAINSoundType soundType;
                 float range;
@@ -213,7 +213,7 @@ namespace SAIN.Patches.Generic
         {
             protected override MethodBase GetTargetMethod()
             {
-                System.Type[] Params = [typeof(Item), typeof(Callback<IOnHandsUseCallback>)];
+                System.Type[] Params = [typeof(Item), typeof(Callback<IQuickUseItem>)];
                 return AccessTools.Method(typeof(Player), nameof(Player.SetInHandsForQuickUse), Params);
             }
 
@@ -228,12 +228,12 @@ namespace SAIN.Patches.Generic
         {
             protected override MethodBase GetTargetMethod()
             {
-                System.Type[] Params = [typeof(ThrowWeapItemClass), typeof(Callback<QuickGrenadeUseCallbackType>)];
+                System.Type[] Params = [typeof(ThrowWeap), typeof(Callback<QuickGrenadeUseCallbackType>)];
                 return AccessTools.Method(typeof(Player), nameof(Player.SetInHandsForQuickUse), Params);
             }
 
             [PatchPrefix]
-            public static void PatchPrefix(ThrowWeapItemClass throwWeap, Player __instance)
+            public static void PatchPrefix(ThrowWeap throwWeap, Player __instance)
             {
                 Helpers.SetItemEquiped(__instance, throwWeap);
             }
@@ -280,13 +280,13 @@ namespace SAIN.Patches.Generic
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(GClass84), nameof(GClass84.method_13));
+            return AccessTools.Method(typeof(FightRequestLayer), nameof(FightRequestLayer.HaveRequests));
         }
 
         [PatchPrefix]
-        public static bool Patch(GClass84 __instance, ref bool __result)
+        public static bool Patch(FightRequestLayer __instance, ref bool __result)
         {
-            var request = __instance.BotOwner_0.BotRequestController.CurRequest;
+            var request = __instance._owner.BotRequestController.CurRequest;
             if (request == null)
             {
                 __result = false;
@@ -295,7 +295,7 @@ namespace SAIN.Patches.Generic
             if (
                 request.Requester != null
                 && request.Requester.IsAI
-                && SAINEnableClass.GetSAIN(__instance.BotOwner_0.ProfileId, out var sain)
+                && SAINEnableClass.GetSAIN(__instance._owner.ProfileId, out var sain)
                 && sain.SAINLayersActive
             )
             {
@@ -310,11 +310,11 @@ namespace SAIN.Patches.Generic
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(GClass591), nameof(GClass591.SetEnvironment));
+            return AccessTools.Method(typeof(StubAIData), nameof(StubAIData.SetEnvironment));
         }
 
         [PatchPostfix]
-        public static void Patch(GClass591 __instance, IndoorTrigger trigger)
+        public static void Patch(StubAIData __instance, IndoorTrigger trigger)
         {
             BotManagerComponent.Instance?.PlayerEnviromentChanged(__instance?.Player?.ProfileId, trigger);
         }
@@ -343,13 +343,13 @@ namespace SAIN.Patches.Generic
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(BotMemoryClass), nameof(BotMemoryClass.SetPanicPoint));
+            return AccessTools.Method(typeof(BotMemory), nameof(BotMemory.SetPanicPoint));
         }
 
         [PatchPrefix]
-        public static bool PatchPrefix(BotMemoryClass __instance)
+        public static bool PatchPrefix(BotMemory __instance)
         {
-            return !SAINEnableClass.GetSAIN(__instance.BotOwner_0.ProfileId, out _);
+            return !SAINEnableClass.GetSAIN(__instance._owner.ProfileId, out _);
         }
     }
 
@@ -389,7 +389,7 @@ namespace SAIN.Patches.Generic
         public static void PatchPrefix(BotWeaponSelector __instance)
         {
             // Try to turn a gun's light off before swapping weapon.
-            __instance.BotOwner_0?.BotLight?.TurnOff(false, true);
+            __instance._owner?.BotLight?.TurnOff(false, true);
         }
     }
 
@@ -435,7 +435,7 @@ namespace SAIN.Patches.Generic
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(BotsController), nameof(BotsController.method_5));
+            return AccessTools.Method(typeof(BotsController), nameof(BotsController.OnGrenadeThrow));
         }
 
         [PatchPrefix]
@@ -457,7 +457,7 @@ namespace SAIN.Patches.Generic
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(BotsController), nameof(BotsController.method_3));
+            return AccessTools.Method(typeof(BotsController), nameof(BotsController.OnGrenadeExplosive));
         }
 
         [PatchPrefix]
@@ -475,13 +475,13 @@ namespace SAIN.Patches.Generic
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(BotReceiver), nameof(BotReceiver.method_5));
+            return AccessTools.Method(typeof(BotReceiver), nameof(BotReceiver.CanApply));
         }
 
         [PatchPrefix]
         public static bool Patch(BotReceiver __instance, IPlayer player)
         {
-            if (!SAINEnableClass.IsBotInCombat(__instance.BotOwner_0))
+            if (!SAINEnableClass.IsBotInCombat(__instance._owner))
             {
                 return true;
             }
@@ -505,7 +505,7 @@ namespace SAIN.Patches.Generic
         [PatchPrefix]
         public static bool Patch(BotRequestController __instance, Player targetToThrow, ref bool __result)
         {
-            if (!SAINEnableClass.IsBotInCombat(__instance.Owner))
+            if (!SAINEnableClass.IsBotInCombat(__instance._owner))
             {
                 return true;
             }
@@ -525,7 +525,7 @@ namespace SAIN.Patches.Generic
         [PatchPrefix]
         public static bool Patch(BotRequest request, AIDataRequestController __instance, ref bool __result)
         {
-            if (!SAINEnableClass.IsBotInCombat(__instance.AiData?.Player_0))
+            if (!SAINEnableClass.IsBotInCombat(__instance._aiData?._player))
             {
                 return true;
             }

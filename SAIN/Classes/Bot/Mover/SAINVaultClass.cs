@@ -106,7 +106,7 @@ public class SAINVaultClass : BotComponentClassBase
             distance = direction.magnitude;
         }
 
-        if (Physics.SphereCast(start, 0.1f, direction, out RaycastHit hit, direction.magnitude, LayerMaskClass.PlayerStaticCollisionsMask))
+        if (Physics.SphereCast(start, 0.1f, direction, out RaycastHit hit, direction.magnitude, LayersMaskController.PlayerStaticCollisionsMask))
         {
             if (CheckObstacleForVault(hit, player.VaultingParameters.VaultingHeight))
             {

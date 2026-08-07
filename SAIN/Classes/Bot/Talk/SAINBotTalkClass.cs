@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using EFT;
 using SAIN.Components;
 using UnityEngine;
+using EFT.Ballistics;
 
 namespace SAIN.SAINComponent.Classes.Talk;
 
@@ -38,7 +39,7 @@ public class SAINBotTalkClass : BotComponentClassBase
         base.Init();
     }
 
-    private void GetHit(DamageInfoStruct DamageInfoStruct, EBodyPart bodyPart, float floatVal)
+    private void GetHit(DamageInfo DamageInfo, EBodyPart bodyPart, float floatVal)
     {
         if (Player == null || BotOwner == null || Bot == null)
         {

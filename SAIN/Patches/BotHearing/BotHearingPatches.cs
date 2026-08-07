@@ -16,18 +16,21 @@ public class TreeSoundPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(TreeInteractive), nameof(TreeInteractive.method_0));
+        return AccessTools.Method(typeof(TreeInteractive), nameof(TreeInteractive.PlaySoundBank));
     }
 
     [PatchPostfix]
-    public static void Patch(Vector3 soundPosition, BetterSource source, IPlayerOwner player, SoundBank ____soundBank)
+    public static void Patch(Vector3 soundPosition, BetterSource source, IObserverToPlayerBridge player, SoundBank ____soundBank)
     {
         if (player.iPlayer != null)
         {
             float baseRange = 50f;
             if (____soundBank != null)
             {
-                baseRange = ____soundBank.Rolloff * player.SoundRadius * 0.8f;
+                // SPT 4.1: the player bridge no longer exposes SoundRadius, it now
+                // lives on Physical. Fall back to 1x if we can't reach it.
+                float soundRadius = (player.iPlayer as Player)?.Physical?.SoundRadius ?? 1f;
+                baseRange = ____soundBank.Rolloff * soundRadius * 0.8f;
             }
             BotManagerComponent.Instance?.BotHearing.PlayAISound(
                 player.iPlayer.ProfileId,
@@ -158,7 +161,7 @@ public class AimSoundPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(Player.FirearmController), nameof(Player.FirearmController.method_60));
+        return AccessTools.Method(typeof(Player.FirearmController), nameof(Player.FirearmController.PlayAimingSound));
     }
 
     [PatchPrefix]

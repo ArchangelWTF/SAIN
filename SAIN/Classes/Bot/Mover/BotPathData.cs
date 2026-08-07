@@ -563,7 +563,7 @@ public class BotPathDataManual(BotComponent bot, IBotPathFinder pathFinder) : IB
                 direction,
                 out RaycastHit hit,
                 maxDist,
-                LayerMaskClass.PlayerStaticCollisionsMask
+                LayersMaskController.PlayerStaticCollisionsMask
             )
         )
         {

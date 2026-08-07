@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using EFT;
 using SAIN.Components;
 using SAIN.Models.Enums;
 using SAIN.Models.Preset.Personalities;

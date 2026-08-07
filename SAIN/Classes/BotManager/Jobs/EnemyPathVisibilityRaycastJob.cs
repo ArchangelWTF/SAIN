@@ -33,8 +33,8 @@ public class EnemyPathVisibilityRaycastJob : SainJobTemplate, IDisposable
     public EnemyPathVisibilityRaycastJob(MonoBehaviour botcontroller)
         : base("Path Visibility Job", botcontroller, true, 1f / 20f)
     {
-        LayerMask HighPolyWithTerrain = LayerMaskClass.HighPolyWithTerrainMask;
-        LayerMask DoorLayer = LayerMaskClass.DoorLayer;
+        LayerMask HighPolyWithTerrain = LayersMaskController.HighPolyWithTerrainMask;
+        LayerMask DoorLayer = LayersMaskController.DoorLayer;
         LayerMask Mask = HighPolyWithTerrain & ~(1 << DoorLayer);
         queryParams = new(Mask, false, QueryTriggerInteraction.Ignore);
     }

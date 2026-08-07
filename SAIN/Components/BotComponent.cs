@@ -378,7 +378,7 @@ public class BotComponent : BotComponentBase, ISPlayer
             try
             {
                 BotOwner.LookSensor.MaxShootDist = float.MaxValue;
-                if (BotOwner.AIData is PlayerAIDataClass aiData)
+                if (BotOwner.AIData is AIData aiData)
                 {
                     aiData.IsNoOffsetShooting = false;
                 }

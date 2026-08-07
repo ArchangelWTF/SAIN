@@ -6,6 +6,7 @@ using SAIN.Preset;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.SAINComponent.Classes.Info;
 using UnityEngine;
+using EFT.Ballistics;
 
 namespace SAIN.SAINComponent.Classes.Talk;
 
@@ -597,7 +598,7 @@ public class GroupTalk : BotBase
         }
     }
 
-    private void friendlyDown(IPlayer player, DamageInfoStruct damage, float time)
+    private void friendlyDown(IPlayer player, DamageInfo damage, float time)
     {
         if (!Bot.Talk.CanTalk)
         {

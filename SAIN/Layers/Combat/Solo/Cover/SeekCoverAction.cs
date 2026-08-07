@@ -127,7 +127,7 @@ internal class SeekCoverAction(BotOwner bot) : BotAction(bot, nameof(SeekCoverAc
         {
             case LeanSetting.Right:
             case LeanSetting.Left:
-                return Vector.Raycast(headPos, rayEnd * RAYCAST_LEAN_HITOBJECT_DIST, LayerMaskClass.HighPolyWithTerrainMask);
+                return Vector.Raycast(headPos, rayEnd * RAYCAST_LEAN_HITOBJECT_DIST, LayersMaskController.HighPolyWithTerrainMask);
 
             default:
                 return false;

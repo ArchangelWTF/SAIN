@@ -7,6 +7,7 @@ using EFT.Interactive;
 using HarmonyLib;
 using SAIN.Helpers;
 using UnityEngine;
+using CommonAssets.Scripts.Game;
 
 namespace SAIN.Components.Extract;
 
@@ -127,7 +128,7 @@ public class ExtractFinderComponent : MonoBehaviour
             return false;
         }
 
-        ExfiltrationControllerClass ExfilController = Singleton<GameWorld>.Instance.ExfiltrationController;
+        ExfiltrationController ExfilController = Singleton<GameWorld>.Instance.ExfiltrationController;
         if (ExfilController == null)
         {
             return false;

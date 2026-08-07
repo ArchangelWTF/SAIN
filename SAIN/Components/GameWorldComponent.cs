@@ -9,6 +9,7 @@ using SAIN.Components.CoverFinder;
 using SAIN.Components.PlayerComponentSpace;
 using SAIN.Helpers;
 using UnityEngine;
+using EFT.Ballistics;
 
 namespace SAIN.Components;
 
@@ -33,7 +34,7 @@ public class GameWorldComponent : MonoBehaviour
         return PlayerComponent != null;
     }
 
-    public void RegisterShot(Player Player, EftBulletClass Bullet, Item Weapon)
+    public void RegisterShot(Player Player, Shot Bullet, Item Weapon)
     {
         if (TryGetPlayerComponent(Player, out PlayerComponent PlayerComponent))
         {
@@ -58,7 +59,7 @@ public class GameWorldComponent : MonoBehaviour
         }
     }
 
-    private IEnumerator TrackBullet(PlayerComponent Player, EftBulletClass Bullet)
+    private IEnumerator TrackBullet(PlayerComponent Player, Shot Bullet)
     {
         //Vector3 LastPosition = Bullet.StartPosition;
         var OtherPlayerData = Player.OtherPlayersData.DataDictionary;

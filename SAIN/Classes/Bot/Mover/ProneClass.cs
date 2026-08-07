@@ -116,6 +116,6 @@ public class ProneClass : BotBase
         float num = Vector3.Angle(from, vector2);
         float lay_DOWN_ANG_SHOOT = HelpersGClass.LAY_DOWN_ANG_SHOOT;
         return num <= Mathf.Abs(lay_DOWN_ANG_SHOOT)
-            && Vector.CanShootToTarget(new ShootPointClass(target, 1f), vector, BotOwner.LookSensor.Mask, true);
+            && Vector.CanShootToTarget(new ShootToPoint(target, 1f), vector, BotOwner.LookSensor.Mask, true);
     }
 }

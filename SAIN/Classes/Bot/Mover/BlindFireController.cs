@@ -172,7 +172,7 @@ public class BlindFireController : BotBase, IBotClass
 
     private int checkBlindFire(Vector3 targetPos)
     {
-        LayerMask mask = LayerMaskClass.HighPolyWithTerrainMask;
+        LayerMask mask = LayersMaskController.HighPolyWithTerrainMask;
         Vector3 firePort = Bot.Transform.WeaponData.FirePort;
         Vector3 direction = targetPos - firePort;
 

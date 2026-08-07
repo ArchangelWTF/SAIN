@@ -125,7 +125,7 @@ public class CoverFinderComponent : BotComponentBase
                     {
                         origin = Bot.NavMeshPosition + Vector3.up * 0.25f,
                         halfExtents = new Vector3(35, 5, 35),
-                        mask = LayerMaskClass.HighPolyWithTerrainNoGrassMask,
+                        mask = LayersMaskController.HighPolyWithTerrainNoGrassMask,
                         minColliderSize = new(0.25f, GlobalSettingsClass.Instance.General.Cover.CoverMinHeight, 0.25f),
                         maxColliderSize = new(30f, 30f, 30f),
                     };

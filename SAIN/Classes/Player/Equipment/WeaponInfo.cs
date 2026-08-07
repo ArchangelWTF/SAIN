@@ -91,7 +91,7 @@ public class WeaponInfo
         MuzzleLoudness += FlashHider?.Loudness ?? 0f;
         BulletSpeed = Weapon.CurrentAmmoTemplate.InitialSpeed * Weapon.SpeedFactor;
         CalculatedAudibleRange = BaseAudibleRange + MuzzleLoudness;
-        if (Suppressor != null || _suppressedWeapons.Contains(Weapon.TemplateId.StringID))
+        if (Suppressor != null || _suppressedWeapons.Contains(Weapon.TemplateId._stringID))
         {
             CalculatedAudibleRange *= SuppressorModifier(BulletSpeed);
             HasSuppressor = true;
@@ -144,7 +144,7 @@ public class WeaponInfo
                         Suppressor ??= mod;
                         break;
                     default:
-                        if (Suppressor == null && _suppressorMods.Contains(mod.TemplateId.StringID))
+                        if (Suppressor == null && _suppressorMods.Contains(mod.TemplateId._stringID))
                         {
                             Suppressor = mod;
                         }
@@ -201,11 +201,11 @@ public class WeaponInfo
 
     private static bool CheckTemplateType(Type modType, string id)
     {
-        if (TemplateIdToObjectMappingsClass.TypeTable.TryGetValue(id, out Type result) && result == modType)
+        if (JsonTypes.TypeTable.TryGetValue(id, out Type result) && result == modType)
         {
             return true;
         }
-        if (TemplateIdToObjectMappingsClass.TemplateTypeTable.TryGetValue(id, out result) && result == modType)
+        if (JsonTypes.TemplateTypeTable.TryGetValue(id, out result) && result == modType)
         {
             return true;
         }

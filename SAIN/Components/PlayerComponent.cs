@@ -29,7 +29,7 @@ public class PlayerComponent : MonoBehaviour, IDisposable, ISPlayer
 
     public event Action<WeaponInfo, Vector3> OnShoot;
 
-    public event Action<PlayerComponent, EftBulletClass> OnBulletFlyBy;
+    public event Action<PlayerComponent, Shot> OnBulletFlyBy;
 
     public event Action<PlayerComponent> OnComponentDestroyed;
 
@@ -272,7 +272,7 @@ public class PlayerComponent : MonoBehaviour, IDisposable, ISPlayer
         PlayerTickData = data;
     }
 
-    public void RegisterFlyBy(PlayerComponent Source, EftBulletClass Bullet)
+    public void RegisterFlyBy(PlayerComponent Source, Shot Bullet)
     {
         OnBulletFlyBy?.Invoke(Source, Bullet);
     }

@@ -147,7 +147,7 @@ public class PoseClass : BotBase
         const float StartHeight = 1.6f;
         const int max = 6;
         const float heightStep = 1f / max;
-        LayerMask Mask = LayerMaskClass.HighPolyWithTerrainMask;
+        LayerMask Mask = LayersMaskController.HighPolyWithTerrainMask;
 
         Vector3 offset = Vector3.up * heightStep;
         Vector3 start = Bot.Transform.Position + Vector3.up * StartHeight;
@@ -172,7 +172,7 @@ public class PoseClass : BotBase
 
     private float FindCrouchHeightColliderSphereCast(Vector3 target, float rayLength = 3f, bool flatDir = true)
     {
-        LayerMask Mask = LayerMaskClass.HighPolyWithTerrainMask;
+        LayerMask Mask = LayersMaskController.HighPolyWithTerrainMask;
         Vector3 start = Bot.Transform.Position + Vector3.up * 0.75f;
         Vector3 direction = target - start;
         if (flatDir)

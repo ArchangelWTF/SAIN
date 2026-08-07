@@ -191,7 +191,7 @@ public class DoorOpener : BotComponentClassBase
     {
         const float SPHERECAST_RADIUS = 0.15f;
         const float SPHERECAST_DISTANCE = 1.5f;
-        if (Physics.SphereCast(ray, SPHERECAST_RADIUS, out RaycastHit hit, SPHERECAST_DISTANCE, LayerMaskClass.PlayerStaticDoorMask))
+        if (Physics.SphereCast(ray, SPHERECAST_RADIUS, out RaycastHit hit, SPHERECAST_DISTANCE, LayersMaskController.PlayerStaticDoorMask))
         {
 #if DEBUG
             DebugGizmos.DrawLine(ray.origin, hit.point, Color.red, 0.25f, 30f, true);
@@ -217,7 +217,7 @@ public class DoorOpener : BotComponentClassBase
                 //Logger.LogDebug($"Failed to find door, but we hit something on [PlayerStaticDoorMask] [{hit.collider.name}]");
             }
         }
-        if (Physics.SphereCast(ray, SPHERECAST_RADIUS, out hit, SPHERECAST_DISTANCE, LayerMaskClass.DoorLayer))
+        if (Physics.SphereCast(ray, SPHERECAST_RADIUS, out hit, SPHERECAST_DISTANCE, LayersMaskController.DoorLayer))
         {
             DebugGizmos.DrawLine(ray.origin, hit.point, Color.red, 0.25f, 30f, true);
             if (FindDoorFromCollider(hit.collider, out data, out index, doors))
@@ -341,11 +341,11 @@ public class DoorOpener : BotComponentClassBase
             switch (type)
             {
                 case EInteractionType.Breach:
-                    Player.vmethod_0(data.Door, gstruct.Value, null);
+                    Player.StartInteraction(data.Door, gstruct.Value, null);
                     break;
 
                 default:
-                    Player.vmethod_1(data.Door, gstruct.Value);
+                    Player.ExecuteInteraction(data.Door, gstruct.Value);
                     break;
             }
             return true;

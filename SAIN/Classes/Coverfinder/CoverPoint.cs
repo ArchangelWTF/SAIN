@@ -8,6 +8,7 @@ using SAIN.Models.Structs;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
 using UnityEngine.AI;
+using EFT.Ballistics;
 
 namespace SAIN.SAINComponent.SubComponents.CoverFinder;
 
@@ -178,16 +179,16 @@ public class CoverPointBotDataClass
 
     public float LastHitInCoverTime { get; private set; }
 
-    public void GetHit(DamageInfoStruct DamageInfoStruct, EBodyPart partHit, Enemy currentEnemy)
+    public void GetHit(DamageInfo DamageInfo, EBodyPart partHit, Enemy currentEnemy)
     {
-        int hitCount = CalcHitCount(DamageInfoStruct);
+        int hitCount = CalcHitCount(DamageInfo);
         bool islegs = partHit.IsLegs();
 
         var hits = _hitsInCover;
         LastHitInCoverTime = Time.time;
         hits.Total += hitCount;
 
-        IPlayer hitFrom = DamageInfoStruct.Player?.iPlayer;
+        IPlayer hitFrom = DamageInfo.Player?.iPlayer;
         if (currentEnemy == null || hitFrom == null)
         {
             hits.Unknown += hitCount;
@@ -301,9 +302,9 @@ public class CoverPointBotDataClass
         return false;
     }
 
-    private static int CalcHitCount(DamageInfoStruct DamageInfoStruct)
+    private static int CalcHitCount(DamageInfo DamageInfo)
     {
-        float received = DamageInfoStruct.Damage;
+        float received = DamageInfo.Damage;
         float max = HITINCOVER_MAX_DAMAGE;
         float maxCoef = HITINCOVER_DAMAGE_COEF;
         if (received >= max)
@@ -499,16 +500,16 @@ public class CoverPoint
         get { return IsCurrent && (StraightDistanceStatus == CoverStatus.InCover || PathDistanceStatus == CoverStatus.InCover); }
     }
 
-    public void GetHit(DamageInfoStruct DamageInfoStruct, EBodyPart partHit, Enemy currentEnemy)
+    public void GetHit(DamageInfo DamageInfo, EBodyPart partHit, Enemy currentEnemy)
     {
-        int hitCount = calcHitCount(DamageInfoStruct);
+        int hitCount = calcHitCount(DamageInfo);
         bool islegs = partHit.IsLegs();
 
         var hits = _hitsInCover;
         LastHitInCoverTime = Time.time;
         hits.Total += hitCount;
 
-        IPlayer hitFrom = DamageInfoStruct.Player?.iPlayer;
+        IPlayer hitFrom = DamageInfo.Player?.iPlayer;
         if (currentEnemy == null || hitFrom == null)
         {
             hits.Unknown += hitCount;
@@ -644,9 +645,9 @@ public class CoverPoint
         return false;
     }
 
-    private int calcHitCount(DamageInfoStruct DamageInfoStruct)
+    private int calcHitCount(DamageInfo DamageInfo)
     {
-        float received = DamageInfoStruct.Damage;
+        float received = DamageInfo.Damage;
         float max = HITINCOVER_MAX_DAMAGE;
         float maxCoef = HITINCOVER_DAMAGE_COEF;
         if (received >= max)

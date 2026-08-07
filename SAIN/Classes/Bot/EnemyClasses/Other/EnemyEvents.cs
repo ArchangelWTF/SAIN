@@ -1,6 +1,7 @@
 ﻿using System;
 using EFT;
 using SAIN.Helpers.Events;
+using EFT.Ballistics;
 
 namespace SAIN.SAINComponent.Classes.EnemyClasses;
 
@@ -78,7 +79,7 @@ public class EnemyEvents
         OnEnemyHeard?.Invoke(Enemy, type, gunFire, place);
     }
 
-    private void enemyHit(DamageInfoStruct damage, EBodyPart _, float _2)
+    private void enemyHit(DamageInfo damage, EBodyPart _, float _2)
     {
         var damageSource = damage.Player?.iPlayer;
         if (damageSource == null)

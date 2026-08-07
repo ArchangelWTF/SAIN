@@ -23,15 +23,15 @@ public class UpdateLightEnablePatch : ModulePatch
     public static bool PatchPrefix(float curLightDist, ref float __result, BotLight __instance)
     {
         __result = curLightDist;
-        if (__instance.BotOwner_0.FlashGrenade.IsFlashed)
+        if (__instance._owner.FlashGrenade.IsFlashed)
         {
             return false;
         }
-        if (!__instance.HaveLight)
+        if (!__instance._haveLight)
         {
             return false;
         }
-        __instance.CurLightDist = curLightDist;
+        __instance._curLightDist = curLightDist;
 
         float timeModifier = BotManagerComponent.Instance.TimeVision.TimeVisionDistanceModifier;
         var lookSettings = GlobalSettingsClass.Instance.Look.Light;
@@ -39,9 +39,9 @@ public class UpdateLightEnablePatch : ModulePatch
         float turnOffRatio = lookSettings.LightOffRatio;
 
         bool isOn = __instance.IsEnable;
-        bool wantOn = !isOn && timeModifier <= turnOnRatio && __instance.BotOwner_0.Memory.IsPeace;
+        bool wantOn = !isOn && timeModifier <= turnOnRatio && __instance._owner.Memory.IsPeace;
         bool wantOff = isOn && timeModifier >= turnOffRatio;
-        __instance.CanUseNow = timeModifier < turnOffRatio;
+        __instance._canUseNow = timeModifier < turnOffRatio;
 
         if (wantOn)
         {
@@ -82,7 +82,7 @@ public class UpdateLightEnablePatch : ModulePatch
 #endif
                     return false;
                 }
-                PlayerComponent playerComponent = gameworld.PlayerTracker.GetPlayerComponent(__instance.BotOwner_0.ProfileId);
+                PlayerComponent playerComponent = gameworld.PlayerTracker.GetPlayerComponent(__instance._owner.ProfileId);
                 if (playerComponent == null)
                 {
 #if DEBUG
@@ -92,10 +92,10 @@ public class UpdateLightEnablePatch : ModulePatch
                 }
                 if (
                     playerComponent.Flashlight.WhiteLight
-                    || (__instance.BotOwner_0.NightVision.UsingNow && playerComponent.Flashlight.IRLight)
+                    || (__instance._owner.NightVision.UsingNow && playerComponent.Flashlight.IRLight)
                 )
                 {
-                    float min = __instance.BotOwner_0.Settings.FileSettings.Look.VISIBLE_DISNACE_WITH_LIGHT;
+                    float min = __instance._owner.Settings.FileSettings.Look.VISIBLE_DISNACE_WITH_LIGHT;
                     __result = Mathf.Clamp(curLightDist, min, float.MaxValue);
                 }
             }
@@ -108,7 +108,7 @@ public class UpdateLightEnablePatch2 : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(BotLight), nameof(BotLight.method_0));
+        return AccessTools.Method(typeof(BotLight), nameof(BotLight.LeaveDarkPlace));
     }
 
     [PatchPrefix]
@@ -133,13 +133,13 @@ public class ToggleNightVisionPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(BotNightVisionData), nameof(BotNightVisionData.method_0));
+        return AccessTools.Method(typeof(BotNightVisionData), nameof(BotNightVisionData.CheckWhatIWant));
     }
 
     [PatchPrefix]
     public static bool PatchPrefix(BotNightVisionData __instance)
     {
-        if (__instance.BotOwner_0.FlashGrenade.IsFlashed)
+        if (__instance._owner.FlashGrenade.IsFlashed)
         {
             return false;
         }
@@ -149,11 +149,11 @@ public class ToggleNightVisionPatch : ModulePatch
         float turnOnRatio = lookSettings.NightVisionOnRatio;
         float turnOffRatio = lookSettings.NightVisionOffRatio;
 
-        if (__instance.NightVisionAtPocket)
+        if (__instance._nightVisionAtPocket)
         {
             if (timeModifier < turnOnRatio)
             {
-                __instance.method_4();
+                __instance.MoveToHeadAndToggleOn();
                 return false;
             }
         }
@@ -161,11 +161,11 @@ public class ToggleNightVisionPatch : ModulePatch
         {
             if (timeModifier < turnOnRatio)
             {
-                __instance.method_5();
+                __instance.ToggleOnIfNeed();
             }
             if (timeModifier >= turnOffRatio)
             {
-                __instance.method_1();
+                __instance.MoveToHeadPocket();
             }
         }
         return false;
@@ -185,12 +185,12 @@ public class DisableLookUpdatePatch : ModulePatch
     [PatchPrefix]
     public static bool Patch(LookSensor __instance)
     {
-        if (SAINEnableClass.IsBotExcluded(__instance.BotOwner))
+        if (SAINEnableClass.IsBotExcluded(__instance._botOwner))
         {
             return true;
         }
 
-        __instance.method_2();
+        __instance.CalcVisibleDistance();
         return false;
     }
 }
@@ -242,19 +242,19 @@ public class BotLightTurnOnPatch : ModulePatch
     [PatchPrefix]
     public static bool PatchPrefix(BotLight __instance)
     {
-        if (__instance.IsInDarkPlace_1 && !SAINPlugin.LoadedPreset.GlobalSettings.General.Flashlight.AllowLightOnForDarkBuildings)
+        if (__instance._isInDarkPlace && !SAINPlugin.LoadedPreset.GlobalSettings.General.Flashlight.AllowLightOnForDarkBuildings)
         {
-            __instance.IsInDarkPlace_1 = false;
+            __instance._isInDarkPlace = false;
         }
-        if (__instance.IsInDarkPlace_1 || __instance.BotOwner_0.Memory.GoalEnemy != null)
-        {
-            return true;
-        }
-        if (!ShallTurnLightOff(__instance.BotOwner_0.Profile.Info.Settings.Role))
+        if (__instance._isInDarkPlace || __instance._owner.Memory.GoalEnemy != null)
         {
             return true;
         }
-        __instance.BotOwner_0.BotLight.TurnOff(false, true);
+        if (!ShallTurnLightOff(__instance._owner.Profile.Info.Settings.Role))
+        {
+            return true;
+        }
+        __instance._owner.BotLight.TurnOff(false, true);
         return false;
     }
 
@@ -289,7 +289,7 @@ public class VisionSpeedPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(EnemyInfo), nameof(EnemyInfo.method_9));
+        return AccessTools.Method(typeof(EnemyInfo), nameof(EnemyInfo.GetVisibilityChangeSpeedK));
     }
 
     [PatchPostfix]
@@ -313,7 +313,7 @@ public class WeatherVisionPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(EnemyInfo), nameof(EnemyInfo.method_11));
+        return AccessTools.Method(typeof(EnemyInfo), nameof(EnemyInfo.GetWeatherK));
     }
 
     [PatchPrefix]
@@ -333,11 +333,11 @@ public class IsPointInVisibleSectorCallerPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(GClass542), nameof(GClass542.method_4));
+        return AccessTools.Method(typeof(EnemyPartVision), nameof(EnemyPartVision.CheckLineOfSight));
     }
 
     [PatchPrefix]
-    public static bool PatchPrefix(GClass542 __instance, BotOwner owner, EnemyPart part)
+    public static bool PatchPrefix(EnemyPartVision __instance, BotOwner owner, EnemyPart part)
     {
         if (SAINEnableClass.GetSAIN(owner.ProfileId, out var sain))
         {
@@ -375,7 +375,7 @@ public class IsPointInVisibleSectorPatch : ModulePatch
     public static bool PatchPrefix(LookSensor __instance, ref bool __result)
     {
         // We already executed this check in the patch above, just need to patch this method to complete early.
-        if (SAINEnableClass.GetSAIN(__instance.BotOwner.ProfileId, out var _))
+        if (SAINEnableClass.GetSAIN(__instance._botOwner.ProfileId, out var _))
         {
             __result = true;
             return false;
@@ -390,7 +390,7 @@ public class VisionDistancePatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(EnemyInfo), nameof(EnemyInfo.method_4));
+        return AccessTools.Method(typeof(EnemyInfo), nameof(EnemyInfo.GetAdditionalSensorDistance));
     }
 
     [PatchPostfix]
@@ -433,7 +433,7 @@ public class CheckFlashlightPatch : ModulePatch
 
             if (!flashLight.WhiteLight && !flashLight.Laser)
             {
-                (____player.AIData as PlayerAIDataClass).UsingLight = false;
+                (____player.AIData as AIData).UsingLight = false;
             }
         }
     }

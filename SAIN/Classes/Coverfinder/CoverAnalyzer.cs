@@ -82,7 +82,7 @@ public class CoverAnalyzer(BotComponent bot, CoverFinderComponent coverFinder) :
                         Vector3.down,
                         out RaycastHit raycastHit,
                         colliderHeight * 0.55f,
-                        LayerMaskClass.HighPolyWithTerrainNoGrassMask
+                        LayersMaskController.HighPolyWithTerrainNoGrassMask
                     )
                 )
                 {
@@ -244,7 +244,7 @@ public class CoverAnalyzer(BotComponent bot, CoverFinderComponent coverFinder) :
             _playerColliderArray[i] = null;
         }
 
-        Physics.OverlapSphereNonAlloc(point, radius, _playerColliderArray, LayerMaskClass.PlayerMask);
+        Physics.OverlapSphereNonAlloc(point, radius, _playerColliderArray, LayersMaskController.PlayerMask);
 
         int count = 0;
         Collider foundCollider = null;

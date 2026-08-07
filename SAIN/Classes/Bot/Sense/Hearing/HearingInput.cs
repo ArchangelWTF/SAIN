@@ -8,6 +8,7 @@ using SAIN.Models.Structs;
 using SAIN.SAINComponent;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
+using EFT.Ballistics;
 
 namespace SAIN.Classes.Bot.Sense.Hearing;
 
@@ -41,7 +42,7 @@ public class HearingInput(HearingSensor hearingSensor) : BotSubClass<HearingSens
         base.Init();
     }
 
-    protected void OnBulletFlyBy(PlayerComponent Source, EftBulletClass Bullet)
+    protected void OnBulletFlyBy(PlayerComponent Source, Shot Bullet)
     {
         Enemy Enemy = Bot.EnemyController.CheckAddEnemy(Source.Player);
         if (Enemy != null)
@@ -316,7 +317,7 @@ public class HearingInput(HearingSensor hearingSensor) : BotSubClass<HearingSens
         base.Dispose();
     }
 
-    private void BulletImpacted(EftBulletClass bullet)
+    private void BulletImpacted(Shot bullet)
     {
         if (IsIgnoringSounds(true))
         {

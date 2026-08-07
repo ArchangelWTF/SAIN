@@ -4,17 +4,19 @@ using Version = SemanticVersioning.Version;
 
 namespace SAINServerMod;
 
-public sealed record SAINServermodMetadata : AbstractModMetadata
+// SPT 4.1 replaced the AbstractModMetadata base record with the IModMetadata
+// interface, and swapped IsBundleMod for HasPrepatcher.
+public sealed record SAINServermodMetadata : IModMetadata
 {
-    public override string ModGuid { get; init; } = "me.sol.sain";
-    public override string Name { get; init; } = "SAIN";
-    public override string Author { get; init; } = "Solarint";
-    public override List<string>? Contributors { get; init; } = [];
-    public override Version Version { get; init; } = new("4.4.3");
-    public override Range SptVersion { get; init; } = new("~4.0.0");
-    public override List<string>? Incompatibilities { get; init; } = [];
-    public override Dictionary<string, Range>? ModDependencies { get; init; } = [];
-    public override string? Url { get; init; } = "https://github.com/ArchangelWTF/SAIN";
-    public override bool? IsBundleMod { get; init; } = false;
-    public override string License { get; init; } = "MIT";
+    public string ModGuid { get; init; } = "me.sol.sain";
+    public string Name { get; init; } = "SAIN";
+    public string Author { get; init; } = "Solarint";
+    public List<string>? Contributors { get; init; } = [];
+    public Version Version { get; init; } = new("4.5.0");
+    public Range SptVersion { get; init; } = new("~4.1.0");
+    public List<string>? Incompatibilities { get; init; } = [];
+    public Dictionary<string, Range>? ModDependencies { get; init; } = [];
+    public string? Url { get; init; } = "https://github.com/ArchangelWTF/SAIN";
+    public bool HasPrepatcher { get; init; } = false;
+    public string License { get; init; } = "MIT";
 }

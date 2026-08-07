@@ -98,7 +98,7 @@ public class DoorHandler : GameWorldBase, IGameWorldClass
         }
 
         // We don't support doors that aren't on the "Interactive" layer
-        if (door.gameObject.layer != LayerMaskClass.InteractiveLayer)
+        if (door.gameObject.layer != LayersMaskController.InteractiveLayer)
         {
             return false;
         }

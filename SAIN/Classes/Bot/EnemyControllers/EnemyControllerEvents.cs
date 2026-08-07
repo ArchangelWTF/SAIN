@@ -1,6 +1,7 @@
 ﻿using System;
 using EFT;
 using SAIN.Helpers.Events;
+using EFT.Ballistics;
 
 namespace SAIN.SAINComponent.Classes.EnemyClasses;
 
@@ -90,7 +91,7 @@ public class EnemyControllerEvents : BotSubClass<SAINEnemyController>, IBotClass
         OnEnemyHit?.Invoke(enemy);
     }
 
-    private void enemyKilled(Player player, IPlayer lastAggressor, DamageInfoStruct lastDamageInfoStruct, EBodyPart lastBodyPart)
+    private void enemyKilled(Player player, IPlayer lastAggressor, DamageInfo lastDamageInfoStruct, EBodyPart lastBodyPart)
     {
         if (player != null)
         {

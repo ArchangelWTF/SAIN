@@ -44,7 +44,7 @@ public static class SAINEnableClass
             return false;
         }
 
-        ProfileInfoSettingsClass settings = botOwner.Profile?.Info?.Settings;
+        ProfileSettings settings = botOwner.Profile?.Info?.Settings;
         if (settings == null)
         {
             return true;
@@ -94,7 +94,7 @@ public static class SAINEnableClass
             return false;
         }
 
-        ProfileInfoSettingsClass settings = iPlayer.Profile?.Info?.Settings;
+        ProfileSettings settings = iPlayer.Profile?.Info?.Settings;
         if (settings == null)
         {
             return true;

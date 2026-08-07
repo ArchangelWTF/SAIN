@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using EFT;
 using Newtonsoft.Json;
-using EFTCore = LocalBotSettingsProviderClass;
-using EFTStatModifiersClass = BotLastBlindEffectModifierClass;
+using EFTCore = BotInternalSettingsController;
+using EFTStatModifiersClass = BotSettingsInGameModif;
 
 namespace SAIN.Helpers;
 
@@ -125,8 +125,6 @@ public class EFTCoreSettings
     {
         EFTCore.Core.ARMOR_CLASS_COEF = coef;
     }
-
-    public EFTCore Core;
 }
 
 public class EFTBotSettings

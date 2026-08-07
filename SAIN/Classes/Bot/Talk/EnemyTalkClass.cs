@@ -23,9 +23,9 @@ public class EnemyTalk : BotBase
 
     public override void Init()
     {
-        if (Singleton<BotEventHandler>.Instance != null)
+        if (Singleton<GlobalEventDispatcher>.Instance != null)
         {
-            Singleton<BotEventHandler>.Instance.OnGrenadeExplosive += tryFakeDeathGrenade;
+            Singleton<GlobalEventDispatcher>.Instance.OnGrenadeExplosive += tryFakeDeathGrenade;
         }
         BotManagerComponent.Instance.BotHearing.PlayerTalk += playerTalked;
         Bot.EnemyController.Events.OnEnemyKilled += enemyKilled;
@@ -94,9 +94,9 @@ public class EnemyTalk : BotBase
 
     public override void Dispose()
     {
-        if (Singleton<BotEventHandler>.Instance != null)
+        if (Singleton<GlobalEventDispatcher>.Instance != null)
         {
-            Singleton<BotEventHandler>.Instance.OnGrenadeExplosive -= tryFakeDeathGrenade;
+            Singleton<GlobalEventDispatcher>.Instance.OnGrenadeExplosive -= tryFakeDeathGrenade;
         }
         BotManagerComponent.Instance.BotHearing.PlayerTalk -= playerTalked;
         if (Bot?.EnemyController != null)

@@ -5,6 +5,7 @@ using SAIN.Components;
 using SAIN.Components.PlayerComponentSpace;
 using SPT.Reflection.Patching;
 using UnityEngine;
+using EFT.InventoryLogic;
 
 namespace SAIN.Patches.BotHearing;
 

@@ -1,6 +1,7 @@
 ﻿using SAIN.Components;
 using SAIN.Models.Enums;
 using UnityEngine;
+using EFT.Ballistics;
 
 namespace SAIN.SAINComponent.Classes;
 
@@ -28,47 +29,47 @@ public class BodyPartHitEffectClass : BotBase
         RightArmInjury = Bot.Medical.HitReaction.BodyParts[EBodyPart.RightArm].InjurySeverity;
     }
 
-    public void GetHit(DamageInfoStruct DamageInfoStruct, EBodyPart bodyPart, float floatVal)
+    public void GetHit(DamageInfo DamageInfo, EBodyPart bodyPart, float floatVal)
     {
         switch (bodyPart)
         {
             case EBodyPart.Head:
-                GetHitInHead(DamageInfoStruct);
+                GetHitInHead(DamageInfo);
                 break;
 
             case EBodyPart.Chest:
             case EBodyPart.Stomach:
-                GetHitInCenter(DamageInfoStruct);
+                GetHitInCenter(DamageInfo);
                 break;
 
             case EBodyPart.LeftLeg:
             case EBodyPart.RightLeg:
-                GetHitInLegs(DamageInfoStruct);
+                GetHitInLegs(DamageInfo);
                 break;
 
             default:
-                GetHitInArms(DamageInfoStruct);
+                GetHitInArms(DamageInfo);
                 break;
         }
     }
 
-    private void GetHitInLegs(DamageInfoStruct DamageInfoStruct)
+    private void GetHitInLegs(DamageInfo DamageInfo)
     {
         HitReaction = EHitReaction.Legs;
     }
 
-    private void GetHitInArms(DamageInfoStruct DamageInfoStruct)
+    private void GetHitInArms(DamageInfo DamageInfo)
     {
         HitReaction = EHitReaction.Arms;
         checkArmInjuries();
     }
 
-    private void GetHitInCenter(DamageInfoStruct DamageInfoStruct)
+    private void GetHitInCenter(DamageInfo DamageInfo)
     {
         HitReaction = EHitReaction.Center;
     }
 
-    private void GetHitInHead(DamageInfoStruct DamageInfoStruct)
+    private void GetHitInHead(DamageInfo DamageInfo)
     {
         HitReaction = EHitReaction.Head;
     }

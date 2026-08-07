@@ -26,9 +26,9 @@ public class AimClass : BotComponentClassBase, IBotClass
         get
         {
             IBotAiming aim = BotOwner.AimingManager.CurrentAiming;
-            if (aim is BotAimingClass aimClass)
+            if (aim is BotAimingData aimClass)
             {
-                return aimClass.AimStatus_0;
+                return aimClass._status;
             }
             if (aim != null && aim.IsReady)
             {
@@ -38,9 +38,9 @@ public class AimClass : BotComponentClassBase, IBotClass
         }
         set
         {
-            if (BotOwner?.AimingManager?.CurrentAiming is BotAimingClass aimClass)
+            if (BotOwner?.AimingManager?.CurrentAiming is BotAimingData aimClass)
             {
-                aimClass.AimStatus_0 = value;
+                aimClass._status = value;
             }
         }
     }
@@ -141,9 +141,9 @@ public class AimClass : BotComponentClassBase, IBotClass
 
     public void LoseAimTarget()
     {
-        if (BotOwner.AimingManager.CurrentAiming is BotAimingClass aimClass && aimClass.AimStatus_0 != AimStatus.NoTarget)
+        if (BotOwner.AimingManager.CurrentAiming is BotAimingData aimClass && aimClass._status != AimStatus.NoTarget)
         {
-            aimClass.AimStatus_0 = AimStatus.NoTarget;
+            aimClass._status = AimStatus.NoTarget;
         }
     }
 

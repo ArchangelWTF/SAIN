@@ -24,7 +24,7 @@ public class SprintLookDirPatch : ModulePatch
         {
             return false;
         }
-        BotOwner botOwner = __instance.BotOwner_0;
+        BotOwner botOwner = __instance._owner;
         if (SAINEnableClass.IsBotInCombat(botOwner))
         {
             return false;
@@ -32,7 +32,7 @@ public class SprintLookDirPatch : ModulePatch
 
         if (__instance.NoSprint)
         {
-            __instance.Player.EnableSprint(false);
+            __instance._player.EnableSprint(false);
             return false;
         }
         if (val && botOwner.Mover.HasPathAndNoComplete)
@@ -53,7 +53,7 @@ public class SprintLookDirPatch : ModulePatch
         {
             botOwner.SetTargetMoveSpeed(1f);
         }
-        __instance.Player.EnableSprint(val);
+        __instance._player.EnableSprint(val);
         return false;
     }
 }
@@ -67,11 +67,11 @@ public class PlayerSetPosePatch : ModulePatch
 
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(RunStateClass), nameof(RunStateClass.ChangePose));
+        return AccessTools.Method(typeof(MovePlayerState), nameof(MovePlayerState.ChangePose));
     }
 
     [PatchPrefix]
-    public static bool Patch(RunStateClass __instance)
+    public static bool Patch(MovePlayerState __instance)
     {
         if (playerField.GetValue(__instance.MovementContext) is Player player)
         {
@@ -147,7 +147,7 @@ public class StopShootCauseAnimatorPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(ShootData), nameof(ShootData.method_1));
+        return AccessTools.Method(typeof(ShootData), nameof(ShootData.OnMoveStateChanged));
     }
 
     [PatchPrefix]
@@ -162,13 +162,13 @@ public class PoseStaminaPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(PlayerPhysicalClass), nameof(PlayerPhysicalClass.ConsumePoseLevelChange));
+        return AccessTools.Method(typeof(Physical), nameof(Physical.ConsumePoseLevelChange));
     }
 
     [PatchPrefix]
-    public static bool PatchPrefix(PlayerPhysicalClass __instance)
+    public static bool PatchPrefix(Physical __instance)
     {
-        if (__instance.Player_0.IsAI)
+        if (__instance._player.IsAI)
         {
             return false;
         }
@@ -189,12 +189,12 @@ public class BotMoverManualUpdatePatch : ModulePatch
     [PatchPrefix]
     public static bool PatchPrefix(BotMover __instance)
     {
-        if (!SAINEnableClass.IsBotInCombat(__instance.BotOwner_0))
+        if (!SAINEnableClass.IsBotInCombat(__instance._owner))
         {
             return true;
         }
         __instance.LocalAvoidance.DropOffset();
-        __instance.PositionOnWayInner = __instance.BotOwner_0.Position;
+        __instance.PositionOnWayInner = __instance._owner.Position;
 
         //__instance.method_16();
         //__instance.method_15();
@@ -217,7 +217,7 @@ public class BotMoverManualFixedUpdatePatch : ModulePatch
     [PatchPrefix]
     public static bool PatchPrefix(BotMover __instance)
     {
-        return !SAINEnableClass.IsBotInCombat(__instance.BotOwner_0);
+        return !SAINEnableClass.IsBotInCombat(__instance._owner);
     }
 }
 
@@ -225,13 +225,13 @@ public class AimStaminaPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(PlayerPhysicalClass), nameof(PlayerPhysicalClass.Aim));
+        return AccessTools.Method(typeof(Physical), nameof(Physical.Aim));
     }
 
     [PatchPrefix]
-    public static bool PatchPrefix(PlayerPhysicalClass __instance)
+    public static bool PatchPrefix(Physical __instance)
     {
-        if (__instance.Player_0.IsAI)
+        if (__instance._player.IsAI)
         {
             return false;
         }
@@ -243,13 +243,13 @@ public class CrawlPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(BotPathFinderClass), nameof(BotPathFinderClass.method_0));
+        return AccessTools.Method(typeof(BotPathFinderCorePoints), nameof(BotPathFinderCorePoints.PreStartWay));
     }
 
     [PatchPrefix]
-    public static bool PatchPrefix(BotPathFinderClass __instance, ref bool __result)
+    public static bool PatchPrefix(BotPathFinderCorePoints __instance, ref bool __result)
     {
-        if (!SAINEnableClass.IsBotInCombat(__instance.BotOwner_0))
+        if (!SAINEnableClass.IsBotInCombat(__instance._owner))
         {
             return true;
         }
@@ -262,17 +262,17 @@ public class EncumberedPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(BasePhysicalClass), nameof(BasePhysicalClass.UpdateWeightLimits));
+        return AccessTools.Method(typeof(PhysicalBase), nameof(PhysicalBase.UpdateWeightLimits));
     }
 
     [PatchPrefix]
-    public static bool PatchPrefix(BasePhysicalClass __instance)
+    public static bool PatchPrefix(PhysicalBase __instance)
     {
         //if (___bool_7)
         //{
         //    return true;
         //}
-        IPlayer player = __instance.IobserverToPlayerBridge_0.iPlayer;
+        IPlayer player = __instance._playerBridge.iPlayer;
         if (player == null)
         {
 #if DEBUG
@@ -290,10 +290,10 @@ public class EncumberedPatch : ModulePatch
         }
 
         // Copy Pasted from original EFT code, there is a check to not enable weight limits for AI
-        BackendConfigSettingsClass.InertiaSettings inertia = Singleton<BackendConfigSettingsClass>.Instance.Inertia;
+        GlobalConfiguration.InertiaSettings inertia = Singleton<GlobalConfiguration>.Instance.Inertia;
         Vector3 b2 = new(
-            inertia.InertiaLimitsStep * (float)__instance.IobserverToPlayerBridge_0.Skills.Strength.SummaryLevel,
-            inertia.InertiaLimitsStep * (float)__instance.IobserverToPlayerBridge_0.Skills.Strength.SummaryLevel,
+            inertia.InertiaLimitsStep * (float)__instance._playerBridge.Skills.Strength.SummaryLevel,
+            inertia.InertiaLimitsStep * (float)__instance._playerBridge.Skills.Strength.SummaryLevel,
             0f
         );
         __instance.BaseInertiaLimits = inertia.InertiaLimits + b2;

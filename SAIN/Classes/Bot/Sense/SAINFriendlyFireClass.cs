@@ -114,6 +114,6 @@ public class SAINFriendlyFireClass : BotComponentClassBase
     private static RaycastHit[] SphereCastAll(Vector3 weaponFirePort, float targetDistance, Vector3 weaponPointDirection)
     {
         const float sphereCastRadius = 0.2f;
-        return Physics.SphereCastAll(weaponFirePort, sphereCastRadius, weaponPointDirection, targetDistance, LayerMaskClass.PlayerMask);
+        return Physics.SphereCastAll(weaponFirePort, sphereCastRadius, weaponPointDirection, targetDistance, LayersMaskController.PlayerMask);
     }
 }

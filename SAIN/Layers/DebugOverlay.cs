@@ -133,7 +133,7 @@ public static class DebugOverlay
 
             if (debug.OverLay_AimInfo)
             {
-                if (bot.BotOwner.AimingManager.CurrentAiming is BotAimingClass aimClass)
+                if (bot.BotOwner.AimingManager.CurrentAiming is BotAimingData aimClass)
                 {
                     stringBuilder.AppendLine($"AimData: Status [{bot.Aim.AimStatus}] " + $"Last Aim Time: [{bot.Aim.LastAimTime}]");
                     stringBuilder.AppendLine(

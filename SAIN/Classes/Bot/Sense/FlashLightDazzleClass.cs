@@ -52,7 +52,7 @@ public class FlashLightDazzleClass : BotBase
                     weaponRoot,
                     (botPos - weaponRoot).normalized,
                     (botPos - weaponRoot).magnitude,
-                    LayerMaskClass.HighPolyWithTerrainMask
+                    LayersMaskController.HighPolyWithTerrainMask
                 )
             )
             {
@@ -81,7 +81,7 @@ public class FlashLightDazzleClass : BotBase
                     weaponRoot,
                     (botPos - weaponRoot).normalized,
                     (botPos - weaponRoot).magnitude,
-                    LayerMaskClass.HighPolyWithTerrainMask
+                    LayersMaskController.HighPolyWithTerrainMask
                 )
             )
             {

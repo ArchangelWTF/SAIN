@@ -3,6 +3,7 @@ using HarmonyLib;
 using SAIN.Components;
 using SPT.Reflection.Patching;
 using Systems.Effects;
+using EFT.Ballistics;
 
 namespace SAIN.Patches.BotHearing;
 
@@ -17,7 +18,7 @@ public class BulletImpactPatch : ModulePatch
     }
 
     [PatchPostfix]
-    public static void PatchPostfix(EftBulletClass info)
+    public static void PatchPostfix(Shot info)
     {
         if (BotManagerComponent.Instance != null)
         {

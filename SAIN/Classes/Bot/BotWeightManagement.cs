@@ -3,7 +3,7 @@ using EFT.InventoryLogic;
 using HarmonyLib;
 using SAIN.Components;
 using SAIN.Preset.GlobalSettings;
-using FloatFunc = GClass849<float>;
+using FloatFunc = Deferred<float>;
 
 namespace SAIN.SAINComponent.Classes;
 
@@ -37,7 +37,7 @@ public class BotWeightManagement : BotComponentClassBase
 
     private float GetBotTotalWeight()
     {
-        float result = InventoryEquipment.smethod_1(_slots);
+        float result = InventoryEquipment.GetTotalWeight(_slots);
         _slots.Clear();
         // Logger.LogWarning(result);
         return result;

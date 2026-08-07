@@ -293,7 +293,7 @@ public class SAINBotUnstuckClass : BotComponentClassBase
 
     private float teleportTimer;
 
-    public PathControllerClass PathController { get; private set; }
+    public BotPathController PathController { get; private set; }
 
     private static NavMeshPath CalcPath(Vector3 start, Vector3 end, out float pathLength)
     {

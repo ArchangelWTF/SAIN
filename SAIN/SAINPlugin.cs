@@ -1,4 +1,4 @@
-global using EFTMath = GClass856;
+global using EFTMath = MyExtensions;
 using BepInEx;
 using BepInEx.Configuration;
 using SAIN.Editor;

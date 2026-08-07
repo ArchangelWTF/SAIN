@@ -29,13 +29,13 @@ public class BotManagerComponent : MonoBehaviour
         get { return Singleton<IBotGame>.Instance; }
     }
 
-    public BotEventHandler BotEventHandler
+    public GlobalEventDispatcher GlobalEventDispatcher
     {
         get
         {
             if (_eventHandler == null)
             {
-                _eventHandler = Singleton<BotEventHandler>.Instance;
+                _eventHandler = Singleton<GlobalEventDispatcher>.Instance;
                 if (_eventHandler != null)
                 {
                     GrenadeController.Subscribe(_eventHandler);
@@ -45,7 +45,7 @@ public class BotManagerComponent : MonoBehaviour
         }
     }
 
-    private BotEventHandler _eventHandler;
+    private GlobalEventDispatcher _eventHandler;
 
     public GameWorldComponent SAINGameWorld { get; private set; }
     public BotsController DefaultController { get; set; }
@@ -117,9 +117,9 @@ public class BotManagerComponent : MonoBehaviour
             BotJobs.Dispose();
             BotSpawnController.UnSubscribe();
 
-            if (BotEventHandler != null)
+            if (GlobalEventDispatcher != null)
             {
-                GrenadeController.UnSubscribe(BotEventHandler);
+                GrenadeController.UnSubscribe(GlobalEventDispatcher);
             }
 
             if (Bots != null && Bots.Count > 0)

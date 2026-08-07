@@ -1,4 +1,5 @@
-﻿using Comfort.Common;
+﻿using System.Reflection;
+using Comfort.Common;
 using EFT.UI;
 using HarmonyLib;
 using UnityEngine;
@@ -15,10 +16,20 @@ internal class Sounds
     private static UISoundsWrapper _soundsWrapper;
     private static AudioSource _audioSource;
 
+    // These are looked up by name, so a client-side rename silently breaks them
+    // rather than failing the build -- SPT 4.1 renamed uisoundsWrapper_0 to _UISounds.
+    private static readonly FieldInfo _wrapperField = AccessTools.Field(typeof(GUISounds), "_UISounds");
+    private static readonly FieldInfo _audioSourceField = AccessTools.Field(typeof(GUISounds), "audioSource_0");
+
     private static void getWrapper()
     {
-        _soundsWrapper = AccessTools.Field(typeof(GUISounds), "uisoundsWrapper_0").GetValue(GUISounds) as UISoundsWrapper;
-        _audioSource = AccessTools.Field(typeof(GUISounds), "audioSource_0").GetValue(GUISounds) as AudioSource;
+        GUISounds sounds = GUISounds;
+        if (sounds == null)
+        {
+            return;
+        }
+        _soundsWrapper = _wrapperField?.GetValue(sounds) as UISoundsWrapper;
+        _audioSource = _audioSourceField?.GetValue(sounds) as AudioSource;
     }
 
     public static void PlaySound(EUISoundType soundType, float volume = 1f)

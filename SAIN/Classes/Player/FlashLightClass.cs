@@ -178,6 +178,23 @@ public class FlashLightClass(PlayerComponent component) : PlayerComponentBase(co
 
     public DeviceMode ActiveModes { get; set; }
 
+    // SPT 4.1 renamed this field from list_0 to _ligthbeamsTransforms (BSG's typo).
+    // FieldRefAccess throws when the field is missing, and because this is a static
+    // initializer that throw became a TypeInitializationException that took down all
+    // of PlayerComponent. Resolve it defensively so the null check above can do its job.
     private static readonly AccessTools.FieldRef<TacticalComboVisualController, List<Transform>> _tacticalModesField =
-        AccessTools.FieldRefAccess<TacticalComboVisualController, List<Transform>>("list_0");
+        TryGetTacticalModesField();
+
+    private static AccessTools.FieldRef<TacticalComboVisualController, List<Transform>> TryGetTacticalModesField()
+    {
+        try
+        {
+            return AccessTools.FieldRefAccess<TacticalComboVisualController, List<Transform>>("_ligthbeamsTransforms");
+        }
+        catch (System.Exception e)
+        {
+            Logger.LogError($"Could not resolve TacticalComboVisualController light beams field: {e.Message}");
+            return null;
+        }
+    }
 }

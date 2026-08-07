@@ -9,6 +9,7 @@ using SAIN.Preset.GlobalSettings;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.SAINComponent.SubComponents.CoverFinder;
 using UnityEngine;
+using EFT.Ballistics;
 
 namespace SAIN.SAINComponent.Classes;
 
@@ -371,13 +372,13 @@ public class SAINCoverClass : BotComponentClassBase
 #endif
     }
 
-    public void GetHit(DamageInfoStruct DamageInfoStruct, EBodyPart bodyPart, float floatVal)
+    public void GetHit(DamageInfo DamageInfo, EBodyPart bodyPart, float floatVal)
     {
         if (CoverInUse != null)
         {
             bool wasSpotted = CoverInUse.Spotted;
             LastHitInCoverTime = Time.time;
-            CoverInUse.GetHit(DamageInfoStruct, bodyPart, Bot.GoalEnemy);
+            CoverInUse.GetHit(DamageInfo, bodyPart, Bot.GoalEnemy);
             if (CoverInUse.Spotted && !wasSpotted)
             {
                 _spottedTime = Time.time + SpottedCoverPoint.SPOTTED_PERIOD;
@@ -474,7 +475,7 @@ public class SAINCoverClass : BotComponentClassBase
     {
         var position = BotOwner.MainParts[bodyPartType].Position;
         Vector3 direction = target - position;
-        return Physics.Raycast(position, direction, dist, LayerMaskClass.HighPolyWithTerrainMask);
+        return Physics.Raycast(position, direction, dist, LayersMaskController.HighPolyWithTerrainMask);
     }
 
     private DebugLabel _debugCoverObject;

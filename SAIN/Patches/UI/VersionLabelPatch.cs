@@ -11,7 +11,7 @@ public class VersionLabelPatch : ModulePatch
 
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(PreloaderUI), nameof(PreloaderUI.method_6));
+        return AccessTools.Method(typeof(PreloaderUI), nameof(PreloaderUI.RefreshCornerLabel));
     }
 
     [PatchPrefix]

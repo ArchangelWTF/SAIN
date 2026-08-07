@@ -11,6 +11,7 @@ using SAIN.Preset;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
 using UnityEngine.AI;
+using EFT.Ballistics;
 
 namespace SAIN.BotController.Classes;
 
@@ -22,9 +23,9 @@ public class Squad
 
     public event Action<Squad> OnSquadEmpty;
 
-    public event Action<IPlayer, DamageInfoStruct, float> LeaderKilled;
+    public event Action<IPlayer, DamageInfo, float> LeaderKilled;
 
-    public event Action<IPlayer, DamageInfoStruct, float> OnMemberKilled;
+    public event Action<IPlayer, DamageInfo, float> OnMemberKilled;
 
     public event Action<BotComponent, float> NewLeaderFound;
 
@@ -556,7 +557,7 @@ public class Squad
         }
     }
 
-    private void memberWasKilled(Player player, IPlayer lastAggressor, DamageInfoStruct lastDamageInfoStruct, EBodyPart lastBodyPart)
+    private void memberWasKilled(Player player, IPlayer lastAggressor, DamageInfo lastDamageInfoStruct, EBodyPart lastBodyPart)
     {
 #if DEBUG
         if (SAINPlugin.DebugMode)

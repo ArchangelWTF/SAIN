@@ -1,5 +1,6 @@
 ﻿using EFT;
 using UnityEngine;
+using EFT.InventoryLogic;
 
 namespace SAIN.Components.Helpers;
 
@@ -18,7 +19,7 @@ public class SAINSoundTypeHandler
 
         if (Item != null)
         {
-            if (Item is ThrowWeapItemClass)
+            if (Item is ThrowWeap)
             {
                 if (sound == "Pin")
                 {
@@ -31,7 +32,7 @@ public class SAINSoundTypeHandler
                     soundDist = SAINPlugin.LoadedPreset.GlobalSettings.Hearing.BaseSoundRange_GrenadePinDraw;
                 }
             }
-            else if (Item is MedsItemClass)
+            else if (Item is Meds)
             {
                 soundType = SAINSoundType.Heal;
                 soundDist = SAINPlugin.LoadedPreset.GlobalSettings.Hearing.BaseSoundRange_Healing;

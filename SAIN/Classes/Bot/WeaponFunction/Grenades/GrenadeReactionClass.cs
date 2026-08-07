@@ -6,6 +6,7 @@ using SAIN.Components;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.SAINComponent.SubComponents;
 using UnityEngine;
+using EFT.InventoryLogic;
 
 namespace SAIN.SAINComponent.Classes.WeaponFunction;
 
@@ -75,8 +76,8 @@ public class GrenadeReactionClass : BotSubClass<BotGrenadeManager>, IBotClass
 
     public Dictionary<Throwable, GrenadeTrackerClass> EnemyGrenadesList { get; private set; } = [];
 
-    public GrenadeReactionClass(BotGrenadeManager ThrowWeapItemClass)
-        : base(ThrowWeapItemClass) { }
+    public GrenadeReactionClass(BotGrenadeManager ThrowWeap)
+        : base(ThrowWeap) { }
 
     public override void Init()
     {

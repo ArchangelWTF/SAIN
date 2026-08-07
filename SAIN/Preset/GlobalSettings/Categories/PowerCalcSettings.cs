@@ -149,7 +149,7 @@ public class PowerCalcSettings : SAINSettingsBase<PowerCalcSettings>, ISAINSetti
         power += RolePower(playerComponent.Player.Profile.Info.Settings.Role);
         power += ArmorPower(playerComponent.Player);
 
-        if (playerComponent.Player.AIData is PlayerAIDataClass aiData)
+        if (playerComponent.Player.AIData is AIData aiData)
         {
             aiData.PowerOfEquipment = power;
         }

@@ -5,7 +5,7 @@ namespace SAIN.Components.BotComponentSpace.Classes;
 
 public class BotMagazineWeapon
 {
-    private static readonly List<MagazineItemClass> _preAllocMagList = new(20);
+    private static readonly List<Magazine> _preAllocMagList = new(20);
 
     public static bool RefillMags(BotComponent bot, BotWeaponInfo weapon, int numberToRefill = -1, bool includeActiveMag = false)
     {
@@ -17,7 +17,7 @@ public class BotMagazineWeapon
 #endif
             return false;
         }
-        if (slot.ContainedItem is not MagazineItemClass activeMag)
+        if (slot.ContainedItem is not Magazine activeMag)
         {
 #if DEBUG
             Logger.LogError($"mag null :: {slot.ContainedItem?.Name} :: {slot.ContainedItem?.ShortName}");
@@ -26,7 +26,7 @@ public class BotMagazineWeapon
         }
 
         _preAllocMagList.Clear();
-        bot.Player.InventoryController.GetReachableItemsOfTypeNonAlloc<MagazineItemClass>(_preAllocMagList, null);
+        bot.Player.InventoryController.GetReachableItemsOfTypeNonAlloc<Magazine>(_preAllocMagList, null);
         if (_preAllocMagList.Count == 0)
         {
             _preAllocMagList.Clear();
@@ -73,7 +73,7 @@ public class BotMagazineWeapon
         return false;
     }
 
-    private static void CheckMag(BotWeaponInfo weapon, ref int refilled, ref int full, MagazineItemClass mag)
+    private static void CheckMag(BotWeaponInfo weapon, ref int refilled, ref int full, Magazine mag)
     {
         if (mag == null)
         {
@@ -85,11 +85,11 @@ public class BotMagazineWeapon
             full++;
             return;
         }
-        weapon.Reload.method_2(weapon.weapon, mag);
+        weapon.Reload.AddAmmoToMag(weapon.weapon, mag);
         refilled++;
     }
 
-    public static float GetAmmoRatio(MagazineItemClass magazine)
+    public static float GetAmmoRatio(Magazine magazine)
     {
         if (magazine == null)
         {

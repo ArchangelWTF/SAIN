@@ -1,11 +1,12 @@
 ﻿using SAIN.Components;
 using UnityEngine;
+using EFT.InventoryLogic;
 
 namespace SAIN.SAINComponent.Classes.WeaponFunction;
 
 public class BotGrenadeManager : BotComponentClassBase
 {
-    public ThrowWeapItemClass MyGrenade { get; set; }
+    public ThrowWeap MyGrenade { get; set; }
     public Vector3? GrenadeDangerPoint
     {
         get { return GrenadeReactionClass.GrenadeDangerPoint; }

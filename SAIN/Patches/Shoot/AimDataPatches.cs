@@ -187,7 +187,7 @@ internal class AimOffsetPatch : ModulePatch
 #if DEBUG
         if (SAINPlugin.LoadedPreset.GlobalSettings.General.Debug.Gizmos.DebugDrawAimGizmos)
         {
-            Vector3 weaponRoot = __instance.BotOwner_0.WeaponRoot.position;
+            Vector3 weaponRoot = __instance._owner.WeaponRoot.position;
             DebugGizmos.DrawLine(weaponRoot, result, Color.red, 0.02f, 0.25f, true);
             DebugGizmos.DrawSphere(result, 0.025f, Color.red, 10f);
             DebugGizmos.DrawLine(result, realTargetPoint, Color.white, 0.02f, 0.25f, true);

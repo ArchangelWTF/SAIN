@@ -3,7 +3,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <ReleaseOutputDir>..\Build\SPT\user\mods\Solarint-SAIN-ServerMod\</ReleaseOutputDir>
+    <ReleaseOutputDir>..\Build\SPT_Runtime\user\mods\Solarint-SAIN-ServerMod\</ReleaseOutputDir>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="SPTarkov.Common" Version="4.1.2" />

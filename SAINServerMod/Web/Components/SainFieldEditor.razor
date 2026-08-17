@@ -1,0 +1,227 @@
+@namespace SAINServerMod.Web.Components
+
+<div class="sain-field">
+    <div class="sain-field-label">
+        <MudText Typo="Typo.body2" Class="sain-field-name">@Value.Meta.Name</MudText>
+        @if (!string.IsNullOrWhiteSpace(Value.Meta.Description))
+        {
+            <MudTooltip Text="@Value.Meta.Description" Arrow="true" Placement="Placement.Top">
+                <MudIcon Icon="@Icons.Material.Outlined.Info" Size="Size.Small" Class="sain-field-help" />
+            </MudTooltip>
+        }
+        @if (Value.Meta.Advanced)
+        {
+            <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined" Class="sain-tag">Advanced</MudChip>
+        }
+        @if (Value.Meta.Developer)
+        {
+            <MudChip T="string" Size="Size.Small" Color="Color.Secondary" Variant="Variant.Outlined" Class="sain-tag">Dev</MudChip>
+        }
+    </div>
+
+    <div class="sain-field-control">
+        @switch (Value.Kind)
+        {
+            case SainFieldKind.Bool:
+                <MudSwitch T="bool" Value="BoolValue" ValueChanged="SetBool" Color="Color.Primary"
+                           Label="@(BoolValue ? "On" : "Off")" />
+                break;
+
+            case SainFieldKind.Float:
+                @if (Value.Meta.HasRange)
+                {
+                    <div class="sain-slider-row">
+                        <MudSlider T="double" Min="Value.Meta.Min" Max="Value.Meta.Max" Step="Step"
+                                   Value="FloatValue" ValueChanged="SetNumber" Color="Color.Primary" Immediate="true" />
+                        <MudNumericField T="double" Value="FloatValue" ValueChanged="SetNumber"
+                                         Min="Value.Meta.Min" Max="Value.Meta.Max" Step="Step"
+                                         Variant="Variant.Outlined" Margin="Margin.Dense" Class="sain-num" />
+                    </div>
+                }
+                else
+                {
+                    <MudNumericField T="double" Value="FloatValue" ValueChanged="SetNumber"
+                                     Variant="Variant.Outlined" Margin="Margin.Dense" Class="sain-num" />
+                }
+                break;
+
+            case SainFieldKind.Int:
+                <MudNumericField T="int" Value="IntValue" ValueChanged="SetInt"
+                                 Min="@(Value.Meta.HasRange ? (int)Value.Meta.Min : int.MinValue)"
+                                 Max="@(Value.Meta.HasRange ? (int)Value.Meta.Max : int.MaxValue)"
+                                 Variant="Variant.Outlined" Margin="Margin.Dense" Class="sain-num" />
+                break;
+
+            case SainFieldKind.Enum:
+                <MudSelect T="string" Value="EnumValue" ValueChanged="SetEnum"
+                           Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Class="sain-select">
+                    @foreach (var name in Enum.GetNames(Value.ValueType))
+                    {
+                        <MudSelectItem T="string" Value="@name">@name</MudSelectItem>
+                    }
+                </MudSelect>
+                break;
+
+            case SainFieldKind.String:
+                <MudTextField T="string" Value="@(Value.Get()?.ToString())" ValueChanged="SetString"
+                              ReadOnly="@(!Value.CanWrite)"
+                              Variant="Variant.Outlined" Margin="Margin.Dense" Class="sain-text" />
+                break;
+
+            default:
+                <MudText Typo="Typo.caption" Class="spt-muted">Unsupported (@Value.ValueType.Name)</MudText>
+                break;
+        }
+    </div>
+
+    <div class="sain-field-reset">
+        @if (CanReset)
+        {
+            <MudTooltip Text="Reset to default" Arrow="true">
+                <MudIconButton Icon="@Icons.Material.Outlined.RestartAlt" Size="Size.Small" OnClick="Reset" />
+            </MudTooltip>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public SainValue Value { get; set; } = default!;
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private double Step
+    {
+        get { return Value.Meta.Rounding > 0 ? 1d / Value.Meta.Rounding : 0.01d; }
+    }
+
+    private bool CanReset
+    {
+        get
+        {
+            return Value.CanWrite
+                && Value.HasDefault
+                && Value.Kind is SainFieldKind.Bool or SainFieldKind.Float or SainFieldKind.Int or SainFieldKind.Enum;
+        }
+    }
+
+    private bool BoolValue
+    {
+        get { return Value.Get() as bool? ?? false; }
+    }
+
+    // Decimal places implied by the field's slider granularity, used to strip float→double noise (e.g. 0.80000001).
+    private int Decimals
+    {
+        get
+        {
+            return Value.Meta.Rounding switch
+            {
+                >= 1000 => 3,
+                >= 100 => 2,
+                >= 10 => 1,
+                _ => 0,
+            };
+        }
+    }
+
+    private double FloatValue
+    {
+        get
+        {
+            var raw = Convert.ToDouble(Value.Get() ?? 0d);
+            if (Value.Meta.HasRange)
+            {
+                raw = Math.Clamp(raw, Value.Meta.Min, Value.Meta.Max);
+            }
+            return Math.Round(raw, Decimals);
+        }
+    }
+    private int IntValue
+    {
+        get { return Convert.ToInt32(Value.Get() ?? 0); }
+    }
+
+    private string EnumValue
+    {
+        get { return Value.Get()?.ToString() ?? string.Empty; }
+    }
+
+    private Task SetBool(bool v)
+    {
+        if (v == BoolValue)
+        {
+            return Task.CompletedTask;
+        }
+        Value.Set(v);
+        return Notify();
+    }
+
+    private Task SetNumber(double v)
+    {
+        var f = (float)v;
+        f = Value.Meta.HasRange ? Value.Meta.Round(Value.Meta.Clamp(f)) : f;
+        if (Math.Abs(f - Convert.ToSingle(Value.Get() ?? 0f)) < 1e-6f)
+        {
+            return Task.CompletedTask;
+        }
+        Value.Set(ConvertTo(f, Value.ValueType));
+        return Notify();
+    }
+
+    private Task SetInt(int v)
+    {
+        if (Value.Meta.HasRange)
+        {
+            v = (int)Value.Meta.Clamp(v);
+        }
+        if (v == IntValue)
+        {
+            return Task.CompletedTask;
+        }
+        Value.Set(ConvertTo(v, Value.ValueType));
+        return Notify();
+    }
+
+    private Task SetEnum(string v)
+    {
+        if (string.Equals(v, EnumValue, StringComparison.Ordinal))
+        {
+            return Task.CompletedTask;
+        }
+        if (Enum.TryParse(Value.ValueType, v, out var parsed))
+        {
+            Value.Set(parsed);
+        }
+        return Notify();
+    }
+
+    private Task SetString(string v)
+    {
+        if (!Value.CanWrite || string.Equals(v, Value.Get()?.ToString(), StringComparison.Ordinal))
+        {
+            return Task.CompletedTask;
+        }
+        Value.Set(v);
+        return Notify();
+    }
+
+    private Task Reset()
+    {
+        Value.Set(Value.Default());
+        return Notify();
+    }
+
+    private static object? ConvertTo(object value, Type target)
+    {
+        if (value.GetType() == target)
+        {
+            return value;
+        }
+        return Convert.ChangeType(value, target);
+    }
+
+    private async Task Notify()
+    {
+        await OnChanged.InvokeAsync();
+        StateHasChanged();
+    }
+}

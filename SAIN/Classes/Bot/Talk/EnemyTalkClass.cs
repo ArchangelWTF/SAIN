@@ -3,11 +3,12 @@ using Comfort.Common;
 using EFT;
 using SAIN.Components;
 using SAIN.Models.Enums;
-using SAIN.Models.Preset.Personalities;
 using SAIN.Models.Structs;
 using SAIN.Preset;
-using SAIN.Preset.BotSettings.SAINSettings;
-using SAIN.Preset.Personalities;
+using SAIN.Preset.Shared.BotSettings.SAINSettings;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.Models.Preset.Personalities;
+using SAIN.Preset.Shared.Personalities.BasePersonality.Categories;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
 
@@ -23,9 +24,9 @@ public class EnemyTalk : BotBase
 
     public override void Init()
     {
-        if (Singleton<BotEventHandler>.Instance != null)
+        if (Singleton<GlobalEventDispatcher>.Instance != null)
         {
-            Singleton<BotEventHandler>.Instance.OnGrenadeExplosive += tryFakeDeathGrenade;
+            Singleton<GlobalEventDispatcher>.Instance.OnGrenadeExplosive += tryFakeDeathGrenade;
         }
         BotManagerComponent.Instance.BotHearing.PlayerTalk += playerTalked;
         Bot.EnemyController.Events.OnEnemyKilled += enemyKilled;
@@ -94,9 +95,9 @@ public class EnemyTalk : BotBase
 
     public override void Dispose()
     {
-        if (Singleton<BotEventHandler>.Instance != null)
+        if (Singleton<GlobalEventDispatcher>.Instance != null)
         {
-            Singleton<BotEventHandler>.Instance.OnGrenadeExplosive -= tryFakeDeathGrenade;
+            Singleton<GlobalEventDispatcher>.Instance.OnGrenadeExplosive -= tryFakeDeathGrenade;
         }
         BotManagerComponent.Instance.BotHearing.PlayerTalk -= playerTalked;
         if (Bot?.EnemyController != null)

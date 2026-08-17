@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using SAIN.Components;
 using SAIN.Models.Structs;
+using SAIN.Preset.Shared.Enums;
 using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes.EnemyClasses;

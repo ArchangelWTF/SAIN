@@ -1,24 +1,27 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using EFT;
 using EFT.UI;
-using SAIN.Components.RotationController;
 using SAIN.Editor;
 using SAIN.Editor.GUISections;
 using SAIN.Editor.Util;
 using SAIN.Helpers;
 using SAIN.Models.Enums;
-using SAIN.Models.Preset.Personalities;
 using SAIN.Models.Structs;
 using SAIN.Plugin;
 using SAIN.Preset;
 using SAIN.Preset.GearStealthValues;
-using SAIN.Preset.GlobalSettings;
-using SAIN.Preset.GlobalSettings.Categories;
-using SAIN.Preset.Personalities;
-using SAIN.SAINComponent.Classes.WeaponFunction;
+using SAIN.Preset.Shared;
+using SAIN.Preset.Shared.Components.RotationController;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.GearStealthValues;
+using SAIN.Preset.Shared.GlobalSettings;
+using SAIN.Preset.Shared.Models;
+using SAIN.Preset.Shared.Models.Enums;
+using SAIN.Preset.Shared.Models.Preset.Personalities;
+using SAIN.Preset.Shared.Personalities;
 using UnityEngine;
 using static SAIN.Editor.SAINLayout;
 
@@ -287,9 +290,9 @@ public class AttributesGUI
             return value;
         }
 
-        if (value is Dictionary<ECaliber, float>)
+        if (value is Dictionary<string, float>)
         {
-            EditFloatDictionary<ECaliber>(value, info, out wasEdited);
+            EditFloatDictionary<string>(value, info, out wasEdited);
             return value;
         }
 
@@ -1003,7 +1006,6 @@ public class AttributesGUI
     }
 
     public static void EditFloatDictionary<T>(object dictValue, ConfigInfoClass info, out bool wasEdited)
-        where T : Enum
     {
         BeginVertical(5f);
 
@@ -1014,14 +1016,6 @@ public class AttributesGUI
         var defaultDictionary = info.DefaultDictionary as Dictionary<T, float>;
         var dictionary = dictValue as Dictionary<T, float>;
 
-        T[] array = EnumValues.GetEnum<T>();
-        if (array != null && array.Length > 0)
-        {
-            for (int i = 0; i < array.Length; i++)
-            {
-                //Logger.LogInfo(array[i]);
-            }
-        }
         List<T> list = new();
         foreach (var entry in dictionary)
         {

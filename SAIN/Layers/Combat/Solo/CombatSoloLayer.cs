@@ -1,7 +1,8 @@
-﻿using EFT;
+using EFT;
 using SAIN.Extensions;
 using SAIN.Layers.Combat.Solo.Cover;
 using SAIN.Models.Enums;
+using SAIN.Preset.Shared.Enums;
 
 namespace SAIN.Layers.Combat.Solo;
 

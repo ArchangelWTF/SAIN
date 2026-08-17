@@ -1,5 +1,6 @@
-﻿using EFT;
+using EFT;
 using SAIN.Helpers;
+using SAIN.Preset.Shared.Enums;
 using UnityEngine;
 
 namespace SAIN.Components.PlayerComponentSpace;

@@ -179,5 +179,5 @@ public class FlashLightClass(PlayerComponent component) : PlayerComponentBase(co
     public DeviceMode ActiveModes { get; set; }
 
     private static readonly AccessTools.FieldRef<TacticalComboVisualController, List<Transform>> _tacticalModesField =
-        AccessTools.FieldRefAccess<TacticalComboVisualController, List<Transform>>("list_0");
+        AccessTools.FieldRefAccess<TacticalComboVisualController, List<Transform>>("_ligthbeamsTransforms");
 }

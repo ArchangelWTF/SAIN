@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using EFT;
 using EFT.UI;
 using SAIN.Helpers;
 using SAIN.Plugin;
 using SAIN.Preset;
 using SAIN.Preset.GlobalSettings.Categories;
+using SAIN.Preset.Shared.Enums;
 using UnityEngine;
 using static SAIN.Editor.SAINLayout;
 

@@ -1,7 +1,7 @@
-﻿using EFT;
+using EFT;
 using SAIN.Components;
 using SAIN.Models.Enums;
-using SAIN.Preset.Personalities;
+using SAIN.Preset.Shared.Personalities.BasePersonality.Categories;
 using SAIN.SAINComponent;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;

@@ -1,6 +1,8 @@
-﻿using EFT;
+using EFT;
 using SAIN.Components.PlayerComponentSpace;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings.Categories;
 using SAIN.SAINComponent;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;

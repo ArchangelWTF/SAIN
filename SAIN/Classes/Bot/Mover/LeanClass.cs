@@ -2,7 +2,8 @@ using System;
 using System.Linq;
 using EFT;
 using SAIN.Components;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.GlobalSettings;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
 
@@ -338,13 +339,13 @@ public class LeanClass : BotBase
     {
         var direction = target - start;
         float distance = Mathf.Clamp(direction.magnitude, 0f, LEAN_MAX_RAYCAST_DIST);
-        return !Physics.Raycast(start, direction.normalized, distance, LayerMaskClass.HighPolyWithTerrainMask);
+        return !Physics.Raycast(start, direction.normalized, distance, LayersMaskController.HighPolyWithTerrainMask);
     }
 
     private Vector3 FindOffset(Vector3 start, Vector3 direction, float distance)
     {
         Vector3 normal = direction.normalized;
-        if (Physics.Raycast(start, normal, out var hit, distance, LayerMaskClass.HighPolyWithTerrainMask))
+        if (Physics.Raycast(start, normal, out var hit, distance, LayersMaskController.HighPolyWithTerrainMask))
         {
             return hit.point;
         }

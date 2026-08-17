@@ -1,0 +1,678 @@
+.sain-container {
+    width: 100%;
+    max-width: 1800px;
+    margin: 0 auto;
+}
+
+/* Filled yellow buttons get dark text, matching SPT's apply/generate buttons. */
+.sain-container .mud-button-filled-warning,
+.sain-container .mud-button-filled-warning:hover,
+.sain-container .mud-button-filled-warning .mud-icon-root {
+    color: #111827 !important;
+}
+
+/* ---- Header hero panel + icon tile + stat tiles ---- */
+.sain-hero {
+    border-color: #1f2937 !important;
+    background:
+        linear-gradient(135deg, rgba(31, 41, 55, 0.92), rgba(3, 7, 18, 0.95) 52%, rgba(9, 9, 11, 0.98)),
+        rgba(9, 9, 11, 0.86) !important;
+}
+
+.sain-hero .spt-title {
+    font-size: 1.9rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.sain-hero-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border: 1px solid rgba(250, 204, 21, 0.36);
+    border-radius: 10px;
+    background:
+        linear-gradient(180deg, rgba(250, 204, 21, 0.12), rgba(250, 204, 21, 0.06)),
+        rgba(250, 204, 21, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.sain-stat {
+    min-width: 92px;
+    padding: 8px 16px;
+    border: 1px solid rgba(63, 63, 70, 0.9);
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(39, 39, 42, 0.58), rgba(24, 24, 27, 0.78)),
+        rgba(24, 24, 27, 0.78);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    text-align: center;
+}
+
+.sain-stat .mud-typography-caption {
+    color: var(--spt-text-muted, #a1a1aa);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.sain-stat .mud-typography-h5 {
+    color: #f8fafc;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+/* ---- Server settings: fill the width with a responsive two-column grid ---- */
+.sain-settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
+    gap: 16px;
+    align-items: start;
+}
+
+/* Toggle rows (plain divs, so MudSwitch renders normally instead of inheriting list typography). */
+.sain-toggle-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.sain-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 4px;
+    border-bottom: 1px solid rgba(39, 39, 42, 0.5);
+}
+
+.sain-toggle-row:last-child {
+    border-bottom: none;
+}
+
+.sain-toggle-list-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* ---- Unified page shell: preset picker sidebar + editor ---- */
+.sain-shell {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.sain-shell-nav {
+    flex: 0 0 300px;
+    position: sticky;
+    top: 16px;
+}
+
+.sain-shell-main {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.sain-shell-nav .mud-list-item:not(.mud-list-item-disabled) {
+    min-height: 52px;
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    border: 1px solid #27272a;
+    border-radius: 8px;
+    background: rgba(24, 24, 27, 0.55);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    transition: border-color 160ms ease, background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.sain-shell-nav .mud-list-item:not(.mud-list-item-disabled):hover {
+    transform: translateY(-1px);
+    border-color: rgba(56, 189, 248, 0.55);
+    background: rgba(24, 24, 27, 0.88);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+}
+
+.sain-shell-nav .mud-selected-item {
+    color: #f8fafc;
+    border-color: rgba(56, 189, 248, 0.86);
+    background:
+        linear-gradient(90deg, rgba(14, 116, 144, 0.34), rgba(24, 24, 27, 0.7)),
+        rgba(14, 116, 144, 0.2) !important;
+    box-shadow: inset 3px 0 0 #38bdf8, inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.sain-shell-nav .mud-list-subheader {
+    padding: 2px 2px 0;
+    margin-top: 10px;
+}
+
+.sain-shell-nav .mud-list-subheader:first-child {
+    margin-top: 0;
+}
+
+.sain-shell-nav .mud-list-subheader .mud-typography-overline {
+    display: block;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--spt-border, #27272a);
+    color: #71717a;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+}
+
+.sain-preset-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+}
+
+.sain-preset-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.sain-shell-nav .sain-preset-disabled {
+    opacity: 0.5;
+}
+
+.sain-preset-item .mud-icon-button {
+    opacity: 0;
+    transition: opacity 120ms ease;
+}
+
+.sain-shell-nav .mud-list-item:hover .mud-icon-button,
+.sain-shell-nav .mud-selected-item .mud-icon-button,
+.sain-preset-item .mud-icon-button:focus-visible {
+    opacity: 1;
+}
+
+.sain-new-preset {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 6px;
+    padding: 18px;
+    border: 1px dashed rgba(82, 82, 91, 0.6);
+    border-radius: var(--spt-radius, 8px);
+    background: rgba(3, 7, 18, 0.24);
+}
+
+.sain-shell-main .mud-tabs-tabbar {
+    border-bottom: 1px solid var(--spt-border, #27272a);
+    background: rgba(9, 9, 11, 0.5) !important;
+    border-radius: 0;
+}
+
+.sain-shell-main .mud-tab {
+    min-height: 52px;
+    color: var(--spt-text-muted, #a1a1aa);
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+    transition: color 160ms ease;
+}
+
+.sain-shell-main .mud-tab .mud-icon-root {
+    transition: color 160ms ease;
+}
+
+.sain-shell-main .mud-tab:hover:not(.mud-tab-active) {
+    color: #d4d4d8;
+}
+
+.sain-shell-main .mud-tab.mud-tab-active,
+.sain-shell-main .mud-tab.mud-tab-active .mud-icon-root {
+    color: #38bdf8;
+}
+
+.sain-shell-main .mud-tab-slider {
+    background: #38bdf8 !important;
+}
+
+.sain-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sain-editor-search {
+    max-width: 420px;
+}
+
+.sain-editor-search .mud-input-adornment .mud-icon-root {
+    color: #71717a;
+    transition: color 160ms ease;
+}
+
+.sain-editor-search .mud-input.mud-input-focused .mud-input-adornment .mud-icon-root {
+    color: #38bdf8;
+}
+
+.sain-editor-body {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.sain-editor-nav {
+    flex: 0 0 220px;
+    position: sticky;
+    top: 16px;
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+    border-right: 1px solid var(--spt-border, #27272a);
+    padding-right: 6px;
+    scrollbar-color: #52525b rgba(3, 7, 18, 0.24);
+}
+
+.sain-editor-content {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.sain-editor-nav .mud-list-item {
+    border-radius: 6px;
+    margin-bottom: 2px;
+    color: var(--spt-text-muted, #a1a1aa);
+    transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease;
+}
+
+.sain-editor-nav .mud-list-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--spt-text, #f8fafc);
+}
+
+.sain-editor-nav .mud-selected-item {
+    color: #f8fafc;
+    font-weight: 700;
+    background: rgba(14, 116, 144, 0.24) !important;
+    box-shadow: inset 3px 0 0 #38bdf8;
+}
+
+.sain-leaf-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+    border: 1px solid var(--spt-border, #27272a);
+    border-radius: var(--spt-radius, 8px);
+    background: linear-gradient(180deg, rgba(24, 24, 27, 0.52), rgba(9, 9, 11, 0.42));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    overflow: hidden;
+}
+
+.sain-field {
+    display: grid;
+    grid-template-columns: minmax(200px, 300px) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px 20px;
+    padding: 12px 16px;
+    border-left: 3px solid transparent;
+    border-bottom: 1px solid rgba(39, 39, 42, 0.6);
+    transition: background 160ms ease, border-color 160ms ease;
+}
+
+.sain-leaf-group .sain-field:last-child {
+    border-bottom: none;
+}
+
+.sain-field:hover,
+.sain-field:focus-within {
+    background: rgba(24, 24, 27, 0.6);
+    border-left-color: rgba(56, 189, 248, 0.7);
+}
+
+.sain-field-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.sain-field-name {
+    color: var(--spt-text, #f8fafc);
+}
+
+.sain-field-help {
+    color: var(--spt-text-muted, #a1a1aa);
+    transition: color 160ms ease;
+}
+
+.sain-field:hover .sain-field-help,
+.sain-field:focus-within .sain-field-help {
+    color: #7dd3fc;
+}
+
+.sain-field-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-start;
+    min-width: 0;
+}
+
+.sain-field-reset {
+    display: flex;
+    justify-content: flex-end;
+    min-width: 32px;
+}
+
+.sain-field-reset .mud-icon-button {
+    opacity: 0.32;
+    transition: opacity 120ms ease, color 120ms ease;
+}
+
+.sain-field:hover .sain-field-reset .mud-icon-button,
+.sain-field:focus-within .sain-field-reset .mud-icon-button {
+    opacity: 1;
+}
+
+.sain-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+}
+
+.sain-slider-row .mud-slider {
+    flex: 1 1 auto;
+    min-width: 120px;
+}
+
+.sain-num {
+    max-width: 130px;
+}
+
+.sain-text {
+    max-width: 260px;
+    width: 100%;
+}
+
+.sain-select {
+    max-width: 220px;
+}
+
+.sain-tag,
+.sain-chip {
+    border-radius: 6px;
+    font-weight: 700;
+}
+
+/* ---- Category labels ---- */
+.sain-category {
+    display: block;
+    margin: 20px 0 8px;
+    color: #d4d4d8 !important;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+}
+
+.sain-panels {
+    background: transparent !important;
+}
+
+.sain-subpanel {
+    border: 1px solid rgba(39, 39, 42, 0.96);
+    border-radius: var(--spt-radius, 8px);
+    margin-bottom: 10px;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(39, 39, 42, 0.34), rgba(24, 24, 27, 0.48)) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    transition: border-color 160ms ease;
+}
+
+.sain-subpanel:hover,
+.sain-subpanel:focus-within {
+    border-color: rgba(82, 82, 91, 0.9);
+}
+
+.sain-subpanel .mud-expand-panel-header {
+    min-height: 46px;
+    padding-inline: 14px;
+    background: rgba(3, 7, 18, 0.16);
+}
+
+.sain-subpanel .mud-expand-panel-text {
+    font-weight: 800;
+    letter-spacing: 0;
+    color: #f8fafc;
+}
+
+.sain-list-item-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.sain-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.sain-add-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sain-section-chips .mud-chip.mud-chip-selected,
+.sain-section-chips .mud-chip.mud-selected {
+    background: rgba(14, 116, 144, 0.28) !important;
+    color: #f8fafc !important;
+}
+
+.sain-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 64px 16px;
+    border: 1px dashed #3f3f46;
+    border-radius: var(--spt-radius, 8px);
+    background: rgba(3, 7, 18, 0.28);
+    margin: 8px;
+}
+
+.sain-empty .mud-icon-root {
+    color: rgba(56, 189, 248, 0.55);
+}
+
+.sain-empty-inline {
+    padding: 24px;
+    text-align: center;
+    border: 1px dashed #3f3f46;
+    border-radius: var(--spt-radius, 8px);
+    background: rgba(3, 7, 18, 0.2);
+}
+
+/* ---- Shared top nav ---- */
+.sain-nav {
+    display: flex;
+    align-items: center;
+}
+
+.sain-nav .sain-nav-item {
+    color: var(--spt-text-muted, #a1a1aa);
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.sain-nav .sain-nav-item:hover {
+    color: var(--spt-text, #f8fafc);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.sain-nav .sain-nav-item-active {
+    color: #38bdf8 !important;
+    background: rgba(14, 116, 144, 0.2);
+}
+
+.sain-update-banner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-color: rgba(250, 204, 21, 0.4) !important;
+    background: linear-gradient(135deg, rgba(250, 204, 21, 0.1), rgba(9, 9, 11, 0.92) 60%) !important;
+}
+
+.sain-update-banner-copy {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+}
+
+.sain-update-banner-copy strong {
+    color: #f8fafc;
+    font-size: 1.05rem;
+}
+
+.sain-release-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--spt-text-muted, #a1a1aa);
+}
+
+.sain-timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sain-timeline-item {
+    position: relative;
+    padding-left: 28px;
+    padding-bottom: 16px;
+}
+
+.sain-timeline-item::before {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 8px;
+    bottom: -8px;
+    width: 2px;
+    background: var(--spt-border, #27272a);
+}
+
+.sain-timeline-item:last-child::before {
+    display: none;
+}
+
+.sain-timeline-marker {
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 3px solid var(--spt-bg, #030712);
+    background: #3f3f46;
+}
+
+.sain-timeline-item-current .sain-timeline-marker {
+    background: #38bdf8;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+}
+
+.sain-timeline-card {
+    padding: 16px;
+}
+
+.sain-timeline-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.sain-timeline-header strong {
+    display: block;
+    color: #f8fafc;
+    font-size: 1.05rem;
+}
+
+.sain-timeline-header > div:first-child span {
+    font-size: 0.8rem;
+}
+
+.sain-timeline-tags {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.sain-timeline-card a {
+    color: #38bdf8;
+}
+
+.sain-release-heading {
+    color: #f8fafc;
+    font-weight: 700;
+    margin: 12px 0 4px;
+}
+
+.sain-release-list {
+    margin: 4px 0;
+    padding-left: 20px;
+    color: #d4d4d8;
+}
+
+.sain-release-list li {
+    margin: 2px 0;
+}
+
+.sain-release-text {
+    color: #d4d4d8;
+    margin: 6px 0;
+    line-height: 1.5;
+}
+
+.sain-release-empty {
+    color: var(--spt-text-muted, #a1a1aa);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 960px) {
+    .sain-shell {
+        flex-direction: column;
+    }
+    .sain-shell-nav {
+        flex: 1 1 auto;
+        position: static;
+        width: 100%;
+    }
+}
+
+@media (max-width: 900px) {
+    .sain-editor-body {
+        flex-direction: column;
+    }
+    .sain-editor-nav {
+        flex: 1 1 auto;
+        position: static;
+        max-height: none;
+        border-right: none;
+        border-bottom: 1px solid var(--spt-border, #27272a);
+        padding-right: 0;
+    }
+}
+
+@media (max-width: 720px) {
+    .sain-field {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+    .sain-field-reset {
+        justify-content: flex-start;
+    }
+}

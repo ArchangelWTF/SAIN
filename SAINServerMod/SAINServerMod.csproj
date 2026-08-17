@@ -1,16 +1,20 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Library</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <ReleaseOutputDir>..\Build\SPT\user\mods\Solarint-SAIN-ServerMod\</ReleaseOutputDir>
+    <ReleaseOutputDir>..\Build\SPT_Runtime\user\mods\Solarint-SAIN-ServerMod\</ReleaseOutputDir>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="SPTarkov.Common" Version="4.0.0" />
-    <PackageReference Include="SPTarkov.DI" Version="4.0.0" />
-    <PackageReference Include="SPTarkov.Reflection" Version="4.0.0" />
-    <PackageReference Include="SPTarkov.Server.Core" Version="4.0.0" />
-    <PackageReference Include="SPTarkov.Server.Web" Version="4.0.0" />
+    <ProjectReference Include="..\SAIN.Preset.Shared\SAIN.Preset.Shared.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="SPTarkov.Common" Version="4.1.0-pre.202607241343" />
+    <PackageReference Include="SPTarkov.DI" Version="4.1.0-pre.202607241343" />
+    <PackageReference Include="SPTarkov.Reflection" Version="4.1.0-pre.202607241343" />
+    <PackageReference Include="SPTarkov.Server.Core" Version="4.1.0-pre.202607241343" />
+    <PackageReference Include="SPTarkov.Server.Web" Version="4.1.0-pre.202607241343" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Data\**">
@@ -38,7 +42,7 @@
   </Target>
   <Target Name="CopyToServerMods" AfterTargets="CopyBuildOutput" Condition="'$(Configuration)' == 'Debug'">
     <PropertyGroup>
-      <ServerModsDir>..\..\SPT\server-csharp\SPTarkov.Server\bin\Debug\$(TargetFramework)\user\mods\Solarint-SAIN-ServerMod\</ServerModsDir>
+      <ServerModsDir>..\..\SPT\server-csharp\SPTushonka.Server\bin\Debug\$(TargetFramework)\user\mods\Solarint-SAIN-ServerMod\</ServerModsDir>
     </PropertyGroup>
     <MakeDir Directories="$(ServerModsDir)" />
     <ItemGroup>

@@ -1,5 +1,6 @@
-﻿using EFT.Weather;
-using SAIN.Preset.GlobalSettings;
+using EFT.Weather;
+using SAIN.Preset.Shared.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings.Categories.Look;
 using UnityEngine;
 
 namespace SAIN.Components.BotController;

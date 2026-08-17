@@ -1,5 +1,6 @@
 ﻿using System;
 using EFT;
+using EFT.Ballistics;
 using SAIN.Models.Enums;
 using UnityEngine;
 
@@ -236,9 +237,9 @@ public class SAINEnemyStatus(EnemyData enemyData) : EnemyBase(enemyData, enemyDa
 
     public int NumberOfSearchesStarted { get; set; }
 
-    public void GetHit(DamageInfoStruct DamageInfoStruct)
+    public void GetHit(DamageInfo DamageInfo)
     {
-        IPlayer player = DamageInfoStruct.Player?.iPlayer;
+        IPlayer player = DamageInfo.Player?.iPlayer;
         if (player != null && (object)player == Enemy.EnemyPlayer)
         {
             if (!ShotMe)

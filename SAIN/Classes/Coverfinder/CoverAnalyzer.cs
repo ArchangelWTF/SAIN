@@ -9,6 +9,10 @@ namespace SAIN.SAINComponent.SubComponents.CoverFinder;
 
 public class CoverAnalyzer(BotComponent bot, CoverFinderComponent coverFinder) : BotBase(bot)
 {
+    // Reused for path checks so failed candidates don't allocate a throwaway PathData (+ NavMeshPath).
+    // On success the instance is handed to the retained CoverPoint and replaced with a fresh scratch.
+    private PathData _scratchPathData = new();
+
     public bool CheckCreateNewCoverPoint(
         Collider collider,
         Vector3 targetPosition,
@@ -23,7 +27,7 @@ public class CoverAnalyzer(BotComponent bot, CoverFinderComponent coverFinder) :
             coverPoint = null;
             return false;
         }
-        PathData pathData = new();
+        PathData pathData = _scratchPathData;
         if (!CheckPath(navMeshHit.position, pathData, botPosition, targetPosition, true))
         {
             reason = "badPath";
@@ -32,6 +36,7 @@ public class CoverAnalyzer(BotComponent bot, CoverFinderComponent coverFinder) :
         }
         reason = string.Empty;
         coverPoint = new CoverPoint(Bot, collider, pathData, navMeshHit.position);
+        _scratchPathData = new PathData();
         return true;
     }
 
@@ -82,7 +87,7 @@ public class CoverAnalyzer(BotComponent bot, CoverFinderComponent coverFinder) :
                         Vector3.down,
                         out RaycastHit raycastHit,
                         colliderHeight * 0.55f,
-                        LayerMaskClass.HighPolyWithTerrainNoGrassMask
+                        LayersMaskController.HighPolyWithTerrainNoGrassMask
                     )
                 )
                 {
@@ -244,7 +249,7 @@ public class CoverAnalyzer(BotComponent bot, CoverFinderComponent coverFinder) :
             _playerColliderArray[i] = null;
         }
 
-        Physics.OverlapSphereNonAlloc(point, radius, _playerColliderArray, LayerMaskClass.PlayerMask);
+        Physics.OverlapSphereNonAlloc(point, radius, _playerColliderArray, LayersMaskController.PlayerMask);
 
         int count = 0;
         Collider foundCollider = null;

@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
 using EFT;
+using EFT.Ballistics;
+using EFT.HealthSystem;
 using EFT.InventoryLogic;
 using SAIN.Components;
 using UnityEngine;
-using FractureEffect = GInterface342;
-using HeavyBleedEffect = GInterface340;
-using LightBleedEffect = GInterface339;
-using PainEffect = GInterface357;
 
 namespace SAIN.SAINComponent.Classes;
 
@@ -52,38 +50,27 @@ public class SAINBotMedicalClass : BotComponentClassBase
             return false;
         }
 
-        // TEST
-        //if (Meds.TryGetValue(EDamageEffectType.Pain, out MedsItemClass testItem))
-        //{
-        //    Meds.Remove(EDamageEffectType.Pain);
-        //    BotOwner.Medecine.FirstAid.CurUsingMeds = testItem;
-        //    BotOwner.Medecine.FirstAid.nullable_0 = EBodyPart.Chest;
-        //    BotOwner.Medecine.FirstAid.method_3();
-        //    return true;
-        //}
-        // END TEST
-
-        MedsItemClass item = SelectItemToUse();
+        Meds item = SelectItemToUse();
         if (item == null)
         {
             return false;
         }
         BotOwner.Medecine.FirstAid.CurUsingMeds = item;
-        BotOwner.Medecine.FirstAid.Nullable_0 = EBodyPart.Chest;
-        BotOwner.Medecine.FirstAid.method_3();
+        BotOwner.Medecine.FirstAid._bodyPartToHeal = EBodyPart.Chest;
+        BotOwner.Medecine.FirstAid.ApplyToSelf();
         return true;
     }
 
-    private MedsItemClass SelectItemToUse()
+    private Meds SelectItemToUse()
     {
-        MedsItemClass item;
-        HeavyBleedEffect heavyBleed = this.Player.HealthController.FindExistingEffect<HeavyBleedEffect>(EBodyPart.Common);
+        Meds item;
+        IHeavyBleeding heavyBleed = this.Player.HealthController.FindExistingEffect<IHeavyBleeding>(EBodyPart.Common);
         if (heavyBleed != null && Meds.TryGetValue(EDamageEffectType.HeavyBleeding, out item))
         {
             Meds.Remove(EDamageEffectType.HeavyBleeding);
             return item;
         }
-        LightBleedEffect lightBleed = this.Player.HealthController.FindExistingEffect<LightBleedEffect>(EBodyPart.Common);
+        ILightBleeding lightBleed = this.Player.HealthController.FindExistingEffect<ILightBleeding>(EBodyPart.Common);
         if (lightBleed != null && Meds.TryGetValue(EDamageEffectType.LightBleeding, out item))
         {
             Meds.Remove(EDamageEffectType.LightBleeding);
@@ -97,10 +84,10 @@ public class SAINBotMedicalClass : BotComponentClassBase
         return null;
     }
 
-    private MedsItemClass FindPainKiller()
+    private Meds FindPainKiller()
     {
-        PainEffect pain = this.Player.HealthController.FindExistingEffect<PainEffect>(EBodyPart.Common);
-        if (pain != null && Meds.TryGetValue(EDamageEffectType.Pain, out MedsItemClass item))
+        IPain pain = this.Player.HealthController.FindExistingEffect<IPain>(EBodyPart.Common);
+        if (pain != null && Meds.TryGetValue(EDamageEffectType.Pain, out Meds item))
         {
             Meds.Remove(EDamageEffectType.Pain);
             return item;
@@ -108,9 +95,9 @@ public class SAINBotMedicalClass : BotComponentClassBase
         return null;
     }
 
-    public void OnHealthEffectStarted(IEffect obj)
+    public void OnHealthEffectStarted(IHealthEffect obj)
     {
-        if (obj is FractureEffect)
+        if (obj is IFracture)
         {
             EBodyPart bodyPart = obj.BodyPart;
             if (bodyPart - EBodyPart.LeftArm <= 1)
@@ -135,7 +122,7 @@ public class SAINBotMedicalClass : BotComponentClassBase
         bool foundPainKiller = false;
         bool foundHeavyBleed = false;
         bool foundLightBleed = false;
-        foreach (MedsItemClass med in _availableHealingItems)
+        foreach (Meds med in _availableHealingItems)
         {
             if (med.TryGetItemComponent(out HealthEffectsComponent healthComponent))
             {
@@ -174,9 +161,9 @@ public class SAINBotMedicalClass : BotComponentClassBase
         }
     }
 
-    public Dictionary<EDamageEffectType, MedsItemClass> Meds { get; } = [];
+    public Dictionary<EDamageEffectType, Meds> Meds { get; } = [];
 
-    private readonly List<MedsItemClass> _availableHealingItems = [];
+    private readonly List<Meds> _availableHealingItems = [];
 
     public void TryCancelHeal()
     {
@@ -229,12 +216,12 @@ public class SAINBotMedicalClass : BotComponentClassBase
         base.Dispose();
     }
 
-    public void GetHit(DamageInfoStruct DamageInfoStruct, EBodyPart bodyPart, float floatVal)
+    public void GetHit(DamageInfo DamageInfo, EBodyPart bodyPart, float floatVal)
     {
         TimeLastShot = Time.time;
-        HitByEnemy.GetHit(DamageInfoStruct, bodyPart, floatVal);
-        HitReaction.GetHit(DamageInfoStruct, bodyPart, floatVal);
-        Bot.Cover.GetHit(DamageInfoStruct, bodyPart, floatVal);
+        HitByEnemy.GetHit(DamageInfo, bodyPart, floatVal);
+        HitReaction.GetHit(DamageInfo, bodyPart, floatVal);
+        Bot.Cover.GetHit(DamageInfo, bodyPart, floatVal);
     }
 
     public float TimeLastShot { get; private set; }

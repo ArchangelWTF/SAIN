@@ -1,4 +1,5 @@
-﻿using SAIN.SAINComponent;
+using SAIN.Preset.Shared.Enums;
+using SAIN.SAINComponent;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.SAINComponent.Classes.Search;
 using UnityEngine;

@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using EFT;
 using SAIN.Components;
 using SAIN.Helpers;
 using SAIN.Models.Enums;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -563,7 +563,7 @@ public class BotPathDataManual(BotComponent bot, IBotPathFinder pathFinder) : IB
                 direction,
                 out RaycastHit hit,
                 maxDist,
-                LayerMaskClass.PlayerStaticCollisionsMask
+                LayersMaskController.PlayerStaticCollisionsMask
             )
         )
         {

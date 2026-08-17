@@ -29,13 +29,13 @@ public class RandomVisiblePointGeneratorJob : SainJobTemplate, IDisposable
         {
             if (player?.IsActive == true)
             {
-                //RaycastJobs.Add(new RaycastJob(ShortRandomDirections, player.Transform.HeadPosition, LayerMaskClass.HighPolyWithTerrainMask, player.Player, null));
-                //RaycastJobs.Add(new RaycastJob(MidRangeRandomDirections, player.Transform.HeadPosition, LayerMaskClass.HighPolyWithTerrainMask, player.Player, null));
+                //RaycastJobs.Add(new RaycastJob(ShortRandomDirections, player.Transform.HeadPosition, LayersMaskController.HighPolyWithTerrainMask, player.Player, null));
+                //RaycastJobs.Add(new RaycastJob(MidRangeRandomDirections, player.Transform.HeadPosition, LayersMaskController.HighPolyWithTerrainMask, player.Player, null));
                 RaycastJobs.Add(
                     new RaycastJob(
                         LongRandomDirections,
                         player.Transform.EyePosition,
-                        LayerMaskClass.HighPolyWithTerrainMask,
+                        LayersMaskController.HighPolyWithTerrainMask,
                         player.Player,
                         null
                     )

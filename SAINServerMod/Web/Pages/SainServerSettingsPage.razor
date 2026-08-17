@@ -1,0 +1,236 @@
+@page "/sain/server-settings"
+@attribute [Authorize]
+@implements IDisposable
+@layout BaseMudBlazorLayout
+@using SAIN.Preset.Shared.Models.WS
+@using SAINServerMod.Ws
+@using SPTarkov.Server.Core.Servers
+@inject SainServerConfigService ServerConfig
+@inject SainPresetEditService Presets
+@inject SaveServer SaveServer
+@inject PresetService PresetService
+@inject SAINPresetWebSocketHandler PresetSync
+@inject NavigationManager Nav
+@inject ISnackbar Snackbar
+
+<PageTitle>SAIN Server Settings</PageTitle>
+<HeadContent>
+    <link rel="stylesheet" href="/SAIN/css/sain.css" />
+</HeadContent>
+
+<div class="spt-page">
+    <MudContainer MaxWidth="MaxWidth.False" Class="sain-container pa-4">
+        <SainNav Current="settings" />
+        <MudPaper Elevation="0" Class="spt-panel sain-hero pa-4 mb-4">
+            <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap" Spacing="3">
+                <MudStack Row AlignItems="AlignItems.Center" Spacing="3">
+                    <div class="sain-hero-icon">
+                        <MudIcon Icon="@Icons.Material.Filled.AdminPanelSettings" Color="Color.Warning" Size="Size.Large" />
+                    </div>
+                    <div>
+                        <MudText Typo="Typo.h5" Class="spt-title">Server Settings</MudText>
+                        <MudText Typo="Typo.caption" Class="spt-muted">Admin controls for SAIN presets and in-game editing. Changes apply immediately. Save persists them.</MudText>
+                    </div>
+                </MudStack>
+                <MudButton Variant="Variant.Filled" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Save" OnClick="SaveAsync">Save</MudButton>
+            </MudStack>
+        </MudPaper>
+
+        <div class="sain-settings-grid">
+            <MudPaper Elevation="0" Class="spt-panel pa-4">
+                <MudText Typo="Typo.subtitle1" Class="spt-title mb-1">Presets</MudText>
+                <MudStack Spacing="3">
+                    <div>
+                        <MudText Typo="Typo.overline" Class="spt-muted mb-1">Available default presets</MudText>
+                        <MudText Typo="Typo.caption" Class="spt-muted d-block mb-2">Turn individual defaults off to hide them from players in-game.</MudText>
+                        @if (IsForced)
+                        {
+                            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mb-2">
+                                A preset is forced below, so hiding individual defaults has no effect while a force is set.
+                            </MudAlert>
+                        }
+                        else if (!HasCustomPresets)
+                        {
+                            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mb-2">
+                                Players always need at least one preset, so the last available one can't be turned off. Add a custom preset to hide more.
+                            </MudAlert>
+                        }
+                        <div class="sain-toggle-list @(IsForced ? "sain-toggle-list-disabled" : null)">
+                            @foreach (var preset in _presets.Where(p => !p.IsCustom))
+                            {
+                                <div class="sain-toggle-row">
+                                    <MudText Typo="Typo.body2">@preset.Name</MudText>
+                                    <MudSwitch T="bool" Value="@IsPresetEnabled(preset.Name)" ValueChanged="@(v => SetPresetEnabled(preset.Name, v))"
+                                               Color="Color.Primary" Disabled="@(IsForced || IsLastAvailable(preset.Name))" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <MudDivider />
+                    <div>
+                        <MudSelect T="string" Value="ForcedValue" ValueChanged="OnForcedChanged" Label="Force a preset for all players"
+                                   Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Style="max-width:360px;">
+                            <MudSelectItem T="string" Value="@NoneOption">Not forced (players choose)</MudSelectItem>
+                            @foreach (var item in _presets)
+                            {
+                                <MudSelectItem T="string" Value="@item.Name">@item.Name @(item.IsCustom ? "(custom)" : "(default)")</MudSelectItem>
+                            }
+                        </MudSelect>
+                        <MudText Typo="Typo.caption" Class="spt-muted">
+                            When set, every player is locked onto this preset and can't change it in-game.
+                        </MudText>
+                    </div>
+                </MudStack>
+            </MudPaper>
+
+            <MudPaper Elevation="0" Class="spt-panel pa-4">
+                <MudText Typo="Typo.subtitle1" Class="spt-title mb-1">In-game editing</MudText>
+                <MudStack Spacing="3">
+                    <div>
+                        <MudSwitch T="bool" @bind-Value="ServerConfig.Config.AllowClientEditing" Color="Color.Primary" Label="Allow all players to edit presets" />
+                        <MudText Typo="Typo.caption" Class="spt-muted">
+                            When off, only the players allowlisted below can save changes from the in-game editor.
+                        </MudText>
+                    </div>
+                    <MudDivider />
+                    <div>
+                        <MudText Typo="Typo.overline" Class="spt-muted mb-1">Allowlist</MudText>
+                        @if (_profiles.Count == 0)
+                        {
+                            <div class="sain-empty-inline"><MudText Typo="Typo.body2" Class="spt-muted">No profiles found on this server.</MudText></div>
+                        }
+                        else
+                        {
+                            <div class="sain-toggle-list">
+                                @foreach (var p in _profiles)
+                                {
+                                    <div class="sain-toggle-row">
+                                        <div>
+                                            <MudText Typo="Typo.body2">@p.Nickname</MudText>
+                                            <MudText Typo="Typo.caption" Class="spt-mono spt-muted">@p.Id</MudText>
+                                        </div>
+                                        <MudSwitch T="bool" Value="@IsAllowed(p.Id)" ValueChanged="@(v => SetAllowed(p.Id, v))"
+                                                   Color="Color.Primary" Disabled="@ServerConfig.Config.AllowClientEditing" />
+                                    </div>
+                                }
+                            </div>
+                            @if (ServerConfig.Config.AllowClientEditing)
+                            {
+                                <MudText Typo="Typo.caption" Class="spt-muted">Editing is open to everyone, so the allowlist is inactive.</MudText>
+                            }
+                        }
+                    </div>
+                </MudStack>
+            </MudPaper>
+        </div>
+    </MudContainer>
+</div>
+
+@code {
+    private const string NoneOption = "\0none";
+
+    private sealed record ProfileRow(string Id, string Nickname);
+
+    private IReadOnlyList<PresetListItem> _presets = Array.Empty<PresetListItem>();
+    private List<ProfileRow> _profiles = new();
+
+    protected override void OnInitialized()
+    {
+        PresetService.CustomPresetsChanged += OnPresetsChangedExternally;
+        _presets = Presets.ListAll();
+        _profiles = SaveServer.GetProfiles()
+            .Select(kv => new ProfileRow(
+                kv.Key.ToString(),
+                kv.Value.CharacterData?.PmcData?.Info?.Nickname ?? kv.Key.ToString()))
+            .Where(p => !p.Nickname.StartsWith("headless_", StringComparison.OrdinalIgnoreCase))
+            .OrderBy(p => p.Nickname, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
+    public void Dispose()
+    {
+        PresetService.CustomPresetsChanged -= OnPresetsChangedExternally;
+    }
+
+    // A preset saved/deleted in-game or from another session: refresh the preset list so the force
+    // dropdown and default toggles stay current.
+    private void OnPresetsChangedExternally()
+    {
+        _ = InvokeAsync(() =>
+        {
+            _presets = Presets.ListAll();
+            StateHasChanged();
+        });
+    }
+
+    private bool HasCustomPresets => _presets.Any(p => p.IsCustom);
+
+    private bool IsForced
+    {
+        get { return !string.IsNullOrEmpty(ServerConfig.Config.ForcedPresetName); }
+    }
+
+    private string ForcedValue
+    {
+        get { return string.IsNullOrEmpty(ServerConfig.Config.ForcedPresetName) ? NoneOption : ServerConfig.Config.ForcedPresetName!; }
+    }
+
+    private void OnForcedChanged(string value)
+    {
+        ServerConfig.Config.ForcedPresetName = value == NoneOption ? null : value;
+    }
+
+    private bool IsPresetEnabled(string name)
+    {
+        return !ServerConfig.Config.DisabledPresets.Contains(name);
+    }
+
+    // The last still-available preset (a default not hidden, or any custom) can't be hidden; its switch is
+    // disabled so players always keep at least one option.
+    private bool IsLastAvailable(string name)
+    {
+        if (ServerConfig.Config.DisabledPresets.Contains(name))
+        {
+            return false;
+        }
+        return !_presets.Any(p => p.Name != name && (p.IsCustom || !ServerConfig.Config.DisabledPresets.Contains(p.Name)));
+    }
+
+    private void SetPresetEnabled(string name, bool enabled)
+    {
+        var list = ServerConfig.Config.DisabledPresets;
+        if (enabled)
+        {
+            list.Remove(name);
+        }
+        else if (!list.Contains(name))
+        {
+            list.Add(name);
+        }
+    }
+
+    private bool IsAllowed(string id)
+    {
+        return ServerConfig.Config.EditAllowlist.Contains(id);
+    }
+
+    private void SetAllowed(string id, bool allowed)
+    {
+        var list = ServerConfig.Config.EditAllowlist;
+        if (allowed && !list.Contains(id))
+        {
+            list.Add(id);
+        }
+        else if (!allowed)
+        {
+            list.Remove(id);
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        await ServerConfig.SaveAsync();
+        await PresetSync.BroadcastPresetChanged(string.Empty, EPresetSyncChange.ConfigChanged);
+        Snackbar.Add("Server settings saved. Connected players will update live.", Severity.Success);
+    }
+}

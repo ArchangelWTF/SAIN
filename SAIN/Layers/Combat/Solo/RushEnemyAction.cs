@@ -1,7 +1,7 @@
-﻿using DrakiaXYZ.BigBrain.Brains;
+using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Models.Enums;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
 using UnityEngine.AI;
@@ -68,7 +68,8 @@ internal class RushEnemyAction(BotOwner bot) : BotAction(bot, nameof(RushEnemyAc
         {
             //&& Bot.Enemy.Path.PathDistance > 3f
             NavMeshPath enemyPath = _enemy.Path.PathToEnemy;
-            if (enemyPath.corners.Length > 2 && (enemyPath.corners[enemyPath.corners.Length - 2] - Bot.Position).sqrMagnitude < 1f)
+            Vector3[] corners = enemyPath.corners;
+            if (corners.Length > 2 && (corners[corners.Length - 2] - Bot.Position).sqrMagnitude < 1f)
             {
                 TryJumpTimer = Time.time + 3f;
                 Bot.Mover.TryJump();

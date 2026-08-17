@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using EFT;
+﻿using EFT;
 
 namespace SAIN.Extensions;
 
@@ -9,7 +6,7 @@ public static class BotExtensions
 {
     public static bool IsBotActive(this BotOwner botOwner)
     {
-        if (botOwner == null && botOwner.StandBy == null)
+        if (botOwner == null || botOwner.StandBy == null)
         {
             return false;
         }

@@ -79,7 +79,7 @@ public class FlashlightRaycastJob : SainJobTemplate, IDisposable
                         new RaycastJob(
                             Directions,
                             player.Transform.WeaponData.PointDirection,
-                            LayerMaskClass.HighPolyWithTerrainMaskAI,
+                            LayersMaskController.HighPolyWithTerrainMaskAI,
                             player.Player,
                             null
                         )
@@ -144,7 +144,7 @@ public class FlashlightRaycastJob : SainJobTemplate, IDisposable
                                 new RaycastJob(
                                     EnemyLight.LightDetection.LightPoints,
                                     Bot.Transform.EyePosition,
-                                    LayerMaskClass.HighPolyWithTerrainMaskAI,
+                                    LayersMaskController.HighPolyWithTerrainMaskAI,
                                     Bot.Player,
                                     Enemy.Player
                                 )

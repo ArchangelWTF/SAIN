@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using SAIN.Helpers;
-using SAIN.Models.Preset.Personalities;
+using System.Collections.Generic;
 using SAIN.Plugin;
 using SAIN.Preset;
+using SAIN.Preset.Shared.Models.Preset.Personalities;
 using static SAIN.Attributes.AttributesGUI;
 
 namespace SAIN.Editor.GUISections;
@@ -13,7 +12,7 @@ public static class BotPersonalityEditor
     {
         string toolTip =
             $"Apply Values set below to Personalities. "
-            + $"Exports edited values to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name}/Personalities folder";
+            + $"Saves edited values to the SPT server for preset '{SAINPlugin.LoadedPreset.Info.Name}'";
 
         if (BuilderClass.SaveChanges(ConfigEditingTracker.GetUnsavedValuesString(), 35))
         {

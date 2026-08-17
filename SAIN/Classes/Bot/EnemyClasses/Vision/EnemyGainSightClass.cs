@@ -1,6 +1,7 @@
-﻿using EFT;
+using EFT;
 using SAIN.Components;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings.Categories.Look.VisionSpeed;
 using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes.EnemyClasses;

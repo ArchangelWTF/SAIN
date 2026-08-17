@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using EFT;
 using EFT.InventoryLogic;
+using SAIN.Extensions;
 using SAIN.SAINComponent;
 using SAIN.SAINComponent.Classes.Info;
 

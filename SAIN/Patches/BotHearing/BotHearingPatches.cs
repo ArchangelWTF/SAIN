@@ -1,8 +1,9 @@
-﻿using System.Reflection;
+using System.Reflection;
 using EFT;
 using EFT.Interactive;
 using HarmonyLib;
 using SAIN.Components;
+using SAIN.Preset.Shared.Enums;
 using SPT.Reflection.Patching;
 using UnityEngine;
 
@@ -16,19 +17,21 @@ public class TreeSoundPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(TreeInteractive), nameof(TreeInteractive.method_0));
+        return AccessTools.Method(typeof(TreeInteractive), nameof(TreeInteractive.PlaySoundBank));
     }
 
     [PatchPostfix]
-    public static void Patch(Vector3 soundPosition, BetterSource source, IPlayerOwner player, SoundBank ____soundBank)
+    public static void Patch(Vector3 soundPosition, BetterSource source, IObserverToPlayerBridge player, SoundBank ____soundBank)
     {
         if (player.iPlayer != null)
         {
             float baseRange = 50f;
+
             if (____soundBank != null)
             {
                 baseRange = ____soundBank.Rolloff * player.SoundRadius * 0.8f;
             }
+
             BotManagerComponent.Instance?.BotHearing.PlayAISound(
                 player.iPlayer.ProfileId,
                 SAINSoundType.Bush,
@@ -158,7 +161,7 @@ public class AimSoundPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(Player.FirearmController), nameof(Player.FirearmController.method_60));
+        return AccessTools.Method(typeof(Player.FirearmController), nameof(Player.FirearmController.PlayAimingSound));
     }
 
     [PatchPrefix]

@@ -118,7 +118,7 @@ public class BotSquadContainer : BotComponentClassBase
             if (member != null && member.GetDistanceToPlayer(Bot.ProfileId) <= CHECK_VISIBLE_MEMBERS_DISTANCE)
             {
                 Vector3 direction = member.Transform.BodyPosition - eyePos;
-                if (!Physics.Raycast(eyePos, direction.normalized, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
+                if (!Physics.Raycast(eyePos, direction.normalized, direction.magnitude, LayersMaskController.HighPolyWithTerrainMask))
                 {
                     VisibleMembers.Add(member);
                 }

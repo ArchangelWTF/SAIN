@@ -1,11 +1,8 @@
-﻿using System;
-using System.Reflection;
 using EFT;
 using EFT.InventoryLogic;
-using HarmonyLib;
 using SAIN.Components;
+using SAIN.Preset.Shared.Enums;
 using SAIN.SAINComponent.Classes.EnemyClasses;
-using SPT.Reflection.Patching;
 using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes.Decision;
@@ -164,14 +161,14 @@ public class SelfActionDecisionClass : BotBase
 
     private bool TryReload(BotOwner botOwner, BotReload reload)
     {
-        if (reload.CanReload(true, out var MagazineItemClass, out var list))
+        if (reload.CanReload(true, out var Magazine, out var list))
         {
             botOwner.ShootData.EndShoot();
             reload.Reloading = true;
             _lastReloadTime = Time.time;
-            if (MagazineItemClass != null)
+            if (Magazine != null)
             {
-                reload.ReloadMagazine(MagazineItemClass);
+                reload.ReloadMagazine(Magazine);
             }
             else if (list != null && list.Count > 0)
             {

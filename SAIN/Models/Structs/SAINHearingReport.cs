@@ -1,4 +1,5 @@
-﻿using SAIN.SAINComponent.Classes.EnemyClasses;
+using SAIN.Preset.Shared.Enums;
+using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
 
 namespace SAIN.Models.Structs;

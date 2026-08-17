@@ -1,0 +1,48 @@
+@namespace SAINServerMod.Web.Components
+@using SAIN.Preset.Shared.Models.Preset.Personalities
+@using SAIN.Preset.Shared.Personalities.BasePersonality
+
+<MudStack Row Spacing="3" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Class="mb-3">
+    <MudSelect T="EPersonality" Value="_selected" ValueChanged="OnSelected" Label="Personality"
+               Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Style="min-width:220px;">
+        @foreach (var key in _keys)
+        {
+            <MudSelectItem T="EPersonality" Value="key">@key</MudSelectItem>
+        }
+    </MudSelect>
+</MudStack>
+
+@if (_settings != null)
+{
+    @if (!string.IsNullOrWhiteSpace(_settings.Description))
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mb-3">@_settings.Description</MudAlert>
+    }
+    <SainSectionEditor Target="_settings" OnChanged="OnChanged" />
+}
+else
+{
+    <MudText Typo="Typo.caption" Class="spt-muted">This preset has no personality data.</MudText>
+}
+
+@code {
+    [Parameter, EditorRequired] public SAINPresetBundle Bundle { get; set; } = default!;
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private List<EPersonality> _keys = new();
+    private EPersonality _selected;
+    private PersonalitySettingsClass? _settings;
+
+    protected override void OnInitialized()
+    {
+        _keys = Bundle.Personalities.Keys.ToList();
+        _selected = _keys.FirstOrDefault();
+        Bundle.Personalities.TryGetValue(_selected, out _settings);
+    }
+
+    private void OnSelected(EPersonality key)
+    {
+        _selected = key;
+        Bundle.Personalities.TryGetValue(_selected, out _settings);
+    }
+}

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Comfort.Common;
+using CommonAssets.Scripts.Game;
 using EFT;
 using EFT.Interactive;
 using HarmonyLib;
@@ -127,7 +128,7 @@ public class ExtractFinderComponent : MonoBehaviour
             return false;
         }
 
-        ExfiltrationControllerClass ExfilController = Singleton<GameWorld>.Instance.ExfiltrationController;
+        ExfiltrationController ExfilController = Singleton<GameWorld>.Instance.ExfiltrationController;
         if (ExfilController == null)
         {
             return false;

@@ -1,4 +1,4 @@
-﻿using EFT;
+using EFT;
 using SAIN.Extensions;
 using SAIN.Models.Enums;
 

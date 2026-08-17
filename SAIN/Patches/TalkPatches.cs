@@ -79,7 +79,7 @@ public class BotTalkPatch : ModulePatch
         {
             return true;
         }
-        if (__instance.BotOwner_0?.HealthController?.IsAlive == false)
+        if (__instance._owner?.HealthController?.IsAlive == false)
         {
             return true;
         }
@@ -94,7 +94,7 @@ public class BotTalkPatch : ModulePatch
             default:
                 break;
         }
-        if (!SAINEnableClass.GetSAIN(__instance.BotOwner_0.ProfileId, out BotComponent bot))
+        if (!SAINEnableClass.GetSAIN(__instance._owner.ProfileId, out BotComponent bot))
         {
             return true;
         }
@@ -124,6 +124,6 @@ public class BotTalkManualUpdatePatch : ModulePatch
     {
         // If handling of bots talking is disabled, let the original method run
         return SAINPlugin.LoadedPreset.GlobalSettings.Talk.DisableBotTalkPatching
-            || !SAINEnableClass.GetSAIN(__instance.BotOwner_0.ProfileId, out _);
+            || !SAINEnableClass.GetSAIN(__instance._owner.ProfileId, out _);
     }
 }

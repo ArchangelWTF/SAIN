@@ -1,8 +1,11 @@
 using System.Collections.Generic;
 using EFT;
+using EFT.Ballistics;
 using SAIN.Components;
+using SAIN.Extensions;
 using SAIN.Helpers;
 using SAIN.Preset;
+using SAIN.Preset.Shared.Enums;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.SAINComponent.Classes.Info;
 using UnityEngine;
@@ -597,7 +600,7 @@ public class GroupTalk : BotBase
         }
     }
 
-    private void friendlyDown(IPlayer player, DamageInfoStruct damage, float time)
+    private void friendlyDown(IPlayer player, DamageInfo damage, float time)
     {
         if (!Bot.Talk.CanTalk)
         {
@@ -1077,12 +1080,12 @@ public class GroupTalk : BotBase
             _reportFriendKilledChance = squadTalk._reportFriendKilledChance;
             _talkRetreatChance = squadTalk._talkRetreatChance;
             _talkRetreatFreq = squadTalk._talkRetreatFreq;
-            _talkRetreatTrigger = squadTalk._talkRetreatTrigger;
-            _talkRetreatMask = squadTalk._talkRetreatMask;
+            _talkRetreatTrigger = squadTalk._talkRetreatTrigger.ToEft();
+            _talkRetreatMask = squadTalk._talkRetreatMask.ToEft();
             _talkRetreatGroupDelay = squadTalk._talkRetreatGroupDelay;
             _underFireNeedHelpChance = squadTalk._underFireNeedHelpChance;
-            _underFireNeedHelpTrigger = squadTalk._underFireNeedHelpTrigger;
-            _underFireNeedHelpMask = squadTalk._underFireNeedHelpMask;
+            _underFireNeedHelpTrigger = squadTalk._underFireNeedHelpTrigger.ToEft();
+            _underFireNeedHelpMask = squadTalk._underFireNeedHelpMask.ToEft();
             _underFireNeedHelpGroupDelay = squadTalk._underFireNeedHelpGroupDelay;
             _underFireNeedHelpFreq = squadTalk._underFireNeedHelpFreq;
             _hearNoiseChance = squadTalk._hearNoiseChance;

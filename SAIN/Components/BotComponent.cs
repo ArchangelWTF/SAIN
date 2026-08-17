@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using EFT;
@@ -7,8 +7,9 @@ using SAIN.Classes.Bot.Sense.Hearing;
 using SAIN.Components.PlayerComponentSpace;
 using SAIN.Layers;
 using SAIN.Models.Enums;
-using SAIN.Preset.GlobalSettings;
 using SAIN.Preset.GlobalSettings.Categories;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.GlobalSettings;
 using SAIN.SAINComponent.Classes;
 using SAIN.SAINComponent.Classes.Debug;
 using SAIN.SAINComponent.Classes.Decision;
@@ -378,7 +379,7 @@ public class BotComponent : BotComponentBase, ISPlayer
             try
             {
                 BotOwner.LookSensor.MaxShootDist = float.MaxValue;
-                if (BotOwner.AIData is PlayerAIDataClass aiData)
+                if (BotOwner.AIData is AIData aiData)
                 {
                     aiData.IsNoOffsetShooting = false;
                 }

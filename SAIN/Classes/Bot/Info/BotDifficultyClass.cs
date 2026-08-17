@@ -1,4 +1,5 @@
-﻿using SAIN.Components;
+using SAIN.Components;
+using SAIN.Extensions;
 using SAIN.Helpers;
 using SAIN.Preset;
 
@@ -53,6 +54,7 @@ public class BotDifficultyClass : BotBase
         AggressionModifier = 1f * globalSettings.AggressionCoef * botSettings.AggressionCoef * personalitySettings.AggressionCoef;
 
         var locationSettings = preset.GlobalSettings.Location.Current();
+
         if (locationSettings == null)
         {
             return;
@@ -93,6 +95,7 @@ public class BotDifficultyClass : BotBase
     private void applyLocation(SAINPresetClass preset)
     {
         var locationSettings = preset.GlobalSettings.Location.Current();
+
         if (locationSettings == null)
         {
             return;

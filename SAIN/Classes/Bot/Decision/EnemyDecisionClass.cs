@@ -1,8 +1,10 @@
-﻿using System.Text;
+using System.Text;
 using EFT;
 using SAIN.Components;
 using SAIN.Models.Enums;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.GlobalSettings.Categories.General;
+using SAIN.Preset.Shared.Models.Enums;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.SAINComponent.Classes.Search;
 using UnityEngine;

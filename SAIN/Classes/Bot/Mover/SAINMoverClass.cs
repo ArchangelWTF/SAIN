@@ -571,7 +571,7 @@ public class SAINMoverClass : BotComponentClassBase, IBotPathFinder
             if (movementContext != null)
             {
                 bool wantToPatrolStance = WantsPatrolStance();
-                if (wantToPatrolStance != movementContext.IsInPatrol)
+                if (wantToPatrolStance != movementContext._isInPatrol)
                 {
                     // If we are in left stance and want to patrol, reset back to normal  before setting patrol next update.
                     //if (wantToPatrolStance && leftStance?.LeftStance == true)

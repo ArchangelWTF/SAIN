@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections;
 using CommonAssets.Scripts.Audio;
 using EFT;
 using SAIN.Components;
 using SAIN.Components.PlayerComponentSpace;
+using SAIN.Preset.Shared.Enums;
 using SAIN.SAINComponent;
 using UnityEngine;
 
@@ -80,7 +81,7 @@ public sealed class PlayerSoundController(PlayerComponent player) : PlayerCompon
                             SAINSoundType.Sprint,
                             Player.Position,
                             SAINPlugin.LoadedPreset.GlobalSettings.Hearing.BaseSoundRange_Sprint,
-                            Player.method_64(EAudioMovementState.Sprint)
+                            Player.CalculateMovementVolumeDefaultMultiplier(EAudioMovementState.Sprint)
                         );
                     }
                 }
@@ -88,7 +89,7 @@ public sealed class PlayerSoundController(PlayerComponent player) : PlayerCompon
                 if (nextState == EPlayerState.Transition || nextState == EPlayerState.Idle)
                 {
                     float num = 1f * Player.MovementContext.CovertMovementVolume;
-                    num *= Player.method_64(EAudioMovementState.Stop);
+                    num *= Player.CalculateMovementVolumeDefaultMultiplier(EAudioMovementState.Stop);
                     BotManagerComponent.Instance.BotHearing.PlayAISound(
                         Player.ProfileId,
                         SAINSoundType.Sprint,
@@ -114,7 +115,7 @@ public sealed class PlayerSoundController(PlayerComponent player) : PlayerCompon
                 _sprintCoroutine = player.StartCoroutine(StartSprintCoroutine(nextState));
                 break;
             case EPlayerState.Jump:
-                float vol = Player.method_64(EAudioMovementState.Jump);
+                float vol = Player.CalculateMovementVolumeDefaultMultiplier(EAudioMovementState.Jump);
                 BotManagerComponent.Instance.BotHearing.PlayAISound(
                     Player.ProfileId,
                     SAINSoundType.Jump,
@@ -167,9 +168,9 @@ public sealed class PlayerSoundController(PlayerComponent player) : PlayerCompon
     {
         EAudioMovementState movementState = ((Player.Pose != EPlayerPose.Duck) ? EAudioMovementState.Run : EAudioMovementState.Duck);
         float covertMovementVolumeBySpeed = Player.MovementContext.CovertMovementVolumeBySpeed;
-        float speed = Player.method_57();
-        float state = Player.method_64(movementState);
-        float randomVolume = (Player.FirstPersonPointOfView || Player.method_80()) ? UnityEngine.Random.Range(0.75f, 1.1f) : 1f;
+        float speed = Player.CalculateStepSoundVolumeSpeedFactor();
+        float state = Player.CalculateMovementVolumeDefaultMultiplier(movementState);
+        float randomVolume = (Player.FirstPersonPointOfView || Player.IsAiUseSimpleSkeleton()) ? UnityEngine.Random.Range(0.75f, 1.1f) : 1f;
 
         float calc = covertMovementVolumeBySpeed * speed * state * randomVolume;
 
@@ -181,7 +182,7 @@ public sealed class PlayerSoundController(PlayerComponent player) : PlayerCompon
         _playedAtLeastOneStep = false;
         while (Player.CurrentState.Name == state)
         {
-            float single = Player.Single_0;
+            float single = Player.LeftStanceCurrentCurveValue;
             if (Math.Abs(_lastAnimatorSign - single) >= float.Epsilon)
             {
                 _lastAnimatorSign = single;
@@ -211,7 +212,7 @@ public sealed class PlayerSoundController(PlayerComponent player) : PlayerCompon
         _playedAtLeastOneStep = false;
         while (Player.CurrentState.Name == state)
         {
-            float single = Player.Single_0;
+            float single = Player.LeftStanceCurrentCurveValue;
             if (Math.Abs(_lastAnimatorSign - single) >= float.Epsilon)
             {
                 _lastAnimatorSign = single;
@@ -227,7 +228,7 @@ public sealed class PlayerSoundController(PlayerComponent player) : PlayerCompon
                             SAINSoundType.Sprint,
                             Player.Position,
                             SAINPlugin.LoadedPreset.GlobalSettings.Hearing.BaseSoundRange_Sprint,
-                            Player.method_64(EAudioMovementState.Sprint)
+                            Player.CalculateMovementVolumeDefaultMultiplier(EAudioMovementState.Sprint)
                         );
                     }
                 }

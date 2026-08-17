@@ -1,4 +1,6 @@
-﻿namespace SAINServerMod.Models.Preset.Personalities;
+using SAIN.Preset.Shared.Models.Preset.Personalities;
+
+namespace SAINServerMod.Models.Preset.Personalities;
 
 public sealed class NicknamesModel
 {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using EFT;
 using SAIN.Classes;
 using SAIN.Components;
@@ -6,7 +6,8 @@ using SAIN.Components.BotComponentSpace.Classes.EnemyClasses;
 using SAIN.Components.PlayerComponentSpace;
 using SAIN.Helpers;
 using SAIN.Models.Enums;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.GlobalSettings;
 using SAIN.Types.PlayerSmoothing;
 using UnityEngine;
 

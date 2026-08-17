@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <RootNamespace>SAIN.Preset.Shared</RootNamespace>
+    <AssemblyName>SAIN.Preset.Shared</AssemblyName>
+  </PropertyGroup>
+</Project>

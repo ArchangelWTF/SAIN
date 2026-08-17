@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using EFT;
@@ -6,6 +6,7 @@ using EFT.InventoryLogic;
 using SAIN.Helpers;
 using SAIN.Plugin;
 using SAIN.Preset;
+using SAIN.Preset.Shared.Enums;
 
 namespace SAIN.SAINComponent.Classes.Info;
 
@@ -21,7 +22,7 @@ public class WeaponInfo
     }
 
     public EWeaponClass WeaponClass { get; private set; }
-    public ECaliber AmmoCaliber { get; private set; }
+    public string AmmoCaliber { get; private set; }
     public float CalculatedAudibleRange { get; private set; }
     public AISoundType AISoundType
     {
@@ -91,7 +92,7 @@ public class WeaponInfo
         MuzzleLoudness += FlashHider?.Loudness ?? 0f;
         BulletSpeed = Weapon.CurrentAmmoTemplate.InitialSpeed * Weapon.SpeedFactor;
         CalculatedAudibleRange = BaseAudibleRange + MuzzleLoudness;
-        if (Suppressor != null || _suppressedWeapons.Contains(Weapon.TemplateId.StringID))
+        if (Suppressor != null || _suppressedWeapons.Contains(Weapon.TemplateId._stringID))
         {
             CalculatedAudibleRange *= SuppressorModifier(BulletSpeed);
             HasSuppressor = true;
@@ -144,18 +145,14 @@ public class WeaponInfo
                         Suppressor ??= mod;
                         break;
                     default:
-                        if (Suppressor == null && _suppressorMods.Contains(mod.TemplateId.StringID))
+                        if (Suppressor == null && _suppressorMods.Contains(mod.TemplateId._stringID))
                         {
                             Suppressor = mod;
                         }
                         break;
                 }
 
-                if (RedDot != null
-                    && Optic != null
-                    && FlashHider != null
-                    && Suppressor != null
-                )
+                if (RedDot != null && Optic != null && FlashHider != null && Suppressor != null)
                 {
                     return;
                 }
@@ -201,11 +198,11 @@ public class WeaponInfo
 
     private static bool CheckTemplateType(Type modType, string id)
     {
-        if (TemplateIdToObjectMappingsClass.TypeTable.TryGetValue(id, out Type result) && result == modType)
+        if (JsonTypes.TypeTable.TryGetValue(id, out Type result) && result == modType)
         {
             return true;
         }
-        if (TemplateIdToObjectMappingsClass.TemplateTypeTable.TryGetValue(id, out result) && result == modType)
+        if (JsonTypes.TemplateTypeTable.TryGetValue(id, out result) && result == modType)
         {
             return true;
         }
@@ -222,12 +219,12 @@ public class WeaponInfo
         return WeaponClass;
     }
 
-    private static ECaliber TryGetAmmoCaliber(Weapon weapon)
+    private static string TryGetAmmoCaliber(Weapon weapon)
     {
-        ECaliber caliber = EnumValues.TryParse<ECaliber>(weapon.Template.ammoCaliber);
-        if (caliber == default)
+        string caliber = weapon.Template.ammoCaliber;
+        if (string.IsNullOrEmpty(caliber))
         {
-            caliber = EnumValues.TryParse<ECaliber>(weapon.AmmoCaliber);
+            caliber = weapon.AmmoCaliber;
         }
         return caliber;
     }
@@ -270,25 +267,25 @@ public class WeaponInfo
     {
         "55818add4bdc2d5b648b456f", // AssaultScopeTypeId
         "55818ae44bdc2dde698b456c", // OpticScopeTypeId
-        "55818aeb4bdc2ddc698b456a"  // SpecialScopeTypeId
+        "55818aeb4bdc2ddc698b456a", // SpecialScopeTypeId
     };
     private static readonly string[] _redDotTypes =
     {
         "55818ad54bdc2ddc698b4569", // CollimatorTypeId
-        "55818acf4bdc2dde698b456b"  // CompactCollimatorTypeId
+        "55818acf4bdc2dde698b456b", // CompactCollimatorTypeId
     };
 
     // Some weapons don't have their suppressors listed in their mod lists, eventhough they are suppressed.
     // So, we check for their weapon IDs instead.
     private static readonly string[] _suppressedWeapons =
     {
-        "674d6121c09f69dfb201a888" // Aklys Defense Velociraptor .300
+        "674d6121c09f69dfb201a888", // Aklys Defense Velociraptor .300
     };
 
     // Some mods are suppressors, but aren't classified as suppressors.
     private static readonly string[] _suppressorMods =
     {
-        "5888945a2459774bf43ba385" // DVL-10 suppressed barrel
+        "5888945a2459774bf43ba385", // DVL-10 suppressed barrel
     };
 }
 

@@ -1,8 +1,9 @@
-﻿using System.Text;
+using System.Text;
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Classes.Bot.Search;
 using SAIN.Models.Enums;
+using SAIN.Preset.Shared.Enums;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -36,6 +37,7 @@ internal class SearchAction(BotOwner bot) : BotAction(bot, "Search"), IBotAction
     public override void Stop()
     {
         base.Stop();
+        unsubscribeFromBotEvents();
         clearSearchTarget();
         _haveTalked = false;
     }
@@ -242,6 +244,16 @@ internal class SearchAction(BotOwner bot) : BotAction(bot, "Search"), IBotAction
             Bot.EnemyController.Events.OnEnemyRemoved += checkClearEnemy;
             Bot.EnemyController.Events.OnEnemyChanged += enemyChanged;
             _subscribed = true;
+        }
+    }
+
+    private void unsubscribeFromBotEvents()
+    {
+        if (_subscribed)
+        {
+            Bot.EnemyController.Events.OnEnemyRemoved -= checkClearEnemy;
+            Bot.EnemyController.Events.OnEnemyChanged -= enemyChanged;
+            _subscribed = false;
         }
     }
 

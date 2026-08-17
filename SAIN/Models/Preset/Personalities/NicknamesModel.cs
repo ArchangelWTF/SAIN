@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using SAIN.Preset.Shared.Models.Preset.Personalities;
 
 namespace SAIN.Models.Preset.Personalities;
 

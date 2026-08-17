@@ -1,17 +1,26 @@
-﻿using SAIN.Helpers;
+using System.Collections.Generic;
 using SAIN.Models.Preset.Personalities;
+using SAIN.Preset.Shared.Models.Preset.Personalities;
+using SAIN.Preset.Shared.Personalities.BasePersonality;
 
 namespace SAIN.Preset.Personalities;
 
 public class PersonalityManagerClass : BasePreset
 {
-    public PersonalityDictionary PersonalityDictionary = new();
+    public PersonalityDictionary PersonalityDictionary = [];
 
-    public PersonalityManagerClass(SAINPresetClass preset)
+    public PersonalityManagerClass(SAINPresetClass preset, Dictionary<EPersonality, PersonalitySettingsClass> serverPersonalities)
         : base(preset)
     {
-        import();
-        PersonalityDefaultsClass.InitDefaults(PersonalityDictionary, Preset);
+        if (serverPersonalities == null || serverPersonalities.Count == 0)
+        {
+            Logger.LogError("[SAIN] Server preset contained no personalities.");
+            return;
+        }
+        foreach (var kv in serverPersonalities)
+        {
+            PersonalityDictionary[kv.Key] = kv.Value;
+        }
     }
 
     public void Init()
@@ -37,40 +46,5 @@ public class PersonalityManagerClass : BasePreset
         {
             settings.Update();
         }
-    }
-
-    private void import()
-    {
-        if (!Preset.Info.IsCustom)
-        {
-            return;
-        }
-
-        foreach (var item in EnumValues.Personalities)
-        {
-            if (SAINPresetClass.Import(out PersonalitySettingsClass personality, Preset.Info.Name, item.ToString(), nameof(Personalities)))
-            {
-                PersonalityDictionary.Add(item, personality);
-            }
-        }
-    }
-
-    public void ResetAllToDefaults()
-    {
-        PersonalityDictionary.Remove(EPersonality.Wreckless);
-        PersonalityDictionary.Remove(EPersonality.SnappingTurtle);
-        PersonalityDictionary.Remove(EPersonality.GigaChad);
-        PersonalityDictionary.Remove(EPersonality.Chad);
-        PersonalityDictionary.Remove(EPersonality.Rat);
-        PersonalityDictionary.Remove(EPersonality.Coward);
-        PersonalityDictionary.Remove(EPersonality.Timmy);
-        PersonalityDictionary.Remove(EPersonality.Normal);
-        PersonalityDefaultsClass.InitDefaults(PersonalityDictionary, Preset);
-    }
-
-    public void ResetToDefault(EPersonality personality)
-    {
-        PersonalityDictionary.Remove(personality);
-        PersonalityDefaultsClass.InitDefaults(PersonalityDictionary, Preset);
     }
 }

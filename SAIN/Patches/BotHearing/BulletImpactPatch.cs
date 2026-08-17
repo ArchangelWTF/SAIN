@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using EFT.Ballistics;
 using HarmonyLib;
 using SAIN.Components;
 using SPT.Reflection.Patching;
@@ -17,7 +18,7 @@ public class BulletImpactPatch : ModulePatch
     }
 
     [PatchPostfix]
-    public static void PatchPostfix(EftBulletClass info)
+    public static void PatchPostfix(Shot info)
     {
         if (BotManagerComponent.Instance != null)
         {

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using EFT;
+using EFT.Ballistics;
 using EFT.HealthSystem;
 using SAIN.Components;
 using SAIN.Models.Enums;
@@ -61,10 +62,10 @@ public class SAINBotHitReaction : BotBase
         base.Dispose();
     }
 
-    public void GetHit(DamageInfoStruct DamageInfoStruct, EBodyPart bodyPart, float floatVal)
+    public void GetHit(DamageInfo DamageInfo, EBodyPart bodyPart, float floatVal)
     {
-        BodyHitEffect.GetHit(DamageInfoStruct, bodyPart, floatVal);
-        AimHitEffect.GetHit(DamageInfoStruct);
+        BodyHitEffect.GetHit(DamageInfo, bodyPart, floatVal);
+        AimHitEffect.GetHit(DamageInfo);
     }
 
     private const float StunDamageThreshold = 50;
@@ -96,7 +97,7 @@ public class SAINBotHitReaction : BotBase
 
     private bool _isStunned;
 
-    private bool IsStunnedFromDamage(DamageInfoStruct DamageInfoStruct)
+    private bool IsStunnedFromDamage(DamageInfo DamageInfo)
     {
         return false;
     }

@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Reflection;
 using SAIN.Helpers;
 using SAIN.Plugin;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.Attributes;
+using SAIN.Preset.Shared.GlobalSettings;
 
 namespace SAIN.Attributes;
 

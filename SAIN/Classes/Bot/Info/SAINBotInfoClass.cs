@@ -1,10 +1,12 @@
-﻿using EFT;
+using EFT;
 using SAIN.Components;
+using SAIN.Extensions;
 using SAIN.Helpers;
-using SAIN.Models.Preset.Personalities;
 using SAIN.Preset;
-using SAIN.Preset.BotSettings.SAINSettings;
-using SAIN.Preset.Personalities;
+using SAIN.Preset.Shared.BotSettings.SAINSettings;
+using SAIN.Preset.Shared.Models.Preset.Personalities;
+using SAIN.Preset.Shared.Personalities.BasePersonality;
+using SAIN.Preset.Shared.Personalities.BasePersonality.Categories;
 using Random = UnityEngine.Random;
 
 namespace SAIN.SAINComponent.Classes.Info;
@@ -92,7 +94,7 @@ public class SAINBotInfoClass : BotComponentClassBase
         CalcTimeBeforeSearch();
         CalcHoldGroundDelay();
         UpdateExtractTime();
-        SetConfigValues(FileSettings);
+        FileSettings.SetConfigValues(BotOwner);
     }
 
     protected override void UpdatePresetSettings(SAINPresetClass preset)
@@ -186,23 +188,6 @@ public class SAINBotInfoClass : BotComponentClassBase
     public EPersonality GetPersonality(out PersonalitySettingsClass settings)
     {
         return SAINPlugin.LoadedPreset.PersonalityManager.PersonalityDictionary.GetPersonality(this, out settings);
-    }
-
-    private void SetConfigValues(SAINSettingsClass sainFileSettings)
-    {
-        var eftFileSettings = BotOwner.Settings.FileSettings;
-        sainFileSettings.Aiming.Apply(eftFileSettings);
-        sainFileSettings.Boss.Apply(eftFileSettings);
-        sainFileSettings.Change.Apply(eftFileSettings);
-        sainFileSettings.Grenade.Apply(eftFileSettings);
-        sainFileSettings.Hearing.Apply(eftFileSettings);
-        sainFileSettings.Lay.Apply(eftFileSettings);
-        sainFileSettings.Look.Apply(eftFileSettings);
-        sainFileSettings.Mind.Apply(eftFileSettings);
-        sainFileSettings.Move.Apply(eftFileSettings);
-        sainFileSettings.Patrol.Apply(eftFileSettings);
-        sainFileSettings.Scattering.Apply(eftFileSettings);
-        sainFileSettings.Shoot.Apply(eftFileSettings);
     }
 
     private SAINSettingsClass _fileSettings;

@@ -1,0 +1,23 @@
+@namespace SAINServerMod.Web.Components
+
+<MudPaper Elevation="0" Class="spt-panel sain-nav pa-2 mb-3">
+    <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+        <MudIcon Icon="@Icons.Material.Filled.Tune" Color="Color.Warning" Class="ml-1 mr-2" />
+        <MudText Typo="Typo.subtitle2" Class="spt-title mr-4">SAIN</MudText>
+        <MudButton Href="/sain/presets" Variant="Variant.Text" Class="@Cls("presets")"
+                   StartIcon="@Icons.Material.Outlined.Tune">Presets</MudButton>
+        <MudButton Href="/sain/updates" Variant="Variant.Text" Class="@Cls("updates")"
+                   StartIcon="@Icons.Material.Outlined.SystemUpdateAlt">Updates</MudButton>
+        <MudButton Href="/sain/server-settings" Variant="Variant.Text" Class="@Cls("settings")"
+                   StartIcon="@Icons.Material.Outlined.AdminPanelSettings">Server Settings</MudButton>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter] public string Current { get; set; } = string.Empty;
+
+    private string Cls(string page)
+    {
+        return "sain-nav-item" + (string.Equals(Current, page, StringComparison.Ordinal) ? " sain-nav-item-active" : string.Empty);
+    }
+}

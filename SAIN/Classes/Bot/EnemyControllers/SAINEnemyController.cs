@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using EFT;
 using SAIN.Components;
-using SAIN.Helpers;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.Helpers;
 
 namespace SAIN.SAINComponent.Classes.EnemyClasses;
 

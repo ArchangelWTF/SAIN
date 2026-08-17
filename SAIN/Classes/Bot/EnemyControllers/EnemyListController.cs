@@ -87,7 +87,7 @@ public class EnemyListController : BotSubClass<SAINEnemyController>, IBotClass
     public override void Dispose()
     {
         GameWorldComponent.Instance.PlayerTracker.OnPlayerRemoved -= RemoveEnemy;
-        BotMemoryClass memory = BotOwner?.Memory;
+        BotMemory memory = BotOwner?.Memory;
         if (memory != null)
         {
             memory.OnAddEnemy -= enemyAdded;
@@ -280,7 +280,7 @@ public class EnemyListController : BotSubClass<SAINEnemyController>, IBotClass
     {
         if (
             !BotOwner.EnemiesController.EnemyInfos.TryGetValue(enemyPlayer, out EnemyInfo enemyInfo)
-            && BotOwner.BotsGroup.Enemies.TryGetValue(enemyPlayer, out BotSettingsClass value)
+            && BotOwner.BotsGroup.Enemies.TryGetValue(enemyPlayer, out BotGroupEnemyInfo value)
         )
         {
             //Logger.LogDebug($"Got EnemyInfo from Bot's Group Enemies.");

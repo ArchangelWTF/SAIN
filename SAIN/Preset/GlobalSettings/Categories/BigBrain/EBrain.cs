@@ -1,59 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using SAIN.Preset.Shared.Enums;
 
 namespace SAIN.Preset.GlobalSettings.Categories;
-
-public enum EBrain
-{
-    ArenaFighter,
-    BossBully,
-    BossGluhar,
-    BossBoar,
-    BossPartisan,
-    Knight,
-    BossKojaniy,
-    BossSanitar,
-    BossKolontay,
-    Tagilla,
-    TagillaAgro,
-    BossTest,
-
-    Obdolbs,
-    ExUsec,
-    BigPipe,
-    BirdEye,
-    FollowerBully,
-    FollowerGluharAssault,
-    FollowerGluharProtect,
-    FollowerGluharScout,
-    FollowerKojaniy,
-    FollowerSanitar,
-    FlBoar,
-    FlBoarCl,
-    FlBoarSt,
-    FlKlnAslt,
-    KolonSec,
-    TagillaFollower,
-    HelperAgro,
-
-    Gifter,
-    Killa,
-    KillaAgro,
-    Marksman,
-    BoarSniper,
-    PMC,
-    SectantPriest,
-    SctPredvst,
-    PrizrakSt,
-    Oni,
-    SectantWarrior,
-    CursAssault,
-    Assault,
-    PmcBear,
-    PmcUsec,
-    InfectedSlow,
-}
 
 public static class AIBrains
 {

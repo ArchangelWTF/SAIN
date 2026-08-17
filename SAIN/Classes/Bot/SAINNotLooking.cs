@@ -1,5 +1,5 @@
-﻿using EFT;
-using SAIN.Preset.GlobalSettings;
+using EFT;
+using SAIN.Preset.Shared.GlobalSettings.Categories.Look;
 using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes;

@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using EFT;
-using SAIN.Models.Preset.Personalities;
+using SAIN.Preset.Shared.Enums;
 
 namespace SAIN.Helpers;
 
@@ -70,7 +70,12 @@ internal static class EnumValues
 
         public static WildSpawnType[] Goons = [WildSpawnType.bossKnight, WildSpawnType.followerBigPipe, WildSpawnType.followerBirdEye];
 
-        public static WildSpawnType[] LabyrinthBots = [WildSpawnType.bossTagillaAgro, WildSpawnType.bossKillaAgro, WildSpawnType.tagillaHelperAgro];
+        public static WildSpawnType[] LabyrinthBots =
+        [
+            WildSpawnType.bossTagillaAgro,
+            WildSpawnType.bossKillaAgro,
+            WildSpawnType.tagillaHelperAgro,
+        ];
 
         public static WildSpawnType[] SpecialBots = [WildSpawnType.crazyAssaultEvent, WildSpawnType.gifter];
 
@@ -88,7 +93,7 @@ internal static class EnumValues
             WildSpawnType.bossKilla,
             WildSpawnType.bossBoar,
             WildSpawnType.bossKolontay,
-            WildSpawnType.bossPartisan
+            WildSpawnType.bossPartisan,
         ];
 
         public static WildSpawnType[] NormalFollowers =
@@ -104,7 +109,7 @@ internal static class EnumValues
             WildSpawnType.followerBoarClose1,
             WildSpawnType.followerBoarClose2,
             WildSpawnType.followerKolontayAssault,
-            WildSpawnType.followerKolontaySecurity
+            WildSpawnType.followerKolontaySecurity,
         ];
     }
 
@@ -120,26 +125,6 @@ internal static class EnumValues
         BotDifficulty.hard,
         BotDifficulty.impossible,
     ];
-    public static readonly WildSpawnType[] WildSpawnTypes = GetEnum<WildSpawnType>();
-
-    public static readonly ECaliber[] AmmoCalibers = GetEnum<ECaliber>();
-    public static readonly EWeaponClass[] WeaponClasses = GetEnum<EWeaponClass>();
-
-    public static readonly EPersonality[] Personalities = GetEnum<EPersonality>();
-
-    public static readonly ECombatDecision[] SoloDecisions = GetEnum<ECombatDecision>();
-    public static readonly ESquadDecision[] SquadDecisions = GetEnum<ESquadDecision>();
-    public static readonly ESelfActionType[] SelfDecisions = GetEnum<ESelfActionType>();
-
-    public static ECaliber ParseCaliber(string caliber)
-    {
-        if (Enum.TryParse(caliber, out ECaliber result))
-        {
-            return result;
-        }
-        Logger.LogError($"Caliber [{caliber}] does not exist in Caliber Enum!");
-        return ECaliber.Default;
-    }
 
     public static EWeaponClass ParseWeaponClass(string weaponClass)
     {
@@ -164,6 +149,11 @@ internal static class EnumValues
 
     public static T[] GetEnum<T>()
     {
-        return (T[])Enum.GetValues(typeof(T));
+        return EnumCache<T>.Values;
+    }
+
+    private static class EnumCache<T>
+    {
+        public static readonly T[] Values = (T[])Enum.GetValues(typeof(T));
     }
 }

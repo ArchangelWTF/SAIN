@@ -103,7 +103,7 @@ public class GrenadeTrackerClass
         {
             return false; // Not looking in the right direction
         }
-        return !Physics.Raycast(lookPoint, grenadeDir, 1f, LayerMaskClass.HighPolyWithTerrainMaskAI);
+        return !Physics.Raycast(lookPoint, grenadeDir, 1f, LayersMaskController.HighPolyWithTerrainMaskAI);
     }
 
     public void UpdateGrenadeDanger(Vector3 Danger)

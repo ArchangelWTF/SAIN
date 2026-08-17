@@ -1,4 +1,4 @@
-﻿using EFT;
+using EFT;
 using SAIN.Components.PlayerComponentSpace;
 using SAIN.Helpers;
 using SAIN.Models.PlayerData;

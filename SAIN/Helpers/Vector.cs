@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.AI;
+﻿using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace SAIN.Helpers;
@@ -42,7 +40,7 @@ public static class Vector
                 new Ray(from, direction),
                 out RaycastHit raycastHit,
                 direction.magnitude,
-                LayerMaskClass.HighPolyWithTerrainMask
+                LayersMaskController.HighPolyWithTerrainMask
             )
         )
         {
@@ -51,7 +49,14 @@ public static class Vector
         }
 
         Vector3 direction2 = midPoint - target;
-        if (Physics.Raycast(new Ray(midPoint, direction2), out raycastHit, direction2.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
+        if (
+            Physics.Raycast(
+                new Ray(midPoint, direction2),
+                out raycastHit,
+                direction2.magnitude,
+                LayersMaskController.HighPolyWithTerrainMask
+            )
+        )
         {
             hitPos = raycastHit.point;
             return false;
@@ -77,7 +82,7 @@ public static class Vector
         return NormalizeFastSelf(v) * num + from;
     }
 
-    public static bool CanShootToTarget(ShootPointClass shootToPoint, Vector3 firePos, LayerMask mask, bool doubleSide = false)
+    public static bool CanShootToTarget(ShootToPoint shootToPoint, Vector3 firePos, LayerMask mask, bool doubleSide = false)
     {
         if (shootToPoint == null)
         {

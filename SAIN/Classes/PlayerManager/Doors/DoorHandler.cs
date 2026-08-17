@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Comfort.Common;
 using EFT.Interactive;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings;
 using UnityEngine;
 
 namespace SAIN.Components;
@@ -98,7 +98,7 @@ public class DoorHandler : GameWorldBase, IGameWorldClass
         }
 
         // We don't support doors that aren't on the "Interactive" layer
-        if (door.gameObject.layer != LayerMaskClass.InteractiveLayer)
+        if (door.gameObject.layer != LayersMaskController.InteractiveLayer)
         {
             return false;
         }

@@ -8,7 +8,13 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses;
 
 public class EnemyPartDataClass
 {
-    public Dictionary<ERaycastCheck, RaycastResult> RaycastResults { get; private set; } = [];
+    private readonly RaycastResult[] _raycastResults =
+    [
+        new RaycastResult(), // LineofSight
+        new RaycastResult(), // Shoot
+        new RaycastResult(), // Vision
+    ];
+
     public float TimeSeen { get; private set; }
 
     public bool CanBeSeen { get; private set; }
@@ -31,18 +37,14 @@ public class EnemyPartDataClass
                 _colliderDictionary.Add(collider.BodyPartColliderType, collider);
             }
         }
-
-        RaycastResults.Add(ERaycastCheck.LineofSight, new RaycastResult());
-        RaycastResults.Add(ERaycastCheck.Shoot, new RaycastResult());
-        RaycastResults.Add(ERaycastCheck.Vision, new RaycastResult());
     }
 
     public void Update(float currentTime)
     {
         const float SUCCESS_PERIOD = 0.25f;
-        float lineOfSightSuccessTime = RaycastResults[ERaycastCheck.LineofSight].TimeLastSuccess;
+        float lineOfSightSuccessTime = _raycastResults[(int)ERaycastCheck.LineofSight].TimeLastSuccess;
         LineOfSight = currentTime - lineOfSightSuccessTime <= SUCCESS_PERIOD;
-        float shootSuccessTime = RaycastResults[ERaycastCheck.Shoot].TimeLastSuccess;
+        float shootSuccessTime = _raycastResults[(int)ERaycastCheck.Shoot].TimeLastSuccess;
         CanShoot = currentTime - shootSuccessTime <= SUCCESS_PERIOD;
         if (!LineOfSight)
         {
@@ -50,7 +52,7 @@ public class EnemyPartDataClass
             TimeSeen = -1f;
             return;
         }
-        float visionSuccessTime = RaycastResults[ERaycastCheck.Vision].TimeLastSuccess;
+        float visionSuccessTime = _raycastResults[(int)ERaycastCheck.Vision].TimeLastSuccess;
         CanBeSeen = currentTime - visionSuccessTime <= SUCCESS_PERIOD;
         if (!CanBeSeen)
         {
@@ -65,7 +67,7 @@ public class EnemyPartDataClass
 
     public void SetLineOfSight(Vector3 castPoint, EBodyPartColliderType colliderType, RaycastHit raycastHit, ERaycastCheck type, float time)
     {
-        RaycastResults[type].Update(castPoint, _colliderDictionary[colliderType], raycastHit, time);
+        _raycastResults[(int)type].Update(castPoint, _colliderDictionary[colliderType], raycastHit, time);
     }
 
     public SAINBodyPartRaycast GetRaycast()

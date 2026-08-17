@@ -1,8 +1,9 @@
-﻿using EFT;
+using EFT;
 using SAIN.Components;
 using SAIN.Extensions;
 using SAIN.Layers.Combat.Solo;
 using SAIN.Models.Enums;
+using SAIN.Preset.Shared.Enums;
 using SAIN.SAINComponent.Classes.Decision;
 
 namespace SAIN.Layers.Combat.Squad;

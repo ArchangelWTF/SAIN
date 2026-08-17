@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Text;
 using EFT;
+using EFT.CameraControl;
 using SAIN.Editor.Util;
 using SAIN.Plugin;
 using SAIN.Preset;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings.Categories.General;
 using UnityEngine;
 using Color = UnityEngine.Color;
 
@@ -164,10 +165,10 @@ public class DebugGizmos
 
     private static float GetScreenScale()
     {
-        if (_nextCheckScreenTime < Time.time && CameraClass.Instance.SSAA.isActiveAndEnabled)
+        if (_nextCheckScreenTime < Time.time && CameraManager.Instance.SSAA.isActiveAndEnabled)
         {
             _nextCheckScreenTime = Time.time + 10f;
-            _screenScale = (float)CameraClass.Instance.SSAA.GetOutputWidth() / (float)CameraClass.Instance.SSAA.GetInputWidth();
+            _screenScale = (float)CameraManager.Instance.SSAA.GetOutputWidth() / (float)CameraManager.Instance.SSAA.GetInputWidth();
         }
         return _screenScale;
     }

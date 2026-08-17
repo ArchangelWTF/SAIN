@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Comfort.Common;
+using Diz.Utils;
 using EFT;
 using EFT.Interactive;
 using SAIN.Interop;

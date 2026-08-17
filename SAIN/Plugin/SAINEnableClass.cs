@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using EFT;
 using SAIN.Components;
 using SAIN.Components.BotController;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings.Categories.General;
 using static SAIN.Helpers.EnumValues;
 
 namespace SAIN;
@@ -14,8 +14,8 @@ public static class SAINEnableClass
         GameWorld.OnDispose += Clear;
     }
 
-    private static readonly HashSet<string> ExcludedBots = [];
-    private static readonly HashSet<string> EnabledBots = [];
+    private static readonly HashSet<string> _excludedBots = [];
+    private static readonly HashSet<string> _enabledBots = [];
 
     /// <summary>
     /// Checks if this bot has SAIN enabled or if it is a vanilla bot.
@@ -34,17 +34,17 @@ public static class SAINEnableClass
         }
 
         string id = player.ProfileId;
-        if (ExcludedBots.Contains(id))
+        if (_excludedBots.Contains(id))
         {
             return true;
         }
 
-        if (EnabledBots.Contains(id))
+        if (_enabledBots.Contains(id))
         {
             return false;
         }
 
-        ProfileInfoSettingsClass settings = botOwner.Profile?.Info?.Settings;
+        ProfileSettings settings = botOwner.Profile?.Info?.Settings;
         if (settings == null)
         {
             return true;
@@ -54,13 +54,13 @@ public static class SAINEnableClass
 
         if (IsBotExcluded(botOwner))
         {
-            ExcludedBots.Add(id);
+            _excludedBots.Add(id);
 #if DEBUG
             Logger.LogDebug($"Added Excluded Bot [{player.Profile.Nickname},{id}]");
 #endif
             return true;
         }
-        EnabledBots.Add(id);
+        _enabledBots.Add(id);
 #if DEBUG
         Logger.LogDebug($"Added Enabled Bot [{player.Profile.Nickname},{id}]");
 #endif
@@ -84,17 +84,17 @@ public static class SAINEnableClass
         }
 
         string id = iPlayer.ProfileId;
-        if (ExcludedBots.Contains(id))
+        if (_excludedBots.Contains(id))
         {
             return true;
         }
 
-        if (EnabledBots.Contains(id))
+        if (_enabledBots.Contains(id))
         {
             return false;
         }
 
-        ProfileInfoSettingsClass settings = iPlayer.Profile?.Info?.Settings;
+        ProfileSettings settings = iPlayer.Profile?.Info?.Settings;
         if (settings == null)
         {
             return true;
@@ -104,17 +104,17 @@ public static class SAINEnableClass
 
         if (IsBotExcluded(botOwner))
         {
-            ExcludedBots.Add(id);
+            _excludedBots.Add(id);
             return true;
         }
-        EnabledBots.Add(id);
+        _enabledBots.Add(id);
         return false;
     }
 
     private static void Clear()
     {
-        ExcludedBots.Clear();
-        EnabledBots.Clear();
+        _excludedBots.Clear();
+        _enabledBots.Clear();
     }
 
     private static void ClearBot(IPlayer player)
@@ -123,8 +123,8 @@ public static class SAINEnableClass
         {
             player.OnIPlayerDeadOrUnspawn -= ClearBot;
             string id = player.ProfileId;
-            ExcludedBots.Remove(id);
-            EnabledBots.Remove(id);
+            _excludedBots.Remove(id);
+            _enabledBots.Remove(id);
         }
     }
 
@@ -133,7 +133,7 @@ public static class SAINEnableClass
     /// </summary>
     public static bool IsBotExcluded(string profileId)
     {
-        return !EnabledBots.Contains(profileId);
+        return !_enabledBots.Contains(profileId);
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public static class SAINEnableClass
 
         WildSpawnType type = settings.Role;
 
-        if (BotSpawnController.StrictExclusionList.Contains(type))
+        if (BotSpawnController.IsExcluded(type))
         {
             return true;
         }
@@ -218,7 +218,8 @@ public static class SAINEnableClass
 
     private static bool ExcludeBloodHounds(WildSpawnType wildSpawnType)
     {
-        return SAINEnabled.VanillaBloodHounds && (wildSpawnType == WildSpawnType.arenaFighter || wildSpawnType == WildSpawnType.arenaFighterEvent);
+        return SAINEnabled.VanillaBloodHounds
+            && (wildSpawnType == WildSpawnType.arenaFighter || wildSpawnType == WildSpawnType.arenaFighterEvent);
     }
 
     private static bool ExcludeLabyrinthBots(WildSpawnType wildSpawnType)
@@ -261,7 +262,7 @@ public static class SAINEnableClass
             return false;
         }
 
-        if (!EnabledBots.Contains(profileId))
+        if (!_enabledBots.Contains(profileId))
         {
             return false;
         }

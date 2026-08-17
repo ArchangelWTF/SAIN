@@ -1,4 +1,5 @@
-﻿using SAINServerMod.Services;
+using SAINServerMod.Callbacks;
+using SAINServerMod.Models.Requests;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Eft.Common;
@@ -6,16 +7,54 @@ using SPTarkov.Server.Core.Utils;
 
 namespace SAINServerMod.Routers.Static;
 
-[Injectable]
-public sealed class SAINStaticRouter(JsonUtil jsonUtil, ConfigService configService)
+[Injectable(TypePriority = OnLoadOrder.Routers + 5)]
+public sealed class SAINStaticRouter(JsonUtil jsonUtil, SAINCallbacks callbacks)
     : StaticRouter(
         jsonUtil,
         [
             new RouteAction<EmptyRequestData>(
+                "/sain/config",
+                async (url, info, sessionID, output, cancellationToken) => await callbacks.GetClientConfig(url, info, sessionID)
+            ),
+            new RouteAction<EmptyRequestData>(
                 "/sain/namepersonalities",
-                async (url, info, sessionID, output) =>
-                    jsonUtil.Serialize(configService.NicknamesModel)
-                    ?? throw new InvalidOperationException("Could not serialize personalities!")
+                async (url, info, sessionID, output, cancellationToken) => await callbacks.GetPersonalities(url, info, sessionID)
+            ),
+            new RouteAction<EmptyRequestData>(
+                "/sain/presets/defaults",
+                async (url, info, sessionID, output, cancellationToken) => await callbacks.GetDefaultPresets(url, info, sessionID)
+            ),
+            new RouteAction<EmptyRequestData>(
+                "/sain/bottypes/list",
+                async (url, info, sessionID, output, cancellationToken) => await callbacks.GetBotTypes(url, info, sessionID)
+            ),
+            new RouteAction<EmptyRequestData>(
+                "/sain/bottypes/exclusions",
+                async (url, info, sessionID, output, cancellationToken) => await callbacks.GetBotTypeExclusions(url, info, sessionID)
+            ),
+            new RouteAction<EmptyRequestData>(
+                "/sain/presets/custom/list",
+                async (url, info, sessionID, output, cancellationToken) => await callbacks.ListCustomPresets(url, info, sessionID)
+            ),
+            new RouteAction<PresetNameRequest>(
+                "/sain/presets/custom/get",
+                async (url, info, sessionID, output, cancellationToken) => await callbacks.GetCustomPreset(url, info, sessionID)
+            ),
+            new RouteAction<PresetSaveRequest>(
+                "/sain/presets/custom/save",
+                async (url, info, sessionID, output, cancellationToken) => await callbacks.SaveCustomPreset(url, info, sessionID)
+            ),
+            new RouteAction<PresetNameRequest>(
+                "/sain/presets/custom/delete",
+                async (url, info, sessionID, output, cancellationToken) => await callbacks.DeleteCustomPreset(url, info, sessionID)
+            ),
+            new RouteAction<PresetNameRequest>(
+                "/sain/data/get",
+                async (url, info, sessionID, output, cancellationToken) => await callbacks.GetData(url, info, sessionID)
+            ),
+            new RouteAction<PresetSaveRequest>(
+                "/sain/data/save",
+                async (url, info, sessionID, output, cancellationToken) => await callbacks.SaveData(url, info, sessionID)
             ),
         ]
     ) { }

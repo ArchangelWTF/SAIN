@@ -1,5 +1,5 @@
-﻿using SAIN.Models.Direction;
-using SAIN.Models.PlayerData;
+using SAIN.Models.Direction;
+using SAIN.Preset.Shared.Enums;
 using UnityEngine;
 
 namespace SAIN.SAINComponent.SubComponents.CoverFinder;

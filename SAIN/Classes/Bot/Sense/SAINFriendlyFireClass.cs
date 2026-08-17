@@ -1,5 +1,6 @@
-﻿using EFT;
+using EFT;
 using SAIN.Components;
+using SAIN.Preset.Shared.Enums;
 using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes;
@@ -77,12 +78,12 @@ public class SAINFriendlyFireClass : BotComponentClassBase
         BotComponent bot
     )
     {
-        RaycastHit[] hits = SphereCastAll(weaponFirePort, distance, weaponPointDirection);
-        int count = hits.Length;
+        int count = SphereCastNonAlloc(weaponFirePort, distance, weaponPointDirection);
         if (count == 0)
         {
             return FriendlyFireStatus.None;
         }
+        RaycastHit[] hits = _sphereCastHits;
 
         for (int i = 0; i < count; i++)
         {
@@ -111,9 +112,18 @@ public class SAINFriendlyFireClass : BotComponentClassBase
         return FriendlyFireStatus.Clear;
     }
 
-    private static RaycastHit[] SphereCastAll(Vector3 weaponFirePort, float targetDistance, Vector3 weaponPointDirection)
+    private static readonly RaycastHit[] _sphereCastHits = new RaycastHit[32];
+
+    private static int SphereCastNonAlloc(Vector3 weaponFirePort, float targetDistance, Vector3 weaponPointDirection)
     {
         const float sphereCastRadius = 0.2f;
-        return Physics.SphereCastAll(weaponFirePort, sphereCastRadius, weaponPointDirection, targetDistance, LayerMaskClass.PlayerMask);
+        return Physics.SphereCastNonAlloc(
+            weaponFirePort,
+            sphereCastRadius,
+            weaponPointDirection,
+            _sphereCastHits,
+            targetDistance,
+            LayersMaskController.PlayerMask
+        );
     }
 }

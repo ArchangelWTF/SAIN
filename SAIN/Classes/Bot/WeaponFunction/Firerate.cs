@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using SAIN.Plugin;
 using SAIN.Preset;
+using SAIN.Preset.Shared.Enums;
 using SAIN.SAINComponent.Classes.Info;
 using UnityEngine;
 using static EFT.InventoryLogic.Weapon;

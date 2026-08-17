@@ -75,8 +75,8 @@ public class GrenadeReactionClass : BotSubClass<BotGrenadeManager>, IBotClass
 
     public Dictionary<Throwable, GrenadeTrackerClass> EnemyGrenadesList { get; private set; } = [];
 
-    public GrenadeReactionClass(BotGrenadeManager ThrowWeapItemClass)
-        : base(ThrowWeapItemClass) { }
+    public GrenadeReactionClass(BotGrenadeManager ThrowWeap)
+        : base(ThrowWeap) { }
 
     public override void Init()
     {

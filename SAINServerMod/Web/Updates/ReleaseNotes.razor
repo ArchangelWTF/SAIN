@@ -1,0 +1,226 @@
+@namespace SAINServerMod.Web.Updates
+@using System.Text.RegularExpressions
+
+@* Renders a GitHub release body. Deliberately not a markdown engine: prose lands as text nodes and the only
+   markup we ever emit is an anchor we built ourselves, from an http(s) url we validated. A release body can
+   never inject markup into the page. *@
+
+@if (Blocks.Count == 0)
+{
+    <p class="sain-release-empty">No release notes.</p>
+}
+else
+{
+    foreach (var block in Blocks)
+    {
+        if (block.IsHeading)
+        {
+            <p class="sain-release-heading">@RenderInline(block.Lines[0])</p>
+        }
+        else if (block.IsList)
+        {
+            <ul class="sain-release-list">
+                @foreach (var line in block.Lines)
+                {
+                    <li>@RenderInline(line)</li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="sain-release-text">@RenderInline(string.Join(' ', block.Lines))</p>
+        }
+    }
+}
+
+@code {
+    [Parameter] public string? Body { get; set; }
+
+    [Parameter] public int MaxBlocks { get; set; } = 12;
+
+    private sealed record Block(bool IsHeading, bool IsList, List<string> Lines);
+
+    private sealed record Segment(string Text, string? Href = null, string? Title = null);
+
+    private List<Block> Blocks = [];
+
+    private static readonly Regex InlinePattern = new(
+        @"\[(?<label>[^\]]+)\]\((?<target>[^\s)]+)\)"
+            + @"|(?<url>https?://[^\s<>]+)"
+            + @"|(?<!\w)@(?<user>[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?)",
+        RegexOptions.Compiled
+    );
+
+    private static readonly Regex PullRequestPattern = new(
+        @"^https?://github\.com/[^/]+/[^/]+/pull/(?<number>\d+)/?$",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase
+    );
+
+    private static readonly Regex ComparePattern = new(
+        @"^https?://github\.com/[^/]+/[^/]+/compare/(?<range>[^/?#]+)/?$",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase
+    );
+
+    protected override void OnParametersSet()
+    {
+        Blocks = Parse(ReleaseDirectives.Strip(Body), MaxBlocks);
+    }
+
+    private RenderFragment RenderInline(string line)
+    {
+        return @<text>
+            @foreach (var segment in ParseInline(line))
+            {
+                if (segment.Href is null)
+                {
+                    @segment.Text
+                }
+                else
+                {
+                    <a href="@segment.Href" title="@segment.Title" target="_blank" rel="noopener noreferrer">@segment.Text</a>
+                }
+            }
+        </text>;
+    }
+
+    private static List<Segment> ParseInline(string line)
+    {
+        List<Segment> segments = [];
+        var cursor = 0;
+
+        foreach (Match match in InlinePattern.Matches(line))
+        {
+            var segment = ToSegment(match);
+
+            if (segment is null)
+            {
+                continue;
+            }
+
+            if (match.Index > cursor)
+            {
+                segments.Add(new Segment(Clean(line[cursor..match.Index])));
+            }
+
+            segments.Add(segment);
+            cursor = match.Index + match.Length;
+        }
+
+        if (cursor < line.Length)
+        {
+            segments.Add(new Segment(Clean(line[cursor..])));
+        }
+
+        return segments;
+    }
+
+    private static Segment? ToSegment(Match match)
+    {
+        if (match.Groups["user"].Success)
+        {
+            var user = match.Groups["user"].Value;
+            return new Segment($"@{user}", $"https://github.com/{user}", $"https://github.com/{user}");
+        }
+
+        if (match.Groups["url"].Success)
+        {
+            var url = match.Groups["url"].Value.TrimEnd('.', ',', ';', ':', '!', '?', ')');
+            return IsSafeUrl(url) ? new Segment(Shorten(url), url, url) : null;
+        }
+
+        var target = match.Groups["target"].Value;
+        return IsSafeUrl(target) ? new Segment(Clean(match.Groups["label"].Value), target, target) : null;
+    }
+
+    private static bool IsSafeUrl(string url)
+    {
+        return Uri.TryCreate(url, UriKind.Absolute, out var parsed)
+            && (parsed.Scheme == Uri.UriSchemeHttp || parsed.Scheme == Uri.UriSchemeHttps);
+    }
+
+    private static string Shorten(string url)
+    {
+        var pullRequest = PullRequestPattern.Match(url);
+
+        if (pullRequest.Success)
+        {
+            return $"#{pullRequest.Groups["number"].Value}";
+        }
+
+        var compare = ComparePattern.Match(url);
+
+        if (compare.Success)
+        {
+            return compare.Groups["range"].Value;
+        }
+
+        var trimmed = new Uri(url).GetComponents(UriComponents.Host | UriComponents.PathAndQuery, UriFormat.Unescaped);
+
+        if (trimmed.StartsWith("www.", StringComparison.OrdinalIgnoreCase))
+        {
+            trimmed = trimmed[4..];
+        }
+
+        return trimmed.Length > 52 ? $"{trimmed[..49]}..." : trimmed;
+    }
+
+    private static List<Block> Parse(string? body, int maxBlocks)
+    {
+        if (string.IsNullOrWhiteSpace(body))
+        {
+            return [];
+        }
+
+        List<Block> blocks = [];
+        Block? current = null;
+
+        foreach (var rawLine in body.Replace("\r\n", "\n").Split('\n'))
+        {
+            var line = rawLine.Trim();
+
+            if (line.Length == 0)
+            {
+                current = null;
+                continue;
+            }
+
+            if (line.StartsWith('#'))
+            {
+                blocks.Add(new Block(true, false, [line.TrimStart('#').Trim()]));
+                current = null;
+            }
+            else if (line.StartsWith("- ") || line.StartsWith("* ") || line.StartsWith("+ "))
+            {
+                if (current is not { IsList: true })
+                {
+                    current = new Block(false, true, []);
+                    blocks.Add(current);
+                }
+
+                current.Lines.Add(line[2..].Trim());
+            }
+            else
+            {
+                if (current is null || current.IsList)
+                {
+                    current = new Block(false, false, []);
+                    blocks.Add(current);
+                }
+
+                current.Lines.Add(line);
+            }
+
+            if (blocks.Count > maxBlocks)
+            {
+                break;
+            }
+        }
+
+        return blocks.Take(maxBlocks).ToList();
+    }
+
+    private static string Clean(string text)
+    {
+        return text.Replace("**", string.Empty).Replace("`", string.Empty).Replace("__", string.Empty);
+    }
+}

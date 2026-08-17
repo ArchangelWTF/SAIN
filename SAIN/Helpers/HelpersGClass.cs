@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using EFT;
 using Newtonsoft.Json;
-using EFTCore = LocalBotSettingsProviderClass;
-using EFTStatModifiersClass = BotLastBlindEffectModifierClass;
+using SAIN.Preset.Server;
+using SAIN.Preset.Shared;
 
 namespace SAIN.Helpers;
 
@@ -11,17 +11,17 @@ internal class HelpersGClass
 {
     public static float LAY_DOWN_ANG_SHOOT
     {
-        get { return EFTCore.Core.LAY_DOWN_ANG_SHOOT; }
+        get { return BotInternalSettingsController.Core.LAY_DOWN_ANG_SHOOT; }
     }
 
     public static float Gravity
     {
-        get { return EFTCore.Core.G; }
+        get { return BotInternalSettingsController.Core.G; }
     }
 
     public static float SMOKE_GRENADE_RADIUS_COEF
     {
-        get { return EFTCore.Core.SMOKE_GRENADE_RADIUS_COEF; }
+        get { return BotInternalSettingsController.Core.SMOKE_GRENADE_RADIUS_COEF; }
     }
 }
 
@@ -37,7 +37,7 @@ public class TemporaryStatModifiers
         float hearingDistance = 1f
     )
     {
-        Modifiers = new EFTStatModifiersClass
+        Modifiers = new BotSettingsInGameModif
         {
             PrecicingSpeedCoef = precision,
             AccuratySpeedCoef = accuracySpeed,
@@ -49,51 +49,50 @@ public class TemporaryStatModifiers
         };
     }
 
-    public EFTStatModifiersClass Modifiers;
-}
-
-public class CoreOverrides
-{
-    public string README =
-        "Dont change anything here unless you know exactly what you are doing. Changes here require game restart! Not all settings do what the name suggests.";
-    public bool SCAV_GROUPS_TOGETHER = false;
-    public float DIST_NOT_TO_GROUP = 50f;
-    public bool CAN_SHOOT_TO_HEAD = true;
-    public float SOUND_DOOR_OPEN_METERS = 40f;
-    public float SOUND_DOOR_BREACH_METERS = 70f;
-    public float JUMP_SPREAD_DIST = 65f;
-    public float BASE_WALK_SPEREAD2 = 65f;
-    public int GRENADE_PRECISION = 10;
-    public float PRONE_POSE = 1f;
-    public float MOVE_COEF = 1f;
-    public float LOWER_POSE = 1f;
-    public float MAX_POSE = 1f;
-    public float FLARE_POWER = 1.75f;
-    public float FLARE_TIME = 2.5f;
-    public float SHOOT_TO_CHANGE_RND_PART_DELTA = 2f;
+    public BotSettingsInGameModif Modifiers;
 }
 
 public class EFTCoreSettings
 {
-    static EFTCoreSettings()
+    private static CoreOverrides _overrides;
+
+    public static bool Load()
     {
-        if (!JsonUtility.Load.LoadObject<CoreOverrides>(out _overrides, nameof(CoreOverrides)))
+        try
         {
-            _overrides = new CoreOverrides();
-            JsonUtility.SaveObjectToJson(_overrides, nameof(CoreOverrides));
+            string json = ServerDataClient.Get(nameof(CoreOverrides));
+
+            if (string.IsNullOrEmpty(json))
+            {
+                Logger.LogError("[SAIN] Server returned no core overrides.");
+                return false;
+            }
+            _overrides = JsonConvert.DeserializeObject<CoreOverrides>(json);
+
+            if (_overrides == null)
+            {
+                Logger.LogError("[SAIN] Could not deserialize the core overrides sent by the server.");
+                return false;
+            }
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"[SAIN] Failed to load core overrides from server: {ex.Message}");
+            throw;
         }
     }
-
-    private static CoreOverrides _overrides;
 
     public static void UpdateCoreSettings()
     {
         try
         {
-            var core = EFTCore.Core;
+            var core = BotInternalSettingsController.Core;
+
             if (_overrides == null)
             {
-                _overrides = new CoreOverrides();
+                Logger.LogError("[SAIN] Core overrides were never loaded from the server; not applying.");
+                return;
             }
 
             core.SCAV_GROUPS_TOGETHER = _overrides.SCAV_GROUPS_TOGETHER;
@@ -123,10 +122,8 @@ public class EFTCoreSettings
 
     public static void UpdateArmorClassCoef(float coef)
     {
-        EFTCore.Core.ARMOR_CLASS_COEF = coef;
+        BotInternalSettingsController.Core.ARMOR_CLASS_COEF = coef;
     }
-
-    public EFTCore Core;
 }
 
 public class EFTBotSettings
@@ -140,7 +137,7 @@ public class EFTBotSettings
         WildSpawnType = type;
         foreach (BotDifficulty diff in difficulties)
         {
-            Settings.Add(diff, EFTCore.GetSettings(diff, type, true));
+            Settings.Add(diff, BotInternalSettingsController.GetSettings(diff, type, true));
         }
     }
 

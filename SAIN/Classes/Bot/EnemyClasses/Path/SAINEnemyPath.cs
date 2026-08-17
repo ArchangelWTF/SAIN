@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using SAIN.Preset.GlobalSettings;
+using System.Collections.Generic;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.GlobalSettings.Categories;
 using UnityEngine;
 using UnityEngine.AI;
 

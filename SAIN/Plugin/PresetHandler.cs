@@ -1,8 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using SAIN.Editor;
 using SAIN.Preset;
-using static SAIN.Helpers.JsonUtility;
+using SAIN.Preset.Server;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.Preset;
 
 namespace SAIN.Plugin;
 
@@ -11,7 +14,10 @@ internal class PresetHandler
     public const string DefaultPreset = "3. Default";
     public const string DefaultPresetDescription = "Bots are difficult but fair, the way SAIN was meant to played.";
 
-    private const string Settings = "ConfigSettings";
+    private static string EditorDefaultsPath
+    {
+        get { return Path.Combine(Path.GetDirectoryName(typeof(PresetHandler).Assembly.Location)!, "EditorDefaults.json"); }
+    }
 
     public static event Action<SAINPresetClass> OnPresetUpdated;
     public static event Action<PresetEditorDefaults> OnEditorSettingsChanged;
@@ -22,43 +28,93 @@ internal class PresetHandler
 
     public static PresetEditorDefaults EditorDefaults;
 
-    public static void LoadCustomPresetOptions()
+    public static bool CanEditCurrentPreset
     {
-        Load.LoadCustomPresetOptions(CustomPresetOptions);
+        get
+        {
+            if (!ServerConfigClient.EditingAllowed)
+            {
+                return false;
+            }
+            if (ServerConfigClient.ForcedActive)
+            {
+                return LoadedPreset?.Info?.IsCustom == true;
+            }
+            return true;
+        }
     }
 
-    public static void Init()
+    public static void LoadCustomPresetOptions()
     {
+        CustomPresetOptions.Clear();
+        foreach (var bundle in PresetSync.CustomBundles)
+        {
+            if (bundle?.Info != null && bundle.Info.IsCustom)
+            {
+                CustomPresetOptions.Add(bundle.Info);
+            }
+        }
+    }
+
+    public static bool Init()
+    {
+        PresetSyncWebSocket.Start();
+        ServerConfigClient.Fetch();
+
         ImportEditorDefaults();
+        PresetSync.PullCustomPresets();
         LoadCustomPresetOptions();
+
         SAINPresetDefinition presetDefinition = null;
-        if (!EditorDefaults.SelectedCustomPreset.IsNullOrEmpty())
+        if (ServerConfigClient.ForcedActive)
+        {
+            presetDefinition = FindDefinitionByName(ServerConfigClient.ForcedPresetName);
+            if (presetDefinition == null)
+            {
+                Logger.LogWarning($"[SAIN] Server forced preset '{ServerConfigClient.ForcedPresetName}' was not found, loading a default.");
+            }
+        }
+        else if (!EditorDefaults.SelectedCustomPreset.IsNullOrEmpty())
         {
             CheckIfPresetLoaded(EditorDefaults.SelectedCustomPreset, out presetDefinition);
         }
-        InitPresetFromDefinition(presetDefinition);
+
+        ApplyDefinition(presetDefinition);
+        return LoadedPreset != null;
     }
 
-    public static bool LoadPresetDefinition(string presetKey, out SAINPresetDefinition definition)
+    internal static SAINPresetDefinition FindDefinitionByName(string name)
     {
-        for (int i = 0; i < CustomPresetOptions.Count; i++)
+        foreach (var def in CustomPresetOptions)
         {
-            var preset = CustomPresetOptions[i];
-            if (preset.IsCustom == true && preset.Name == presetKey)
+            if (string.Equals(def.Name, name, StringComparison.Ordinal))
             {
-                definition = preset;
-                return true;
+                return def;
             }
         }
-        if (Load.LoadObject(out definition, "Info", PresetsFolder, presetKey))
+        foreach (var def in DefaultPresetOptions())
         {
-            if (definition.IsCustom == true)
+            if (string.Equals(def.Name, name, StringComparison.Ordinal))
             {
-                CustomPresetOptions.Add(definition);
-                return true;
+                return def;
             }
         }
-        return false;
+        return null;
+    }
+
+    public static List<SAINPresetDefinition> DefaultPresetOptions()
+    {
+        var list = new List<SAINPresetDefinition>();
+
+        foreach (var bundle in PresetSync.ServerDefaults())
+        {
+            if (bundle?.Info != null)
+            {
+                list.Add(bundle.Info);
+            }
+        }
+
+        return list;
     }
 
     public static void SavePresetDefinition(SAINPresetDefinition definition)
@@ -67,27 +123,112 @@ internal class PresetHandler
         {
             return;
         }
+
         string baseName = definition.Name;
-        for (int i = 0; i < 100; i++)
+
+        for (int i = 0; NameTaken(definition.Name) && i < 100; i++)
         {
-            if (DoesFileExist("Info", PresetsFolder, definition.Name))
-            {
-                definition.Name = baseName + $" Copy({i})";
-                continue;
-            }
-            break;
+            definition.Name = baseName + $" Copy({i})";
         }
-        CustomPresetOptions.Add(definition);
-        SaveObjectToJson(definition, "Info", PresetsFolder, definition.Name);
+
+        if (!CustomPresetOptions.Contains(definition))
+        {
+            CustomPresetOptions.Add(definition);
+        }
+    }
+
+    private static bool NameTaken(string name)
+    {
+        return PresetSync.TryGetCustomBundle(name, out _);
+    }
+
+    public static SAINPresetClass GetDefaultPreset(SAINDifficulty difficulty)
+    {
+        if (difficulty == SAINDifficulty.none)
+        {
+            return null;
+        }
+
+        if (PresetSync.TryGetServerDefault(difficulty, out var bundle))
+        {
+            return new SAINPresetClass(bundle);
+        }
+
+        return null;
     }
 
     public static void loadDefault()
     {
         LoadedPreset =
-            SAINDifficultyClass.GetDefaultPreset(EditorDefaults.SelectedDefaultPreset)
-            ?? SAINDifficultyClass.GetDefaultPreset(SAINDifficulty.hard);
+            GetDefaultPreset(EditorDefaults.SelectedDefaultPreset) ?? GetDefaultPreset(SAINDifficulty.hard) ?? GetFirstAvailablePreset();
+
+        if (LoadedPreset == null)
+        {
+            throw new InvalidOperationException("No presets available from the server");
+        }
+
         LoadedPreset.Init();
         LoadedPreset.UpdateDefaults();
+    }
+
+    private static SAINPresetClass GetFirstAvailablePreset()
+    {
+        foreach (var bundle in PresetSync.ServerDefaults())
+        {
+            if (bundle?.Info != null)
+            {
+                return new SAINPresetClass(bundle);
+            }
+        }
+        foreach (var bundle in PresetSync.CustomBundles)
+        {
+            if (bundle?.Info != null)
+            {
+                return new SAINPresetClass(bundle);
+            }
+        }
+        return null;
+    }
+
+    internal static bool IsDefaultAvailable(string name)
+    {
+        foreach (var bundle in PresetSync.ServerDefaults())
+        {
+            if (bundle?.Info != null && string.Equals(bundle.Info.Name, name, StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    internal static SAINPresetDefinition NearestAvailableDefault(SAINDifficulty target)
+    {
+        SAINPresetDefinition best = null;
+        int bestDistance = int.MaxValue;
+        foreach (var bundle in PresetSync.ServerDefaults())
+        {
+            if (bundle?.Info == null)
+            {
+                continue;
+            }
+            int distance = Math.Abs((int)bundle.Info.BaseSAINDifficulty - (int)target);
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                best = bundle.Info;
+            }
+        }
+        return best;
+    }
+
+    internal static void ApplyDefinition(SAINPresetDefinition def)
+    {
+        if (def != null && !def.IsCustom)
+        {
+            EditorDefaults.SelectedDefaultPreset = def.BaseSAINDifficulty;
+        }
+        InitPresetFromDefinition(def);
     }
 
     public static void InitPresetFromDefinition(SAINPresetDefinition def, bool isCopy = false)
@@ -102,9 +243,23 @@ internal class PresetHandler
 
         try
         {
-            var defaultPreset = SAINDifficultyClass.GetDefaultPreset(def.BaseSAINDifficulty);
+            var defaultPreset = GetDefaultPreset(def.BaseSAINDifficulty);
 
-            LoadedPreset = new SAINPresetClass(def, isCopy);
+            if (isCopy)
+            {
+                PresetSync.PublishCustom(LoadedPreset, def);
+            }
+
+            if (!PresetSync.TryGetCustomBundle(def.Name, out var bundle))
+            {
+                Logger.LogWarning($"[SAIN] Custom preset '{def.Name}' is not available from the server`, loading default!");
+                loadDefault();
+                UpdateExistingBots();
+                ExportEditorDefaults();
+                return;
+            }
+
+            LoadedPreset = new SAINPresetClass(bundle);
             LoadedPreset.Init();
 
             if (defaultPreset != null)
@@ -124,7 +279,7 @@ internal class PresetHandler
 
     public static void ExportEditorDefaults()
     {
-        if (EditorDefaults.SelectedDefaultPreset == SAINDifficulty.none && LoadedPreset.Info.IsCustom)
+        if (EditorDefaults.SelectedDefaultPreset == SAINDifficulty.none && LoadedPreset?.Info != null && LoadedPreset.Info.IsCustom)
         {
             EditorDefaults.SelectedCustomPreset = LoadedPreset.Info.Name;
         }
@@ -132,19 +287,53 @@ internal class PresetHandler
         {
             EditorDefaults.SelectedCustomPreset = string.Empty;
         }
-        SaveObjectToJson(EditorDefaults, Settings, PresetsFolder);
+
+        try
+        {
+            string json = SPT.Common.Utils.Json.Serialize(EditorDefaults);
+
+            if (json != _lastSavedEditorDefaults)
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(EditorDefaultsPath)!);
+                File.WriteAllText(EditorDefaultsPath, json);
+                _lastSavedEditorDefaults = json;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"[SAIN] Failed to save editor defaults: {ex.Message}");
+        }
+
         OnEditorSettingsChanged?.Invoke(EditorDefaults);
     }
 
+    private static string _lastSavedEditorDefaults;
+
     public static void ImportEditorDefaults()
     {
-        if (Load.LoadObject(out PresetEditorDefaults editorDefaults, Settings, PresetsFolder))
+        try
         {
-            EditorDefaults = editorDefaults;
+            string json = File.Exists(EditorDefaultsPath) ? File.ReadAllText(EditorDefaultsPath) : null;
+
+            if (!string.IsNullOrEmpty(json))
+            {
+                EditorDefaults = SPT.Common.Utils.Json.Deserialize<PresetEditorDefaults>(json);
+            }
         }
-        else
+        catch (Exception ex)
         {
-            EditorDefaults = new PresetEditorDefaults(DefaultPreset);
+            Logger.LogError($"[SAIN] Failed to load editor defaults: {ex.Message}");
+        }
+
+        EditorDefaults ??= new PresetEditorDefaults(DefaultPreset);
+
+        try
+        {
+            _lastSavedEditorDefaults = SPT.Common.Utils.Json.Serialize(EditorDefaults);
+        }
+        catch
+        {
+            _lastSavedEditorDefaults = null;
         }
     }
 
@@ -159,10 +348,12 @@ internal class PresetHandler
     private static bool CheckIfPresetLoaded(string presetName, out SAINPresetDefinition definition)
     {
         definition = null;
+
         if (string.IsNullOrEmpty(presetName))
         {
             return false;
         }
+
         for (int i = 0; i < CustomPresetOptions.Count; i++)
         {
             var presetDef = CustomPresetOptions[i];
@@ -172,6 +363,7 @@ internal class PresetHandler
                 return true;
             }
         }
+
         return false;
     }
 }

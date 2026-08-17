@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using EFT.InventoryLogic;
-using SAIN.Preset.GearStealthValues;
+using SAIN.Preset.Shared.GearStealthValues;
 using SAIN.SAINComponent.Classes.Info;
 using UnityEngine;
 

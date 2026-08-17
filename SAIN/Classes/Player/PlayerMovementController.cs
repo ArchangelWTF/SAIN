@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using EFT;
 using SAIN.Components;
 using SAIN.Components.PlayerComponentSpace;
-using SAIN.Components.RotationController;
 using SAIN.Helpers;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.Components.RotationController;
+using SAIN.Preset.Shared.GlobalSettings;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.Types.TurnSmoothing;
 using UnityEngine;
@@ -247,7 +247,7 @@ public class PlayerMovementController
         }
 
         bool moving = botComponent?.Mover?.Moving == true || botOwner.Mover?.IsMoving == true;
-        bool aiming = botOwner.AimingManager.CurrentAiming is BotAimingClass aimClass && aimClass.AimStatus_0 != AimStatus.NoTarget;
+        bool aiming = botOwner.AimingManager.CurrentAiming is BotAimingData aimClass && aimClass._status != AimStatus.NoTarget;
         bool aimingDownSights = player.HandsController is Player.FirearmController firearmController && firearmController.IsAiming;
 
         if (aimingDownSights && aiming)
@@ -314,7 +314,7 @@ public class PlayerMovementController
                 {
                     return AIM_COMPLETE_SETTINGS;
                 }
-                if (currentAim is BotAimingClass aimclass && aimclass.AimStatus_0 != AimStatus.NoTarget)
+                if (currentAim is BotAimingData aimclass && aimclass._status != AimStatus.NoTarget)
                 {
                     return settings.SMOOTHING_BY_STATE[EBotLookMode.Aiming];
                 }

@@ -8,6 +8,7 @@ using HarmonyLib;
 using SAIN.Components.PlayerComponentSpace;
 using SAIN.Helpers;
 using SAIN.Models.Structs;
+using SAIN.Preset.Shared.Enums;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
 
@@ -27,13 +28,13 @@ public class GrenadeController(BotManagerComponent controller) : BotManagerBase(
 
     public void Dispose() { }
 
-    public void Subscribe(BotEventHandler eventHandler)
+    public void Subscribe(GlobalEventDispatcher eventHandler)
     {
         eventHandler.OnGrenadeThrow += GrenadeThrown;
         eventHandler.OnGrenadeExplosive += GrenadeExplosion;
     }
 
-    public void UnSubscribe(BotEventHandler eventHandler)
+    public void UnSubscribe(GlobalEventDispatcher eventHandler)
     {
         eventHandler.OnGrenadeThrow -= GrenadeThrown;
         eventHandler.OnGrenadeExplosive -= GrenadeExplosion;
@@ -53,7 +54,7 @@ public class GrenadeController(BotManagerComponent controller) : BotManagerBase(
         int throwableId
     )
     {
-        if (!Singleton<BotEventHandler>.Instantiated || playerProfileID == null)
+        if (!Singleton<GlobalEventDispatcher>.Instantiated || playerProfileID == null)
         {
             return;
         }
@@ -89,7 +90,7 @@ public class GrenadeController(BotManagerComponent controller) : BotManagerBase(
     private void RegisterGrenadeExplosionForSAINBots(Vector3 explosionPosition, Player player, string playerProfileID, float range)
     {
         // Play a sound with the input range.
-        Singleton<BotEventHandler>.Instance?.PlaySound(player, explosionPosition, range, AISoundType.gun);
+        Singleton<GlobalEventDispatcher>.Instance?.PlaySound(player, explosionPosition, range, AISoundType.gun);
         float currentTime = Time.time;
         // We dont want bots to think the grenade explosion was a place they heard an enemy, so set this manually.
         foreach (var bot in Bots.Values)
@@ -142,7 +143,7 @@ public class GrenadeController(BotManagerComponent controller) : BotManagerBase(
 
         Vector3 dangerPoint = Vector.DangerPoint(position, force, mass);
         grenade.DestroyEvent += grenadeDestroyed;
-        Singleton<BotEventHandler>.Instance?.PlaySound(player, grenade.transform.position, 20f, AISoundType.gun);
+        Singleton<GlobalEventDispatcher>.Instance?.PlaySound(player, grenade.transform.position, 20f, AISoundType.gun);
         OnGrenadeThrown?.Invoke(grenade, dangerPoint, grenade.ProfileId);
         if (GameWorldComponent.TryGetPlayerComponent(player, out PlayerComponent playerComponent))
         {
@@ -194,7 +195,7 @@ public class GrenadeController(BotManagerComponent controller) : BotManagerBase(
                         VelocityNormal,
                         out RaycastHit Hit,
                         5,
-                        LayerMaskClass.HighPolyWithTerrainMask
+                        LayersMaskController.HighPolyWithTerrainMask
                     )
                 )
                 {

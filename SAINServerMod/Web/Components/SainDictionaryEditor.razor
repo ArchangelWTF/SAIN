@@ -1,0 +1,114 @@
+@namespace SAINServerMod.Web.Components
+@using System.Collections
+
+@if (_dict == null || _dict.Count == 0)
+{
+    <MudText Typo="Typo.caption" Class="spt-muted">No entries.</MudText>
+}
+else if (_radioMode)
+{
+    <MudRadioGroup T="string" Value="_radioSelected" ValueChanged="SetRadio">
+        @foreach (var key in _keys)
+        {
+            <MudRadio T="string" Value="@key.ToString()" Color="Color.Primary" Dense="true">@Label(key)</MudRadio>
+        }
+    </MudRadioGroup>
+}
+else
+{
+    @foreach (var key in _keys)
+    {
+        var kind = SainValue.Classify(_valueType);
+        @if (kind is SainFieldKind.Nested)
+        {
+            <MudExpansionPanels Elevation="0" Class="sain-panels">
+                <MudExpansionPanel Text="@Label(key)" Class="sain-subpanel">
+                    <SainSettingsEditor Target="_dict[key]" Depth="Depth + 1" OnChanged="OnChanged" />
+                </MudExpansionPanel>
+            </MudExpansionPanels>
+        }
+        else if (kind is SainFieldKind.List)
+        {
+            <MudExpansionPanels Elevation="0" Class="sain-panels">
+                <MudExpansionPanel Text="@Label(key)" Class="sain-subpanel">
+                    <SainListEditor Value="EntryValue(key)" OnChanged="OnChanged" />
+                </MudExpansionPanel>
+            </MudExpansionPanels>
+        }
+        else
+        {
+            <SainFieldEditor Value="EntryValue(key)" OnChanged="OnChanged" />
+        }
+    }
+}
+
+@code {
+    [Parameter, EditorRequired] public SainMember Member { get; set; } = default!;
+    [Parameter] public int Depth { get; set; }
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private IDictionary? _dict;
+    private Type _keyType = typeof(object);
+    private Type _valueType = typeof(object);
+    private List<object> _keys = new();
+    private bool _radioMode;
+    private string _radioSelected = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        _dict = Member.GetValue() as IDictionary;
+        var args = Member.ValueType.IsGenericType ? Member.ValueType.GetGenericArguments() : null;
+        _keyType = args is { Length: 2 } ? args[0] : typeof(object);
+        _valueType = args is { Length: 2 } ? args[1] : typeof(object);
+
+        _keys = _dict?.Keys.Cast<object>().ToList() ?? new();
+
+        _radioMode = _valueType == typeof(bool) && _keyType.Name == "EPersonality";
+        if (_radioMode && _dict != null)
+        {
+            _radioSelected = _keys.FirstOrDefault(k => _dict[k] is true)?.ToString() ?? string.Empty;
+        }
+    }
+
+    private string Label(object key)
+    {
+        return key.ToString() ?? string.Empty;
+    }
+
+    private SainValue EntryValue(object key)
+    {
+        var numeric = _valueType == typeof(float) || _valueType == typeof(double)
+            || _valueType == typeof(int) || _valueType == typeof(long);
+        var meta = new SainMeta
+        {
+            Name = Label(key),
+            Description = Member.Meta.Description,
+            HasRange = numeric && Member.Meta.HasRange,
+            Min = Member.Meta.Min,
+            Max = Member.Meta.Max,
+            Rounding = Member.Meta.Rounding,
+        };
+
+        return new SainValue
+        {
+            Meta = meta,
+            ValueType = _valueType,
+            Getter = () => _dict![key],
+            Setter = v => _dict![key] = v,
+        };
+    }
+
+    private Task SetRadio(string selected)
+    {
+        _radioSelected = selected;
+        if (_dict != null)
+        {
+            foreach (var key in _keys)
+            {
+                _dict[key] = string.Equals(key.ToString(), selected, StringComparison.Ordinal);
+            }
+        }
+        StateHasChanged();
+        return OnChanged.InvokeAsync();
+    }
+}

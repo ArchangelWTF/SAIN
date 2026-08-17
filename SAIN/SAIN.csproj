@@ -29,6 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SAIN.Preset.Shared\SAIN.Preset.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\References\hollowed.dll</HintPath>
     </Reference>
@@ -51,6 +55,7 @@
     <Reference Include="Sirenix.Serialization">
       <HintPath>..\References\Sirenix.Serialization.dll</HintPath>
     </Reference>
+    <Reference Include="websocket-sharp" HintPath="..\References\websocket-sharp.dll" Private="false" />
     <Reference Include="spt-common">
       <HintPath>..\References\spt-common.dll</HintPath>
     </Reference>
@@ -80,7 +85,10 @@
   <!-- Build script-->
   <Target Name="CleanUnwantedFiles" AfterTargets="Build">
     <ItemGroup>
-      <UnwantedFiles Include="$(OutputPath)*.pdb; $(OutputPath)*.deps.json; $(OutputPath)*.dll" Exclude="$(OutputPath)SAIN.dll" />
+      <UnwantedFiles
+        Include="$(OutputPath)*.pdb; $(OutputPath)*.deps.json; $(OutputPath)*.dll"
+        Exclude="$(OutputPath)SAIN.dll;$(OutputPath)SAIN.Preset.Shared.dll"
+      />
     </ItemGroup>
     <Delete Files="@(UnwantedFiles)" />
   </Target>

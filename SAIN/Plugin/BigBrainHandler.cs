@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using DrakiaXYZ.BigBrain.Brains;
@@ -7,8 +7,10 @@ using SAIN.Layers;
 using SAIN.Layers.Combat.Run;
 using SAIN.Layers.Combat.Solo;
 using SAIN.Layers.Combat.Squad;
-using SAIN.Preset.GlobalSettings;
 using SAIN.Preset.GlobalSettings.Categories;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings.Categories.General;
 
 namespace SAIN;
 
@@ -149,12 +151,7 @@ public static class BigBrainHandler
         {
             List<string> brainList = GetBrainList(AIBrains.Scavs);
 
-            List<string> LayersToToggle =
-            [
-                "Help",
-                "AssaultEnemyFar",
-                .. _commonVanillaLayersToRemove,
-            ];
+            List<string> LayersToToggle = ["Help", "AssaultEnemyFar", .. _commonVanillaLayersToRemove];
 
             ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
 
@@ -191,10 +188,7 @@ public static class BigBrainHandler
         {
             List<string> brainList = [nameof(EBrain.ExUsec)];
 
-            List<string> LayersToToggle =
-            [
-                .. _commonVanillaLayersToRemove,
-            ];
+            List<string> LayersToToggle = [.. _commonVanillaLayersToRemove];
 
             ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
         }
@@ -203,10 +197,7 @@ public static class BigBrainHandler
         {
             List<string> brainList = [nameof(EBrain.ArenaFighter)];
 
-            List<string> LayersToToggle =
-            [
-                .. _commonVanillaLayersToRemove,
-            ];
+            List<string> LayersToToggle = [.. _commonVanillaLayersToRemove];
 
             ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
 
@@ -322,12 +313,7 @@ public static class BigBrainHandler
         {
             List<string> brainList = GetBrainList(AIBrains.PMCs);
 
-            List<string> LayersToToggle =
-            [
-                "PmcBear",
-                "PmcUsec",
-                .. _commonVanillaLayersToRemove,
-            ];
+            List<string> LayersToToggle = ["PmcBear", "PmcUsec", .. _commonVanillaLayersToRemove];
 
             ToggleVanillaLayers(brainList, LayersToToggle, useVanillaLayers);
 
@@ -342,7 +328,12 @@ public static class BigBrainHandler
             ToggleVanillaLayers(brainList, layersToToggle, useVanillaLayers);
         }
 
-        public static void ToggleVanillaLayersForBrainsAndRoles(List<string> brainList, List<WildSpawnType> roles, List<string> layersToToggle, bool useVanillaLayers)
+        public static void ToggleVanillaLayersForBrainsAndRoles(
+            List<string> brainList,
+            List<WildSpawnType> roles,
+            List<string> layersToToggle,
+            bool useVanillaLayers
+        )
         {
             ToggleVanillaLayers(brainList, layersToToggle, roles, useVanillaLayers);
         }

@@ -1,5 +1,4 @@
-﻿using Unity.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SAIN.Types.Jobs;
 

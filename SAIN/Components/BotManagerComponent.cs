@@ -29,13 +29,13 @@ public class BotManagerComponent : MonoBehaviour
         get { return Singleton<IBotGame>.Instance; }
     }
 
-    public BotEventHandler BotEventHandler
+    public GlobalEventDispatcher BotEventHandler
     {
         get
         {
             if (_eventHandler == null)
             {
-                _eventHandler = Singleton<BotEventHandler>.Instance;
+                _eventHandler = Singleton<GlobalEventDispatcher>.Instance;
                 if (_eventHandler != null)
                 {
                     GrenadeController.Subscribe(_eventHandler);
@@ -45,7 +45,7 @@ public class BotManagerComponent : MonoBehaviour
         }
     }
 
-    private BotEventHandler _eventHandler;
+    private GlobalEventDispatcher _eventHandler;
 
     public GameWorldComponent SAINGameWorld { get; private set; }
     public BotsController DefaultController { get; set; }

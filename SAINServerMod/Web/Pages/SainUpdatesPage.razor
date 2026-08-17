@@ -1,6 +1,6 @@
 @page "/sain/updates"
 @implements IDisposable
-@attribute [Authorize]
+@attribute [Authorize(Policy = "Administrator")]
 @layout BaseMudBlazorLayout
 @using SAINServerMod.Web.Updates
 @inject GitHubReleaseService ReleaseService

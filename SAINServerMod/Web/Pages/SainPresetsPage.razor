@@ -1,5 +1,5 @@
 @page "/sain/presets"
-@attribute [Authorize]
+@attribute [Authorize(Policy = "Administrator")]
 @implements IDisposable
 @layout BaseMudBlazorLayout
 @inject SainPresetEditService Presets

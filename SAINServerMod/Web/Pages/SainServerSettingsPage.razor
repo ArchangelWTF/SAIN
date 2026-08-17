@@ -1,5 +1,5 @@
 @page "/sain/server-settings"
-@attribute [Authorize]
+@attribute [Authorize(Policy = "Administrator")]
 @implements IDisposable
 @layout BaseMudBlazorLayout
 @using SAIN.Preset.Shared.Models.WS

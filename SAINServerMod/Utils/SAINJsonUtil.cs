@@ -1,8 +1,10 @@
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using SPTarkov.Server.Core.Models.Spt.Servers;
 
 namespace SAINServerMod.Utils;
 
@@ -24,6 +26,11 @@ public static class SAINJsonUtil
     public static T? Deserialize<T>(string json)
     {
         return JsonSerializer.Deserialize<T>(json, Indented);
+    }
+
+    public static StreamedJsonBody StreamRaw(string? json)
+    {
+        return new StreamedJsonBody(string.IsNullOrEmpty(json) ? null : JsonNode.Parse(json));
     }
 
     private static void DataContractTypeInfoResolver(JsonTypeInfo typeInfo)

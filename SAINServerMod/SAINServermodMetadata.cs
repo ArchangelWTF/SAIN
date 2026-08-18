@@ -13,7 +13,7 @@ public sealed record SAINServermodMetadata : IModMetadata, IModBlazorMetadata
     public string Author { get; init; } = "Solarint";
     public List<string>? Contributors { get; init; } = [];
     public Version Version { get; init; } = new(SAINVersionInfo.SAINVersion);
-    public Range SptVersion { get; init; } = new("~4.1.2");
+    public Range SptVersion { get; init; } = new("~4.1.3");
     public List<string>? Incompatibilities { get; init; } = [];
     public Dictionary<string, Range>? ModDependencies { get; init; } = [];
     public string? Url { get; init; } = "https://github.com/ArchangelWTF/SAIN";

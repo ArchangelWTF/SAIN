@@ -12,33 +12,33 @@ public sealed class SAINStaticRouter(JsonUtil jsonUtil, SAINCallbacks callbacks)
     : StaticRouter(
         jsonUtil,
         [
-            new RouteAction<EmptyRequestData>(
+            new StreamedRouteAction<EmptyRequestData>(
                 "/sain/config",
-                async (url, info, sessionID, output, cancellationToken) => await callbacks.GetClientConfig(url, info, sessionID)
+                async (url, info, sessionID, cancellationToken) => await callbacks.GetClientConfig(url, info, sessionID)
             ),
-            new RouteAction<EmptyRequestData>(
+            new StreamedRouteAction<EmptyRequestData>(
                 "/sain/namepersonalities",
-                async (url, info, sessionID, output, cancellationToken) => await callbacks.GetPersonalities(url, info, sessionID)
+                async (url, info, sessionID, cancellationToken) => await callbacks.GetPersonalities(url, info, sessionID)
             ),
-            new RouteAction<EmptyRequestData>(
+            new StreamedRouteAction<EmptyRequestData>(
                 "/sain/presets/defaults",
-                async (url, info, sessionID, output, cancellationToken) => await callbacks.GetDefaultPresets(url, info, sessionID)
+                async (url, info, sessionID, cancellationToken) => await callbacks.GetDefaultPresets(url, info, sessionID)
             ),
-            new RouteAction<EmptyRequestData>(
+            new StreamedRouteAction<EmptyRequestData>(
                 "/sain/bottypes/list",
-                async (url, info, sessionID, output, cancellationToken) => await callbacks.GetBotTypes(url, info, sessionID)
+                async (url, info, sessionID, cancellationToken) => await callbacks.GetBotTypes(url, info, sessionID)
             ),
-            new RouteAction<EmptyRequestData>(
+            new StreamedRouteAction<EmptyRequestData>(
                 "/sain/bottypes/exclusions",
-                async (url, info, sessionID, output, cancellationToken) => await callbacks.GetBotTypeExclusions(url, info, sessionID)
+                async (url, info, sessionID, cancellationToken) => await callbacks.GetBotTypeExclusions(url, info, sessionID)
             ),
-            new RouteAction<EmptyRequestData>(
+            new StreamedRouteAction<EmptyRequestData>(
                 "/sain/presets/custom/list",
-                async (url, info, sessionID, output, cancellationToken) => await callbacks.ListCustomPresets(url, info, sessionID)
+                async (url, info, sessionID, cancellationToken) => await callbacks.ListCustomPresets(url, info, sessionID)
             ),
-            new RouteAction<PresetNameRequest>(
+            new StreamedRouteAction<PresetNameRequest>(
                 "/sain/presets/custom/get",
-                async (url, info, sessionID, output, cancellationToken) => await callbacks.GetCustomPreset(url, info, sessionID)
+                async (url, info, sessionID, cancellationToken) => await callbacks.GetCustomPreset(url, info, sessionID)
             ),
             new RouteAction<PresetSaveRequest>(
                 "/sain/presets/custom/save",
@@ -48,9 +48,9 @@ public sealed class SAINStaticRouter(JsonUtil jsonUtil, SAINCallbacks callbacks)
                 "/sain/presets/custom/delete",
                 async (url, info, sessionID, output, cancellationToken) => await callbacks.DeleteCustomPreset(url, info, sessionID)
             ),
-            new RouteAction<PresetNameRequest>(
+            new StreamedRouteAction<PresetNameRequest>(
                 "/sain/data/get",
-                async (url, info, sessionID, output, cancellationToken) => await callbacks.GetData(url, info, sessionID)
+                async (url, info, sessionID, cancellationToken) => await callbacks.GetData(url, info, sessionID)
             ),
             new RouteAction<PresetSaveRequest>(
                 "/sain/data/save",

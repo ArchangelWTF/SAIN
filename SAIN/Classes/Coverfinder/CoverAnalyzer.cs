@@ -181,9 +181,10 @@ public class CoverAnalyzer(BotComponent bot, CoverFinderComponent coverFinder) :
     private static bool checkPathToEnemy(NavMeshPath path, Vector3 targetPosition)
     {
         const float PATH_NODE_MIN_DIST_SQR = 0.5f;
-        for (int i = 0; i < path.corners.Length - 1; i++)
+        Vector3[] corners = path.corners;
+        for (int i = 0; i < corners.Length - 1; i++)
         {
-            if (IsPositionNearLineSegment(targetPosition, path.corners[i], path.corners[i + 1], PATH_NODE_MIN_DIST_SQR))
+            if (IsPositionNearLineSegment(targetPosition, corners[i], corners[i + 1], PATH_NODE_MIN_DIST_SQR))
             {
                 return false;
             }

@@ -47,6 +47,8 @@ public class SAINEnemyController : BotComponentClassBase
         get { return Events.HumanInLineOfSightEvent.Value; }
     }
 
+    private const float CHANGE_ENEMY_DIST_RATIO_MELEE = 0.9f;
+
     public SAINEnemyController(BotComponent sain)
         : base(sain)
     {
@@ -61,33 +63,6 @@ public class SAINEnemyController : BotComponentClassBase
         _listController.ManualUpdate();
         checkDiscrepency();
         base.ManualUpdate();
-    }
-
-    public void LateUpdate()
-    {
-        //if (Bot == null || Bot.EnemyController == null || !Bot.BotActive)
-        //{
-        //    return;
-        //}
-        //
-        //foreach (var item in EnemiesDictionary)
-        //{
-        //    Enemy enemy = item.Value;
-        //    if (enemy == null || !enemy.CheckValid())
-        //    {
-        //        _invalidIdsToRemove.Add(item.Key);
-        //    }
-        //}
-        //
-        //if (_invalidIdsToRemove.Count > 0)
-        //{
-        //    foreach (var id in _invalidIdsToRemove)
-        //    {
-        //        Bot.EnemyController.RemoveEnemy(id);
-        //    }
-        //    Logger.LogWarning($"Removed {_invalidIdsToRemove.Count} Invalid Enemies");
-        //    _invalidIdsToRemove.Clear();
-        //}
     }
 
     public override void Dispose()
@@ -119,16 +94,6 @@ public class SAINEnemyController : BotComponentClassBase
     public bool IsPlayerAnEnemy(string profileID)
     {
         return _listController.IsPlayerAnEnemy(profileID);
-    }
-
-    public bool IsPlayerFriendly(IPlayer iPlayer)
-    {
-        return _listController.IsPlayerFriendly(iPlayer);
-    }
-
-    public bool IsBotInBotsGroup(BotOwner botOwner)
-    {
-        return _listController.IsBotInBotsGroup(botOwner);
     }
 
     private void EnemyAdded(Enemy enemy)
@@ -298,6 +263,11 @@ public class SAINEnemyController : BotComponentClassBase
 
         if (VisibleEnemies.Count > 0)
         {
+            if (PrefersMelee())
+            {
+                return SelectMeleeEnemy();
+            }
+
             return SelectVisibleEnemy(CHANGE_ENEMY_DIST_RATIO_SHOOTER, CHANGE_ENEMY_DIST_RATIO_NON_SHOOTER);
         }
 
@@ -412,6 +382,33 @@ public class SAINEnemyController : BotComponentClassBase
         return closestKnownEnemy;
     }
 
+    private bool PrefersMelee()
+    {
+        return BotOwner.WeaponManager?.IsMelee == true
+            || Bot.Info.Profile.WildSpawnType is WildSpawnType.bossTagilla or WildSpawnType.bossTagillaAgro;
+    }
+
+    private Enemy SelectMeleeEnemy()
+    {
+        if (VisibleEnemies.Count > 1)
+        {
+            VisibleEnemies.SortBy(EnemyList.EBotListSortType.ByRealDistance);
+        }
+
+        Enemy closestVisibleEnemy = VisibleEnemies[0];
+
+        if (_goalEnemy == null || _goalEnemy == closestVisibleEnemy || !VisibleEnemies.Contains(_goalEnemy))
+        {
+            return closestVisibleEnemy;
+        }
+
+        if (closestVisibleEnemy.RealDistance < CHANGE_ENEMY_DIST_RATIO_MELEE * _goalEnemy.RealDistance)
+        {
+            return closestVisibleEnemy;
+        }
+        return _goalEnemy;
+    }
+
     private Enemy SelectVisibleEnemy(float CHANGE_ENEMY_DIST_RATIO_SHOOTER, float CHANGE_ENEMY_DIST_RATIO_NON_SHOOTER)
     {
         if (VisibleEnemies.Count > 1)
@@ -452,14 +449,6 @@ public class SAINEnemyController : BotComponentClassBase
         for (int i = 0; i < VisibleEnemies.Count; i++)
         {
             Enemy visibleEnemy = VisibleEnemies[i];
-            if (visibleEnemy == _goalEnemy)
-            {
-                return _goalEnemy;
-            }
-            else if (visibleEnemy.RealDistance < CHANGE_ENEMY_DIST_RATIO_SHOOTER * _goalEnemy.RealDistance)
-            {
-                return visibleEnemy;
-            }
             if (visibleEnemy == _goalEnemy)
             {
                 return _goalEnemy;

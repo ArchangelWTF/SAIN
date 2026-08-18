@@ -322,7 +322,8 @@ public class SAINBotUnstuckClass : BotComponentClassBase
         }
         if (path.status == NavMeshPathStatus.PathPartial)
         {
-            Vector3 lastCorner = path.corners[path.corners.Length - 1];
+            Vector3[] corners = path.corners;
+            Vector3 lastCorner = corners[corners.Length - 1];
             float sqrMag = (lastCorner - end).magnitude;
             float combinedLength = sqrMag + pathLength;
             if (combinedLength < _minDistancePathLength)

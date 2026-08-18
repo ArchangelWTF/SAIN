@@ -16,10 +16,7 @@ public class SearchDecider : BotSubClass<SearchClass>
     private float _nextCheckLootTime;
 
     public SearchDecider(SearchClass searchClass)
-        : base(searchClass)
-    {
-        CanEverTick = false;
-    }
+        : base(searchClass) { }
 
     public bool ShallStartSearch(Enemy enemy, out SearchReasonsStruct reasons)
     {

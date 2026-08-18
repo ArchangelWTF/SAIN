@@ -9,8 +9,6 @@ public static class MouseFunctions
         checkMouseEvents();
     }
 
-    public static void OnGUI() { }
-
     public static bool CheckMouseDrag()
     {
         return Event.current.type == EventType.Repaint && CheckMouseDrag(GUILayoutUtility.GetLastRect());

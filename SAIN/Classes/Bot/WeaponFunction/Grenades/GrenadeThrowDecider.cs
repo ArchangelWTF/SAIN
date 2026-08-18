@@ -42,10 +42,7 @@ public class GrenadeThrowDecider : BotSubClass<BotGrenadeManager>, IBotDecisionC
     private readonly AIGreanageThrowData[] _validThrowsBuffer = new AIGreanageThrowData[6];
 
     public GrenadeThrowDecider(BotGrenadeManager ThrowWeap)
-        : base(ThrowWeap)
-    {
-        CanEverTick = false;
-    }
+        : base(ThrowWeap) { }
 
     protected override void UpdatePresetSettings(SAINPresetClass preset)
     {

@@ -10,10 +10,7 @@ namespace SAIN.SAINComponent.Classes.Decision;
 public class SelfActionDecisionClass : BotBase
 {
     public SelfActionDecisionClass(BotComponent sain)
-        : base(sain)
-    {
-        CanEverTick = false;
-    }
+        : base(sain) { }
 
     public ESelfActionType CurrentSelfAction
     {

@@ -1,4 +1,4 @@
-﻿using EFT;
+using EFT;
 using SAIN.Components;
 using UnityEngine;
 
@@ -6,16 +6,43 @@ namespace SAIN.SAINComponent.SubComponents;
 
 public class GrenadeTrackerClass
 {
-    public GrenadeTrackerClass(BotComponent bot, Grenade grenade, Vector3 dangerPoint, float reactionTime)
+    private const float ESTIMATED_FUSE_TIME = 3.5f;
+    private const float NOTICE_WITHOUT_LOOKING_DISTANCE = 3f;
+    private const float SPOTTED_ON_ARRIVAL_DISTANCE = 10f;
+
+    public GrenadeTrackerClass(BotComponent bot, Grenade grenade, Vector3 dangerPoint, float reactionTime, bool willNotice)
     {
         _bot = bot;
         _reactionTime = reactionTime;
+        WillNotice = willNotice;
         DangerPoint = dangerPoint;
         Grenade = grenade;
-        if ((grenade.transform.position - bot.Position).magnitude < 10f)
+        TimeThrown = Time.time;
+        if ((grenade.transform.position - bot.Position).magnitude < SPOTTED_ON_ARRIVAL_DISTANCE)
         {
             SetSpotted();
         }
+    }
+
+    /// <summary>
+    /// Rolled once when the grenade is thrown. A bot that fails the roll never reacts to this one, so
+    /// grenades still land on people instead of every bot dodging every throw.
+    /// </summary>
+    public bool WillNotice { get; }
+
+    public float TimeThrown { get; }
+
+    public float TimeSinceThrown
+    {
+        get { return Time.time - TimeThrown; }
+    }
+
+    /// <summary>
+    /// Estimated seconds before this goes off. Can be wrong for a cooked grenade, on purpose.
+    /// </summary>
+    public float EstimatedTimeRemaining
+    {
+        get { return Mathf.Max(0f, ESTIMATED_FUSE_TIME - TimeSinceThrown); }
     }
 
     public void CheckHeardGrenadeCollision(float maxRange)
@@ -54,8 +81,6 @@ public class GrenadeTrackerClass
             var trigger = isFrag ? EPhraseTrigger.OnEnemyGrenade : EPhraseTrigger.Look;
             _bot.Talk.GroupSay(trigger, ETagStatus.Combat, false, 100);
 
-            Vector3 pos = DangerPoint;
-            BotOwner.BewareGrenade.AddGrenadeDanger(pos, Grenade);
             return;
         }
 
@@ -65,7 +90,9 @@ public class GrenadeTrackerClass
         }
 
         GrenadeDistance = (Grenade.transform.position - BotOwner.Position).magnitude;
-        if (GrenadeDistance < 3f)
+
+        // Something landing at your feet registers whether or not you were looking at it.
+        if (GrenadeDistance < NOTICE_WITHOUT_LOOKING_DISTANCE)
         {
             SetSpotted();
             return;
@@ -103,20 +130,14 @@ public class GrenadeTrackerClass
         {
             return false; // Not looking in the right direction
         }
-        return !Physics.Raycast(lookPoint, grenadeDir, 1f, LayersMaskController.HighPolyWithTerrainMaskAI);
+
+        return !Physics.Raycast(lookPoint, grenadeDir.normalized, grenadeDir.magnitude, LayersMaskController.HighPolyWithTerrainMaskAI);
     }
 
     public void UpdateGrenadeDanger(Vector3 Danger)
     {
         DangerPoint = Danger;
-        if (_sentToBot && !_updated)
-        {
-            _updated = true;
-            BotOwner.BewareGrenade.AddGrenadeDanger(Danger, Grenade);
-        }
     }
-
-    private bool _updated;
 
     private float TimeSpotted { get; set; }
     public float TimeSinceSpotted
@@ -129,7 +150,7 @@ public class GrenadeTrackerClass
     private bool Spotted { get; set; }
     public bool CanReact
     {
-        get { return Spotted && TimeSinceSpotted > _reactionTime; }
+        get { return WillNotice && Spotted && TimeSinceSpotted > _reactionTime; }
     }
 
     private readonly float _reactionTime;

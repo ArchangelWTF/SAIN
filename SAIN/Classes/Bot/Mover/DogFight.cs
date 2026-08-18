@@ -220,7 +220,8 @@ public class DogFight : BotBase
                         dogFightPath.ClearCorners();
                         if (NavMesh.CalculatePath(Bot.Position, Point, -1, dogFightPath))
                         {
-                            MovePoint = dogFightPath.corners[dogFightPath.corners.Length - 1];
+                            Vector3[] corners = dogFightPath.corners;
+                            MovePoint = corners[corners.Length - 1];
                             return true;
                         }
                     }

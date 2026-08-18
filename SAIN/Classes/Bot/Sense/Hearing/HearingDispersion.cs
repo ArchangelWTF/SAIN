@@ -87,51 +87,6 @@ public class HearingDispersion(HearingSensor hearingSensor) : BotSubClass<Hearin
         return Sound.Enemy.EnemyPosition;
     }
 
-    public static bool GetRandomReachablePointInBoxAroundPlayer(
-        PlayerComponent playerComp,
-        Vector3 size,
-        out Vector3 result,
-        out NavMeshPath path,
-        float navSampleRange = 2f,
-        int maxTries = 10
-    )
-    {
-        PlayerNavData navData = playerComp.Transform.NavData;
-        Vector3 origin = navData.Status == EPlayerNavMeshDistance.OffNavMesh ? playerComp.Position : playerComp.Transform.NavData.Position;
-        for (int i = 0; i < maxTries; i++)
-        {
-            Vector3 randomPoint = RandomPointInBox(origin, size);
-            if (!NavMesh.SamplePosition(randomPoint, out NavMeshHit hit, navSampleRange, -1))
-            {
-#if DEBUG
-                Logger.LogDebug(
-                    $"Failed nav sample [randomDir magnitude: {(randomPoint - origin).magnitude}] [Box Size magnitude {size.magnitude}]"
-                );
-#endif
-                continue; // No valid point found
-            }
-            path = new NavMeshPath();
-            if (!NavMesh.CalculatePath(origin, hit.position, -1, path))
-            {
-#if DEBUG
-                Logger.LogDebug($"Failed nav path");
-#endif
-                continue;
-            }
-            Vector3[] corners = path.corners;
-            int length = corners.Length;
-            if (length > 1)
-            {
-                result = corners[length - 1];
-                return true;
-            }
-        }
-
-        result = Vector3.zero;
-        path = null;
-        return false; // No valid point found
-    }
-
     public bool GetRandomReachablePointAroundPlayer(
         PlayerComponent playerComp,
         float radius,
@@ -173,17 +128,6 @@ public class HearingDispersion(HearingSensor hearingSensor) : BotSubClass<Hearin
 
         result = Vector3.zero;
         return false; // No valid point found
-    }
-
-    public static Vector3 RandomPointInBox(Vector3 center, Vector3 size)
-    {
-        Vector3 halfSize = size * 0.5f;
-
-        return new Vector3(
-                Random.Range(-halfSize.x, halfSize.x),
-                Random.Range(-halfSize.y, halfSize.y),
-                Random.Range(-halfSize.z, halfSize.z)
-            ) + center;
     }
 
     private float GetBaseDispersion(float enemyDistance, SAINSoundType soundType)

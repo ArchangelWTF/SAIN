@@ -455,7 +455,7 @@ public class Enemy : BotBase, ISPlayer
         }
 
         Vector3? LastKnown = LastKnownPosition;
-        if (LastKnown != null && Path.PathCorners.Length >= 2)
+        if (LastKnown != null && Path.PathCornerCount >= 2)
         {
             Vector3 botPosition = Bot.Position;
             Vector3 botEyePosition = Bot.Transform.EyePosition;

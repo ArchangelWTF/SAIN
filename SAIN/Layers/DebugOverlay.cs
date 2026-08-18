@@ -35,7 +35,7 @@ public static class DebugOverlay
                         $"VisiblePathPoint: [{enemy.VisiblePathPoint}] Dist2Bot: [{enemy.VisiblePathPointDistanceToBot}] DistToLN: [{enemy.VisiblePathPointDistanceToEnemyLastKnown}]"
                     );
                     stringBuilder.AppendLine(
-                        $"Path: [{enemy.Path.PathToEnemyStatus}] Nodes: [{enemy.Path.AllPathNodeCount}] corners: [{enemy.Path.PathCorners?.Length}]"
+                        $"Path: [{enemy.Path.PathToEnemyStatus}] Nodes: [{enemy.Path.AllPathNodeCount}] corners: [{enemy.Path.PathCornerCount}]"
                     );
                     stringBuilder.AppendLine(
                         $" Enemy Statuses: "

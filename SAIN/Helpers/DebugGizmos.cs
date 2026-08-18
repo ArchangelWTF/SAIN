@@ -282,15 +282,20 @@ public class DebugGizmos
 
     public static void SetLinePositions(GameObject gameObject, params Vector3[] positions)
     {
+        SetLinePositions(gameObject, positions, positions?.Length ?? 0);
+    }
+
+    public static void SetLinePositions(GameObject gameObject, Vector3[] positions, int count)
+    {
         if (gameObject != null && positions != null)
         {
-            int count = positions.Length;
+            count = Mathf.Min(count, positions.Length);
             if (count > 0)
             {
                 LineRenderer lineRenderer = gameObject.GetOrAddComponent<LineRenderer>();
                 if (lineRenderer != null)
                 {
-                    lineRenderer.positionCount = positions.Length;
+                    lineRenderer.positionCount = count;
                     for (int i = 0; i < count; i++)
                     {
                         lineRenderer.SetPosition(i, positions[i]);

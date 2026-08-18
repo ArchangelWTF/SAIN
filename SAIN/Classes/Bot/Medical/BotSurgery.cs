@@ -7,10 +7,7 @@ namespace SAIN.SAINComponent.Classes;
 public class BotSurgery : BotBase
 {
     public BotSurgery(BotComponent bot)
-        : base(bot)
-    {
-        CanEverTick = false;
-    }
+        : base(bot) { }
 
     public bool SurgeryStarted
     {

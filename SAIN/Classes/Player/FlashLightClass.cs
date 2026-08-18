@@ -51,8 +51,6 @@ public class FlashLightClass(PlayerComponent component) : PlayerComponentBase(co
 
     public LightDetectionClass LightDetection { get; } = new LightDetectionClass(component);
 
-    public void Update() { }
-
     public void CheckDevice()
     {
         CheckUsingLightModes();

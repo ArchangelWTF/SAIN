@@ -108,7 +108,6 @@ public static class SAINEditor
                 StylesClass.CreateCache();
             }
 
-            MouseFunctions.OnGUI();
             CursorSettings.SetUnlockCursor(0, true);
             GUIUtility.ScaleAroundPivot(ScaledPivot, Vector2.zero);
             MainWindow = GUI.Window(0, MainWindow, MainWindowFunc, "SAIN AI Settings Editor", GetStyle(Style.window));
@@ -134,7 +133,6 @@ public static class SAINEditor
         float space = DragRect.height + EditTabsClass.TabMenuRect.height;
         Space(space);
         GUITabs.CreateTabs(selectedTab);
-        MouseFunctions.OnGUI();
         DrawTooltip();
     }
 

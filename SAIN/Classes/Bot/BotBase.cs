@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using EFT;
 using SAIN.Components;
 using SAIN.Components.PlayerComponentSpace;
@@ -85,41 +84,8 @@ public abstract class BotComponentClassBase : BotBase
     public override void Init()
     {
         Bot.AddBotTickClass(this);
-        foreach (IBotClass Class in SubClasses)
-        {
-            Class.Init();
-        }
-
         base.Init();
     }
-
-    public override void ManualUpdate()
-    {
-        float time = Time.time;
-        foreach (IBotClass Class in SubClasses)
-        {
-            Class.ManualUpdate();
-        }
-
-        base.ManualUpdate();
-    }
-
-    public override void Dispose()
-    {
-        foreach (IBotClass Class in SubClasses)
-        {
-            Class?.Dispose();
-        }
-
-        base.Dispose();
-    }
-
-    protected void AddSubClass(IBotClass Class)
-    {
-        SubClasses.Add(Class);
-    }
-
-    protected readonly List<IBotClass> SubClasses = [];
 }
 
 public abstract class BotSubClass<T>(T sainClass) : BotBase(sainClass.Bot)

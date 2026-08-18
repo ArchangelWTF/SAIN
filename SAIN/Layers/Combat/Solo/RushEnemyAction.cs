@@ -67,9 +67,9 @@ internal class RushEnemyAction(BotOwner bot) : BotAction(bot, nameof(RushEnemyAc
         if (_shallTryJump && TryJumpTimer < Time.time && Bot.Player.IsSprintEnabled)
         {
             //&& Bot.Enemy.Path.PathDistance > 3f
-            NavMeshPath enemyPath = _enemy.Path.PathToEnemy;
-            Vector3[] corners = enemyPath.corners;
-            if (corners.Length > 2 && (corners[corners.Length - 2] - Bot.Position).sqrMagnitude < 1f)
+            Vector3[] corners = _enemy.Path.PathCorners;
+            int cornerCount = _enemy.Path.PathCornerCount;
+            if (cornerCount > 2 && (corners[cornerCount - 2] - Bot.Position).sqrMagnitude < 1f)
             {
                 TryJumpTimer = Time.time + 3f;
                 Bot.Mover.TryJump();

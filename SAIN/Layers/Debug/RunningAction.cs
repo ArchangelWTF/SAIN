@@ -47,7 +47,8 @@ internal class RunningAction(BotOwner bot) : BotAction(bot, nameof(RunningAction
                 path = new NavMeshPath();
                 if (NavMesh.CalculatePath(Bot.Position, hit.position, -1, path))
                 {
-                    _runDestination = path.corners[path.corners.Length - 1];
+                    Vector3[] corners = path.corners;
+                    _runDestination = corners[corners.Length - 1];
                     return true;
                 }
             }

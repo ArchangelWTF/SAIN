@@ -22,12 +22,6 @@ public class GrenadeController(BotManagerComponent controller) : BotManagerBase(
 
     public event Action<Grenade, Vector3> OnGrenadeDangerUpdated;
 
-    public void Init() { }
-
-    public void Update() { }
-
-    public void Dispose() { }
-
     public void Subscribe(GlobalEventDispatcher eventHandler)
     {
         eventHandler.OnGrenadeThrow += GrenadeThrown;
@@ -125,7 +119,7 @@ public class GrenadeController(BotManagerComponent controller) : BotManagerBase(
 
     private void GrenadeThrown(Grenade grenade, Vector3 position, Vector3 force, float mass)
     {
-        if (grenade == null)
+        if (grenade == null || ActiveGrenades.ContainsKey(grenade))
         {
             return;
         }
@@ -155,7 +149,7 @@ public class GrenadeController(BotManagerComponent controller) : BotManagerBase(
                     RelevantPlayers.Add(otherPlayer.OtherPlayerComponent);
                 }
             }
-            ActiveGrenades.Add(grenade, RelevantPlayers);
+            ActiveGrenades[grenade] = RelevantPlayers;
             BotController.StartCoroutine(GrenadeTracker(grenade, playerComponent, RelevantPlayers, dangerPoint));
         }
     }

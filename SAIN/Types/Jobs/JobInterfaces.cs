@@ -16,8 +16,6 @@ public interface IBotRaycastJobSingleTarget
     public IPlayer Target { get; }
 }
 
-public interface IDisposableJobFor : IJobFor, IDisposable { }
-
 public interface IRaycastJob : IDisposable
 {
     public JobHandle Schedule(int MaxCommandsPerJob = 8);

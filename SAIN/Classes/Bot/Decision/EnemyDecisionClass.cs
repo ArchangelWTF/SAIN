@@ -28,10 +28,7 @@ public class EnemyDecisionClass : BotBase
     public bool? DebugShallSearch { get; set; }
 
     public EnemyDecisionClass(BotComponent sain)
-        : base(sain)
-    {
-        CanEverTick = false;
-    }
+        : base(sain) { }
 
     public bool GetDecision(out ECombatDecision result, Enemy enemy, EnemyList knownEnemies)
     {

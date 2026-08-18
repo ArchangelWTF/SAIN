@@ -457,6 +457,11 @@ public class SAINCoverClass : BotComponentClassBase
 
     public bool CheckLimbsForCover(Enemy enemy)
     {
+        if (enemy?.EnemyTransform == null)
+        {
+            return false;
+        }
+
         var target = enemy.EnemyTransform.WeaponData.WeaponRoot;
         const float rayDistance = 3f;
         if (CheckLimbForCover(BodyPartType.leftLeg, target, rayDistance) || CheckLimbForCover(BodyPartType.leftArm, target, rayDistance))

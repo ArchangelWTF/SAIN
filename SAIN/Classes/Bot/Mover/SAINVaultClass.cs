@@ -50,13 +50,13 @@ public class SAINVaultClass : BotComponentClassBase
     public static bool FindVaultPoint(Player player, NavMeshPath path, out SAINVaultPoint point)
     {
         point = null;
-        if (path.corners.Length < 3)
+        Vector3[] corners = path.corners;
+        if (corners.Length < 3)
         {
             return false;
         }
 
         int totalChecks = 0;
-        Vector3[] corners = path.corners;
         int max = corners.Length - 1;
 
         bool foundPoint = false;

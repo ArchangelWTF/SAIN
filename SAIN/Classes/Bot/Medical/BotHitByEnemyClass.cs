@@ -9,10 +9,7 @@ public class BotHitByEnemyClass : BotBase
     public Enemy EnemyWhoLastShotMe { get; private set; }
 
     public BotHitByEnemyClass(BotComponent bot)
-        : base(bot)
-    {
-        CanEverTick = false;
-    }
+        : base(bot) { }
 
     public override void Init()
     {

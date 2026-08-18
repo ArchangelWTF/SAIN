@@ -13,10 +13,7 @@ public class DogFightDecisionClass : BotBase
     }
 
     public DogFightDecisionClass(BotComponent bot)
-        : base(bot)
-    {
-        CanEverTick = false;
-    }
+        : base(bot) { }
 
     public override void Init()
     {

@@ -465,14 +465,6 @@ public class BotComponent : BotComponentBase, ISPlayer
         StopAllCoroutines();
     }
 
-    private void OnEnable() { }
-
-    public void LateUpdate()
-    {
-        //BotActivation?.LateUpdate();
-        //EnemyController?.LateUpdate();
-    }
-
     private void HandleDumbShit()
     {
         if (IsCheater)

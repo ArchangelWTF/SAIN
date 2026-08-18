@@ -256,7 +256,6 @@ public class PlayerComponent : MonoBehaviour, IDisposable, ISPlayer
 #if DEBUG
                 drawTransformGizmos();
 #endif
-                Flashlight.Update();
                 Equipment.Update();
             }
         }

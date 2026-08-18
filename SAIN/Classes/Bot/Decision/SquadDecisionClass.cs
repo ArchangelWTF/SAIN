@@ -11,10 +11,7 @@ namespace SAIN.SAINComponent.Classes.Decision;
 public class SquadDecisionClass : BotBase
 {
     public SquadDecisionClass(BotComponent sain)
-        : base(sain)
-    {
-        CanEverTick = false;
-    }
+        : base(sain) { }
 
     private BotSquadContainer Squad
     {

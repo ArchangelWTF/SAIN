@@ -16,10 +16,7 @@ public class SearchPathFinder : BotSubClass<SearchClass>
     public bool FinishedPeeking { get; set; }
 
     public SearchPathFinder(SearchClass searchClass)
-        : base(searchClass)
-    {
-        CanEverTick = false;
-    }
+        : base(searchClass) { }
 
     public bool HasPathToSearchTarget(Enemy enemy, out string failReason)
     {
@@ -63,8 +60,7 @@ public class SearchPathFinder : BotSubClass<SearchClass>
             return;
         }
 
-        var pathToEnemy = enemy.Path.PathToEnemy;
-        if (pathToEnemy.corners.Length > 2)
+        if (enemy.Path.PathCornerCount > 2)
         {
             return;
         }
@@ -98,13 +94,14 @@ public class SearchPathFinder : BotSubClass<SearchClass>
             failReason = "path Invalid";
             return false;
         }
-        int length = path.corners.Length;
+        Vector3[] corners = enemy.Path.PathCorners;
+        int length = enemy.Path.PathCornerCount;
         if (length < 2)
         {
             failReason = "path Invalid corner length";
             return false;
         }
-        Vector3 destination = path.corners[length - 1];
+        Vector3 destination = corners[length - 1];
         if ((destination - Bot.Position).sqrMagnitude <= 0.33f)
         {
             failReason = "tooClose";

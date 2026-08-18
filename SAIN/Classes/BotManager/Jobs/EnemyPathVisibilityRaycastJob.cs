@@ -146,7 +146,7 @@ public class EnemyPathVisibilityRaycastJob : SainJobTemplate, IDisposable
                 }
                 if (visibleNodes.Count == 0)
                 {
-                    if (enemy.Path.PathCorners.Length > 1)
+                    if (enemy.Path.PathCornerCount > 1)
                     {
                         enemy.SetLastCornerAsVisiblePathPoint(enemy.Path.PathCorners[1]);
                     }

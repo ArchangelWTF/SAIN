@@ -219,10 +219,40 @@ public static class PresetTunerExtensions
         }
     }
 
+    private static readonly ESainWildSpawnType[] _flashResistantBosses =
+    [
+        ESainWildSpawnType.bossTagilla,
+        ESainWildSpawnType.bossTagillaAgro,
+        ESainWildSpawnType.bossKilla,
+        ESainWildSpawnType.bossKillaAgro,
+    ];
+
+    private const float FLASH_RESISTANT_DISORIENTATION = 0.25f;
+    private const float FLASH_RESISTANT_DURATION = 0.5f;
+
+    private static void ApplyFlashResistantBosses(this Dictionary<ESainWildSpawnType, SAINSettingsGroupClass> botSettings)
+    {
+        foreach (ESainWildSpawnType type in _flashResistantBosses)
+        {
+            if (!botSettings.TryGetValue(type, out var group))
+            {
+                continue;
+            }
+
+            foreach (var pair in group.Settings)
+            {
+                pair.Value.Look.FlashDisorientation = FLASH_RESISTANT_DISORIENTATION;
+                pair.Value.Look.FlashDurationMulti = FLASH_RESISTANT_DURATION;
+            }
+        }
+    }
+
     private static void ApplyBase(this GlobalSettingsClass global, Dictionary<ESainWildSpawnType, SAINSettingsGroupClass> botSettings)
     {
         global.Difficulty.ScatteringCoef = 0.75f;
         global.Difficulty.ACCURACY_SPEED_COEF = 0.8f;
+
+        botSettings.ApplyFlashResistantBosses();
 
         foreach (var botsetting in botSettings)
         {

@@ -162,14 +162,31 @@ public class GrenadeReactionClass : BotSubClass<BotGrenadeManager>, IBotClass
         if (DangerGrenade != closest)
         {
             DangerGrenade = closest;
-            Reaction = GetReaction();
-#if DEBUG
-            if (SAINPlugin.DebugMode)
-            {
-                Logger.LogDebug($"[{Bot.name}] grenade reaction [{Reaction}] at [{Mathf.Sqrt(closestSqrDist)}m]");
-            }
-#endif
+            SetReaction(GetReaction(), closestSqrDist);
+            return;
         }
+
+        EGrenadeReaction reaction = GetReaction();
+
+        if (reaction != EGrenadeReaction.None)
+        {
+            SetReaction(reaction, closestSqrDist);
+        }
+    }
+
+    private void SetReaction(EGrenadeReaction reaction, float sqrDistance)
+    {
+        if (Reaction == reaction)
+        {
+            return;
+        }
+        Reaction = reaction;
+#if DEBUG
+        if (SAINPlugin.DebugMode)
+        {
+            Logger.LogDebug($"[{Bot.name}] grenade reaction [{reaction}] at [{Mathf.Sqrt(sqrDistance)}m]");
+        }
+#endif
     }
 
     public EGrenadeReaction Reaction { get; private set; }
@@ -222,6 +239,11 @@ public class GrenadeReactionClass : BotSubClass<BotGrenadeManager>, IBotClass
         if (distance > OCCLUSION_TRUST_DISTANCE && BlastIsOccluded())
         {
             return EGrenadeReaction.None;
+        }
+
+        if (distance < BLAST_OVERRIDE_DISTANCE)
+        {
+            return EGrenadeReaction.Scatter;
         }
 
         switch (Bot.Info.Personality)

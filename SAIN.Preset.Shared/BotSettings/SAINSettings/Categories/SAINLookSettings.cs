@@ -8,6 +8,22 @@ namespace SAIN.Preset.Shared.BotSettings.SAINSettings.Categories;
 public class SAINLookSettings : SAINSettingsBase<SAINLookSettings>, ISAINSettings
 {
     [DataMember]
+    [NameAndDescription(
+        "Flashbang Duration Multiplier",
+        "Scales how long this bot type stays blinded, on top of the global multiplier. Lowering makes them recover more quickly."
+    )]
+    [MinMax(0f, 2f, 100f)]
+    public float FlashDurationMulti = 1f;
+
+    [DataMember]
+    [NameAndDescription(
+        "Flashbang Disorientation",
+        "How far off a blinded bot of this type aims and sprays. Lower it for leaving bots to get their bearings back faster."
+    )]
+    [MinMax(0f, 2f, 100f)]
+    public float FlashDisorientation = 1f;
+
+    [DataMember]
     [Name("Can Use Flashlights")]
     public bool CAN_USE_LIGHT = true;
 

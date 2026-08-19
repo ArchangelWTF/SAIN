@@ -76,6 +76,11 @@ public class GrenadeController(BotManagerComponent controller) : BotManagerBase(
                             botGroupClass.AddSmokePlace(explosionPosition, smokeLifeTime, radius, position);
                         }
                     }
+
+                    if (BotController.DefaultController.BotSmokesVisionSystem != null)
+                    {
+                        BotController.DefaultController.BotSmokesVisionSystem.TryAddGrenade(throwableId, explosionPosition);
+                    }
                 }
             }
         }

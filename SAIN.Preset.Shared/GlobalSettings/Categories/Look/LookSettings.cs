@@ -30,6 +30,11 @@ public class LookSettings : SAINSettingsBase<LookSettings>, ISAINSettings
     public LightNVGSettings Light = new();
 
     [DataMember]
+    [Category("Core Settings")]
+    [Name("Flashbang Settings")]
+    public FlashbangSettings Flashbang = new();
+
+    [DataMember]
     [Category("Extra")]
     [Name("Not Looking At Bot Settings")]
     public NotLookingSettings NotLooking = new();
@@ -41,5 +46,6 @@ public class LookSettings : SAINSettingsBase<LookSettings>, ISAINSettings
         list.Add(NotLooking);
         list.Add(Time);
         list.Add(Light);
+        list.Add(Flashbang);
     }
 }

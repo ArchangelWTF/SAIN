@@ -7,6 +7,7 @@ using SAIN.Layers;
 using SAIN.Layers.Combat.Run;
 using SAIN.Layers.Combat.Solo;
 using SAIN.Layers.Combat.Squad;
+using SAIN.Layers.Flashed;
 using SAIN.Preset.GlobalSettings.Categories;
 using SAIN.Preset.Shared.Enums;
 using SAIN.Preset.Shared.GlobalSettings;
@@ -344,6 +345,7 @@ public static class BigBrainHandler
 
             BrainManager.AddCustomLayer(typeof(DebugLayer), brainList, 99);
             BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), brainList, 80);
+            BrainManager.AddCustomLayer(typeof(SAINFlashedLayer), brainList, 85);
             BrainManager.AddCustomLayer(typeof(CombatSquadLayer), brainList, settings.SAINCombatSquadLayerPriority);
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, settings.SAINCombatSoloLayerPriority);
 
@@ -359,6 +361,7 @@ public static class BigBrainHandler
 
             BrainManager.AddCustomLayer(typeof(DebugLayer), brainList, 99, roles);
             BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), brainList, 80, roles);
+            BrainManager.AddCustomLayer(typeof(SAINFlashedLayer), brainList, 85, roles);
             BrainManager.AddCustomLayer(typeof(CombatSquadLayer), brainList, settings.SAINCombatSquadLayerPriority, roles);
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, settings.SAINCombatSoloLayerPriority, roles);
 
@@ -412,6 +415,7 @@ public static class BigBrainHandler
 
             BrainManager.AddCustomLayer(typeof(DebugLayer), pmcBrain, 99);
             BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), pmcBrain, 80);
+            BrainManager.AddCustomLayer(typeof(SAINFlashedLayer), pmcBrain, 85);
             BrainManager.AddCustomLayer(typeof(ExtractLayer), pmcBrain, settings.SAINExtractLayerPriority);
             BrainManager.AddCustomLayer(typeof(CombatSquadLayer), pmcBrain, settings.SAINCombatSquadLayerPriority);
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), pmcBrain, settings.SAINCombatSoloLayerPriority);
@@ -430,6 +434,7 @@ public static class BigBrainHandler
             //BrainManager.AddCustomLayer(typeof(BotUnstuckLayer), stringList, 98);
             BrainManager.AddCustomLayer(typeof(DebugLayer), brainList, 99);
             BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), brainList, 80);
+            BrainManager.AddCustomLayer(typeof(SAINFlashedLayer), brainList, 85);
             BrainManager.AddCustomLayer(typeof(ExtractLayer), brainList, settings.SAINExtractLayerPriority);
             BrainManager.AddCustomLayer(typeof(CombatSquadLayer), brainList, settings.SAINCombatSquadLayerPriority);
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, settings.SAINCombatSoloLayerPriority);
@@ -444,6 +449,7 @@ public static class BigBrainHandler
 
             BrainManager.AddCustomLayer(typeof(DebugLayer), raiderBrain, 99, roles);
             BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), raiderBrain, 80, roles);
+            BrainManager.AddCustomLayer(typeof(SAINFlashedLayer), raiderBrain, 85, roles);
             BrainManager.AddCustomLayer(typeof(ExtractLayer), raiderBrain, settings.SAINExtractLayerPriority, roles);
             BrainManager.AddCustomLayer(typeof(CombatSquadLayer), raiderBrain, settings.SAINCombatSquadLayerPriority, roles);
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), raiderBrain, settings.SAINCombatSoloLayerPriority, roles);
@@ -457,6 +463,7 @@ public static class BigBrainHandler
             //BrainManager.AddCustomLayer(typeof(BotUnstuckLayer), stringList, 98);
             BrainManager.AddCustomLayer(typeof(DebugLayer), brainList, 99);
             BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), brainList, 80);
+            BrainManager.AddCustomLayer(typeof(SAINFlashedLayer), brainList, 85);
             BrainManager.AddCustomLayer(typeof(ExtractLayer), brainList, settings.SAINExtractLayerPriority);
             BrainManager.AddCustomLayer(typeof(CombatSquadLayer), brainList, settings.SAINCombatSquadLayerPriority);
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, settings.SAINCombatSoloLayerPriority);
@@ -470,6 +477,7 @@ public static class BigBrainHandler
             //BrainManager.AddCustomLayer(typeof(BotUnstuckLayer), stringList, 98);
             BrainManager.AddCustomLayer(typeof(DebugLayer), brainList, 99);
             BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), brainList, 80);
+            BrainManager.AddCustomLayer(typeof(SAINFlashedLayer), brainList, 85);
             BrainManager.AddCustomLayer(typeof(ExtractLayer), brainList, settings.SAINExtractLayerPriority);
             BrainManager.AddCustomLayer(typeof(CombatSquadLayer), brainList, settings.SAINCombatSquadLayerPriority);
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, settings.SAINCombatSoloLayerPriority);
@@ -482,6 +490,7 @@ public static class BigBrainHandler
             //BrainManager.AddCustomLayer(typeof(BotUnstuckLayer), stringList, 146);
             BrainManager.AddCustomLayer(typeof(DebugLayer), brainList, 150);
             BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), brainList, 118);
+            BrainManager.AddCustomLayer(typeof(SAINFlashedLayer), brainList, 123);
             BrainManager.AddCustomLayer(typeof(ExtractLayer), brainList, 108);
             BrainManager.AddCustomLayer(typeof(CombatSquadLayer), brainList, 104);
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, 102);
@@ -495,6 +504,7 @@ public static class BigBrainHandler
             //BrainManager.AddCustomLayer(typeof(BotUnstuckLayer), stringList, 98);
             BrainManager.AddCustomLayer(typeof(DebugLayer), brainList, 99);
             BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), brainList, 80);
+            BrainManager.AddCustomLayer(typeof(SAINFlashedLayer), brainList, 85);
             BrainManager.AddCustomLayer(typeof(ExtractLayer), brainList, settings.SAINExtractLayerPriority);
             BrainManager.AddCustomLayer(typeof(CombatSquadLayer), brainList, settings.SAINCombatSquadLayerPriority);
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, settings.SAINCombatSoloLayerPriority);
@@ -508,6 +518,7 @@ public static class BigBrainHandler
             //BrainManager.AddCustomLayer(typeof(BotUnstuckLayer), stringList, 98);
             BrainManager.AddCustomLayer(typeof(DebugLayer), brainList, 99);
             BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), brainList, 80);
+            BrainManager.AddCustomLayer(typeof(SAINFlashedLayer), brainList, 85);
             BrainManager.AddCustomLayer(typeof(ExtractLayer), brainList, settings.SAINExtractLayerPriority);
             BrainManager.AddCustomLayer(typeof(CombatSquadLayer), brainList, settings.SAINCombatSquadLayerPriority);
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, settings.SAINCombatSoloLayerPriority);
@@ -521,6 +532,7 @@ public static class BigBrainHandler
             //BrainManager.AddCustomLayer(typeof(BotUnstuckLayer), stringList, 98);
             BrainManager.AddCustomLayer(typeof(DebugLayer), brainList, 99);
             BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), brainList, 80);
+            BrainManager.AddCustomLayer(typeof(SAINFlashedLayer), brainList, 85);
             BrainManager.AddCustomLayer(typeof(CombatSquadLayer), brainList, 70);
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, 69);
         }
@@ -533,6 +545,7 @@ public static class BigBrainHandler
             //BrainManager.AddCustomLayer(typeof(BotUnstuckLayer), stringList, 98);
             BrainManager.AddCustomLayer(typeof(DebugLayer), brainList, 99);
             BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), brainList, 80);
+            BrainManager.AddCustomLayer(typeof(SAINFlashedLayer), brainList, 85);
             BrainManager.AddCustomLayer(typeof(CombatSquadLayer), brainList, 70);
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, 69);
         }
@@ -543,6 +556,7 @@ public static class BigBrainHandler
 
             BrainManager.AddCustomLayer(typeof(DebugLayer), brainList, 99);
             BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), brainList, 80);
+            BrainManager.AddCustomLayer(typeof(SAINFlashedLayer), brainList, 85);
             BrainManager.AddCustomLayer(typeof(CombatSquadLayer), brainList, 64);
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, 62);
         }

@@ -25,7 +25,7 @@ public class UpdateLightEnablePatch : ModulePatch
     public static bool PatchPrefix(float curLightDist, ref float __result, BotLight __instance)
     {
         __result = curLightDist;
-        if (__instance._owner.FlashGrenade.IsFlashed)
+        if (SAINEnableClass.GetSAIN(__instance._owner.ProfileId, out var flashedBot) && flashedBot.Flashed.IsFlashed)
         {
             return false;
         }
@@ -138,7 +138,7 @@ public class ToggleNightVisionPatch : ModulePatch
     [PatchPrefix]
     public static bool PatchPrefix(BotNightVisionData __instance)
     {
-        if (__instance._owner.FlashGrenade.IsFlashed)
+        if (SAINEnableClass.GetSAIN(__instance._owner.ProfileId, out var flashedBot) && flashedBot.Flashed.IsFlashed)
         {
             return false;
         }
@@ -281,6 +281,26 @@ public class BotLightTurnOnPatch : ModulePatch
             return settings.TurnLightOffNoEnemyFOLLOWER;
         }
         return settings.TurnLightOffNoEnemyRAIDERROGUE;
+    }
+}
+
+public class FlashbangDurationPatch : ModulePatch
+{
+    protected override MethodBase GetTargetMethod()
+    {
+        return AccessTools.Method(typeof(BotFlashGrenade), nameof(BotFlashGrenade.AddBlindEffect));
+    }
+
+    [PatchPrefix]
+    public static bool PatchPrefix(BotFlashGrenade __instance, float time, Vector3 position)
+    {
+        if (!SAINEnableClass.GetSAIN(__instance._owner.ProfileId, out var bot) || bot.Flashed == null)
+        {
+            return true;
+        }
+
+        bot.Flashed.ApplyFlash(time, position);
+        return false;
     }
 }
 

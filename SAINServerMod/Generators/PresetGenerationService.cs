@@ -73,6 +73,15 @@ public sealed class PresetGenerationService(
         {
             logger.Error($"[SAIN] Failed to import directory presets: {ex.Message}");
         }
+
+        try
+        {
+            await presetService.UpgradeCustomToCurrentSchemaAsync();
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"[SAIN] Failed to bring custom presets up to date: {ex.Message}");
+        }
     }
 
     public GeneratedPreset Generate(SAINDifficulty difficulty, string name, string description)

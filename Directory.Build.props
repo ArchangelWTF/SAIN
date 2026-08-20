@@ -1,0 +1,6 @@
+<Project>
+    <PropertyGroup>
+        <VersionPrefix>4.5.0</VersionPrefix>
+        <SptVersion>4.1.3</SptVersion>
+    </PropertyGroup>
+</Project>

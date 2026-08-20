@@ -1,7 +1,9 @@
-﻿using EFT;
+using EFT;
+using EFT.Ballistics;
 using SAIN.Components;
 using SAIN.Helpers;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings.Categories;
 using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes;
@@ -75,9 +77,9 @@ public class AimHitEffectClass : BotBase
         return dir;
     }
 
-    private float calcDamageMod(DamageInfoStruct DamageInfoStruct)
+    private float calcDamageMod(DamageInfo DamageInfo)
     {
-        float mod = DamageInfoStruct.Damage / DAMAGE_BASELINE;
+        float mod = DamageInfo.Damage / DAMAGE_BASELINE;
         mod = Mathf.Clamp(mod, DAMAGE_MIN_MOD, DAMAGE_MAX_MOD) * DAMAGE_MANUAL_MODIFIER;
         if (_affectActive)
         {
@@ -86,9 +88,9 @@ public class AimHitEffectClass : BotBase
         return mod;
     }
 
-    private Vector3 getHitReactionDir(DamageInfoStruct DamageInfoStruct)
+    private Vector3 getHitReactionDir(DamageInfo DamageInfo)
     {
-        Vector3 hitPoint = DamageInfoStruct.HitPoint;
+        Vector3 hitPoint = DamageInfo.HitPoint;
         //DebugGizmos.Sphere(hitPoint, 0.25f, Color.red, true, 0.25f);
         Vector3 center = Bot.Transform.BodyPosition;
         //DebugGizmos.Sphere(center, 0.25f, Color.blue, true, 0.25f);
@@ -100,13 +102,13 @@ public class AimHitEffectClass : BotBase
         return result;
     }
 
-    public void GetHit(DamageInfoStruct DamageInfoStruct)
+    public void GetHit(DamageInfo DamageInfo)
     {
-        float mod = calcDamageMod(DamageInfoStruct);
+        float mod = calcDamageMod(DamageInfo);
         Vector3 hitReactionDir;
         if (DAMAGE_USE_HIT_OFFSET_DIR)
         {
-            hitReactionDir = getHitReactionDir(DamageInfoStruct) * mod;
+            hitReactionDir = getHitReactionDir(DamageInfo) * mod;
             _affectVector += hitReactionDir;
         }
         else

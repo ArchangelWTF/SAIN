@@ -1,5 +1,5 @@
 ﻿using SAIN.Models.Direction;
-using SAIN.Models.PlayerData;
+using SAIN.Models.Enums;
 using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes.Mover;

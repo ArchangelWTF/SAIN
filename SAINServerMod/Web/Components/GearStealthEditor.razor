@@ -1,0 +1,24 @@
+@namespace SAINServerMod.Web.Components
+@using System.Reflection
+
+<MudText Typo="Typo.body2" Class="spt-muted mb-3">
+    Per-equipment stealth modifiers. Lower values make gear quieter/harder to notice.
+</MudText>
+
+@if (_member != null)
+{
+    <SainDictionaryEditor Member="_member" OnChanged="OnChanged" />
+}
+
+@code {
+    [Parameter, EditorRequired] public SAINPresetBundle Bundle { get; set; } = default!;
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private SainMember? _member;
+
+    protected override void OnInitialized()
+    {
+        var field = typeof(SAINPresetBundle).GetField(nameof(SAINPresetBundle.GearStealthValues));
+        _member = field != null ? new SainMember(Bundle, field) : null;
+    }
+}

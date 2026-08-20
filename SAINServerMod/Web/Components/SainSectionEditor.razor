@@ -1,0 +1,146 @@
+@namespace SAINServerMod.Web.Components
+
+@if (Target == null)
+{
+    <MudText Typo="Typo.caption" Class="spt-muted">Nothing to edit.</MudText>
+}
+else
+{
+    <div class="sain-editor">
+        <MudTextField T="string" @bind-Value="_query" Immediate="true" DebounceInterval="200"
+                      Placeholder="Search settings…" Variant="Variant.Outlined" Margin="Margin.Dense"
+                      Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search"
+                      Clearable="true" Class="sain-editor-search" />
+
+        @if (!string.IsNullOrWhiteSpace(_query))
+        {
+            var hits = SainSearch.Collect(Target, _query!, ShowAdvanced, ShowDeveloper);
+            @if (hits.Count == 0)
+            {
+                <div class="sain-empty-inline">
+                    <MudText Typo="Typo.body2" Class="spt-muted">No settings match “@_query”.</MudText>
+                </div>
+            }
+            else
+            {
+                <div class="sain-editor-content">
+                    @foreach (var group in hits.GroupBy(h => h.Breadcrumb))
+                    {
+                        <MudText Typo="Typo.overline" Class="sain-category spt-muted">@group.Key</MudText>
+                        <div class="sain-leaf-group">
+                            @foreach (var hit in group)
+                            {
+                                <SainFieldEditor Value="hit.Member.ToValue()" OnChanged="OnChanged" />
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <div class="sain-editor-body">
+                <div class="sain-editor-nav">
+                    <MudList T="string" SelectedValue="_selected" SelectedValueChanged="v => _selected = v"
+                             Dense="true" Color="Color.Primary">
+                        @foreach (var section in _sections)
+                        {
+                            <MudListItem T="string" Value="@section.Name" Text="@section.Name" />
+                        }
+                    </MudList>
+                </div>
+                <div class="sain-editor-content">
+                    @{ var active = _sections.FirstOrDefault(s => s.Name == _selected) ?? _sections.FirstOrDefault(); }
+                    @if (active == null)
+                    {
+                        <MudText Typo="Typo.caption" Class="spt-muted">No settings.</MudText>
+                    }
+                    else if (active.Leaves != null)
+                    {
+                        <div class="sain-leaf-group">
+                            @foreach (var member in active.Leaves.Where(Visible))
+                            {
+                                <SainFieldEditor Value="member.ToValue()" OnChanged="OnChanged" />
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        @switch (active.Member!.Kind)
+                        {
+                            case SainFieldKind.Nested:
+                                <SainSettingsEditor Target="active.Member.GetValue()" Depth="1" OnChanged="OnChanged" />
+                                break;
+                            case SainFieldKind.Dictionary:
+                                <SainDictionaryEditor Member="active.Member" OnChanged="OnChanged" />
+                                break;
+                            case SainFieldKind.List:
+                                <SainListEditor Value="active.Member.ToValue()" OnChanged="OnChanged" />
+                                break;
+                        }
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired] public object? Target { get; set; }
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    [CascadingParameter(Name = "ShowAdvanced")] public bool ShowAdvanced { get; set; } = true;
+    [CascadingParameter(Name = "ShowDeveloper")] public bool ShowDeveloper { get; set; }
+
+    private sealed record Section(string Name, SainMember? Member, List<SainMember>? Leaves);
+
+    private List<Section> _sections = new();
+    private string? _selected;
+    private string _query = string.Empty;
+    private object? _lastTarget;
+
+    protected override void OnParametersSet()
+    {
+        if (ReferenceEquals(_lastTarget, Target))
+        {
+            return;
+        }
+        _lastTarget = Target;
+        _sections = BuildSections();
+        _selected = _sections.FirstOrDefault()?.Name;
+        _query = string.Empty;
+    }
+
+    private List<Section> BuildSections()
+    {
+        var sections = new List<Section>();
+        if (Target == null)
+        {
+            return sections;
+        }
+
+        var members = SainReflection.Members(Target);
+        var leaves = members.Where(IsLeaf).ToList();
+        if (leaves.Count > 0)
+        {
+            sections.Add(new Section("General", null, leaves));
+        }
+
+        foreach (var member in members.Where(m => !IsLeaf(m)))
+        {
+            sections.Add(new Section(member.Meta.Name, member, null));
+        }
+
+        return sections;
+    }
+
+    private bool Visible(SainMember m)
+    {
+        return SainReflection.IsVisible(m.Meta, ShowAdvanced, ShowDeveloper);
+    }
+
+    private static bool IsLeaf(SainMember m)
+    {
+        return m.Kind is SainFieldKind.Bool or SainFieldKind.Float or SainFieldKind.Int or SainFieldKind.String or SainFieldKind.Enum;
+    }
+}

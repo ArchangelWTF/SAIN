@@ -237,5 +237,5 @@ public class EnemyPlaceRaycastJob : BotManagerBase
     private NativeArray<RaycastCommand> _commands;
     private JobHandle RaycastJobHandle;
 
-    private readonly LayerMask Mask = LayerMaskClass.HighPolyWithTerrainMaskAI;
+    private readonly LayerMask Mask = LayersMaskController.HighPolyWithTerrainMaskAI;
 }

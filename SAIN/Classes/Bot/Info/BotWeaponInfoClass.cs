@@ -1,10 +1,10 @@
 using System.Linq;
 using EFT.InventoryLogic;
 using SAIN.Components;
-using SAIN.Components.BotComponentSpace.Classes;
 using SAIN.Helpers;
 using SAIN.Preset;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.GlobalSettings.Categories;
 using SAIN.SAINComponent.Classes.WeaponFunction;
 using UnityEngine;
 using static EFT.InventoryLogic.Weapon;
@@ -15,7 +15,7 @@ public class BotWeaponInfoClass : BotBase
 {
     public float FinalModifier { get; private set; }
     public EWeaponClass EWeaponClass { get; private set; }
-    public ECaliber ECaliber { get; private set; }
+    public string Caliber { get; private set; }
     public float SwapToSemiDist { get; private set; } = 50f;
     public float SwapToAutoDist { get; private set; } = 45f;
 
@@ -75,13 +75,13 @@ public class BotWeaponInfoClass : BotBase
     private void calculateCurrentWeapon(Weapon weapon)
     {
         EWeaponClass = EnumValues.ParseWeaponClass(weapon.Template.weapClass);
-        ECaliber = EnumValues.ParseCaliber(weapon.CurrentAmmoTemplate.Caliber);
+        Caliber = weapon.CurrentAmmoTemplate.Caliber;
         calculateShootModifier();
-        SwapToSemiDist = getWeaponSwapToSemiDist(ECaliber, EWeaponClass);
-        SwapToAutoDist = getWeaponSwapToFullAutoDist(ECaliber, EWeaponClass);
+        SwapToSemiDist = getWeaponSwapToSemiDist(Caliber, EWeaponClass);
+        SwapToAutoDist = getWeaponSwapToFullAutoDist(Caliber, EWeaponClass);
     }
 
-    private static float getAmmoShootability(ECaliber caliber)
+    private static float getAmmoShootability(string caliber)
     {
         if (_shootSettings.AmmoCaliberShootability.TryGetValue(caliber, out var ammo))
         {
@@ -99,7 +99,7 @@ public class BotWeaponInfoClass : BotBase
         return 0.5f;
     }
 
-    private static float getWeaponSwapToSemiDist(ECaliber caliber, EWeaponClass weaponClass)
+    private static float getWeaponSwapToSemiDist(string caliber, EWeaponClass weaponClass)
     {
         if (_shootSettings.AmmoCaliberFullAutoMaxDistances.TryGetValue(caliber, out var caliberDist))
         {
@@ -108,7 +108,7 @@ public class BotWeaponInfoClass : BotBase
         return 55f;
     }
 
-    private static float getWeaponSwapToFullAutoDist(ECaliber caliber, EWeaponClass weaponClass)
+    private static float getWeaponSwapToFullAutoDist(string caliber, EWeaponClass weaponClass)
     {
         return getWeaponSwapToSemiDist(caliber, weaponClass) * 0.85f;
     }
@@ -117,7 +117,7 @@ public class BotWeaponInfoClass : BotBase
     {
         var weapInfo = Bot.Info.WeaponInfo;
 
-        float AmmoCaliberModifier = getAmmoShootability(ECaliber).Scale0to1(_shootSettings.AmmoCaliberScaling).Round100();
+        float AmmoCaliberModifier = getAmmoShootability(Caliber).Scale0to1(_shootSettings.AmmoCaliberScaling).Round100();
 
         float WeaponClassModifier = getWeaponShootability(EWeaponClass).Scale0to1(_shootSettings.WeaponClassScaling).Round100();
 
@@ -149,7 +149,7 @@ public class BotWeaponInfoClass : BotBase
     {
         get
         {
-            if (ECaliber == ECaliber.Caliber9x39)
+            if (Caliber == Calibers.Caliber9x39)
             {
                 return 125f;
             }

@@ -1,7 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using EFT;
+using Newtonsoft.Json;
 using SAIN.Components.PlayerComponentSpace;
+using SAIN.Extensions;
+using SAIN.Preset.Server;
+using SAIN.Preset.Shared.Enums;
 using UnityEngine;
 
 namespace SAIN.Components.BotController;
@@ -30,22 +34,41 @@ public class BotSpawnController : BotManagerBase
     public static BotSpawnController Instance { get; private set; }
 
     public Dictionary<string, BotComponent> BotDictionary { get; } = [];
+    private static IReadOnlyList<WildSpawnType> StrictExclusionList { get; set; } = [];
 
-    public static List<WildSpawnType> StrictExclusionList { get; } =
-        new()
+    public static void LoadExclusionList()
+    {
+        var list = new List<WildSpawnType>();
+        try
         {
-            WildSpawnType.bossZryachiy,
-            WildSpawnType.followerZryachiy,
-            WildSpawnType.peacefullZryachiyEvent,
-            WildSpawnType.ravangeZryachiyEvent,
-            WildSpawnType.shooterBTR,
-            WildSpawnType.marksman,
-            WildSpawnType.infectedAssault,
-            WildSpawnType.infectedCivil,
-            WildSpawnType.infectedLaborant,
-            WildSpawnType.infectedPmc,
-            WildSpawnType.infectedTagilla,
-        };
+            string json = ServerDataClient.GetBotTypeExclusions();
+            var shared = JsonConvert.DeserializeObject<List<ESainWildSpawnType>>(json);
+            if (shared != null)
+            {
+                foreach (var type in shared)
+                {
+                    list.Add(type.ToEft());
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"[SAIN] Failed to fetch bot exclusion list from the server: {ex.Message}");
+        }
+        StrictExclusionList = list.AsReadOnly();
+    }
+
+    public static bool IsExcluded(WildSpawnType type)
+    {
+        for (int i = 0; i < StrictExclusionList.Count; i++)
+        {
+            if (StrictExclusionList[i] == type)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void ManualUpdate(float currentTime, float deltaTime)
     {

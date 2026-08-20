@@ -11,18 +11,18 @@ public class EnableUsecPmcKhorovodPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(GClass350), nameof(GClass350.EventsPriority));
+        return AccessTools.Method(typeof(PmcUsecLayersStrategy), nameof(PmcUsecLayersStrategy.EventsPriority));
     }
 
     [PatchPrefix]
-    public static bool Patch(ref GClass671 __result)
+    public static bool Patch(ref BotEventsPriority __result)
     {
         if (!SAINPlugin.LoadedPreset.GlobalSettings.General.Jokes.EnableKhorovodPMCs)
         {
             return true;
         }
 
-        __result = new GClass671(77, 74, 55, 75, -1, 76);
+        __result = new BotEventsPriority(77, 74, 55, 75, -1, 76);
 
         return false;
     }
@@ -35,18 +35,18 @@ public class EnableBearPmcKhorovodPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(GClass348), nameof(GClass348.EventsPriority));
+        return AccessTools.Method(typeof(PmcBearLayersStrategy), nameof(PmcBearLayersStrategy.EventsPriority));
     }
 
     [PatchPrefix]
-    public static bool Patch(ref GClass671 __result)
+    public static bool Patch(ref BotEventsPriority __result)
     {
         if (!SAINPlugin.LoadedPreset.GlobalSettings.General.Jokes.EnableKhorovodPMCs)
         {
             return true;
         }
 
-        __result = new GClass671(77, 74, 55, 75, -1, 76);
+        __result = new BotEventsPriority(77, 74, 55, 75, -1, 76);
 
         return false;
     }

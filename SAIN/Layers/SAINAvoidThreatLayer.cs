@@ -1,9 +1,10 @@
-﻿using EFT;
+using EFT;
 using SAIN.Components;
 using SAIN.Extensions;
 using SAIN.Layers.Combat.Solo;
 using SAIN.Layers.Combat.Solo.Cover;
 using SAIN.Models.Enums;
+using SAIN.Preset.Shared.Enums;
 
 namespace SAIN.Layers;
 
@@ -35,7 +36,7 @@ internal class SAINAvoidThreatLayer(BotOwner bot, int priority) : SAINLayer(bot,
                 }
 
             case ECombatDecision.AvoidGrenade:
-                return new Action(typeof(SeekCoverAction), $"Avoid Grenade");
+                return new Action(typeof(AvoidGrenadeAction), $"Grenade - {Bot.Grenade.GrenadeReactionClass.Reaction}");
 
             default:
                 return new Action(typeof(DogFightAction), $"NO DECISION - ERROR IN LOGIC");

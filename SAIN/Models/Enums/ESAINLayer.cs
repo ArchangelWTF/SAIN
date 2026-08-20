@@ -7,6 +7,6 @@ public enum ESAINLayer
     Squad,
     Extract,
     Run,
-    Peace,
     AvoidThreat,
+    Flashed,
 }

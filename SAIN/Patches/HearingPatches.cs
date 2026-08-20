@@ -1,10 +1,11 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Comfort.Common;
 using EFT;
 using EFT.InventoryLogic;
 using HarmonyLib;
 using SAIN.Components;
 using SAIN.Components.PlayerComponentSpace;
+using SAIN.Preset.Shared.Enums;
 using SPT.Reflection.Patching;
 using UnityEngine;
 
@@ -21,9 +22,9 @@ public class GrenadeCollisionPatch : ModulePatch
     }
 
     [PatchPostfix]
-    public static void Patch(Grenade __instance, SoundBank ___soundBank_0)
+    public static void Patch(Grenade __instance, SoundBank ____collisionSoundBank)
     {
-        ___soundBank_0.Rolloff = _defaultRolloff * ROLLOFF_MULTI;
+        ____collisionSoundBank.Rolloff = _defaultRolloff * ROLLOFF_MULTI;
         //Logger.LogDebug($"Rolloff {_defaultRolloff} after {___soundBank_0.Rolloff}");
         BotManagerComponent.Instance?.GrenadeController.GrenadeCollided(__instance, 35);
     }
@@ -50,13 +51,13 @@ public class TryPlayShootSoundPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(PlayerAIDataClass), nameof(PlayerAIDataClass.TryPlayShootSound));
+        return AccessTools.Method(typeof(AIData), nameof(AIData.TryPlayShootSound));
     }
 
     [PatchPrefix]
-    public static bool PatchPrefix(PlayerAIDataClass __instance)
+    public static bool PatchPrefix(AIData __instance)
     {
-        __instance.Boolean_0 = true;
+        __instance.UseFlare = true;
         return false;
     }
 }
@@ -126,9 +127,9 @@ public class TogglableSetPatch : ModulePatch
             return;
         }
 
-        if (!simulate && !silent && __instance.On != value && __instance.Item.Owner is Player.PlayerInventoryController invCont)
+        if (!simulate && !silent && __instance.On != value && __instance.Item.Owner is Player.PlayerInventoryController inventoryController)
         {
-            Player player = invCont.Player_0;
+            Player player = inventoryController.Player;
 
             const float baseRange = 10f;
             BotManagerComponent.Instance?.BotHearing.PlayAISound(

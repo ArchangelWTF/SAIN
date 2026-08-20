@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using EFT;
 using SAIN.Components;
 using SAIN.Helpers;
@@ -50,13 +50,13 @@ public class SAINVaultClass : BotComponentClassBase
     public static bool FindVaultPoint(Player player, NavMeshPath path, out SAINVaultPoint point)
     {
         point = null;
-        if (path.corners.Length < 3)
+        Vector3[] corners = path.corners;
+        if (corners.Length < 3)
         {
             return false;
         }
 
         int totalChecks = 0;
-        Vector3[] corners = path.corners;
         int max = corners.Length - 1;
 
         bool foundPoint = false;
@@ -106,7 +106,16 @@ public class SAINVaultClass : BotComponentClassBase
             distance = direction.magnitude;
         }
 
-        if (Physics.SphereCast(start, 0.1f, direction, out RaycastHit hit, direction.magnitude, LayerMaskClass.PlayerStaticCollisionsMask))
+        if (
+            Physics.SphereCast(
+                start,
+                0.1f,
+                direction,
+                out RaycastHit hit,
+                direction.magnitude,
+                LayersMaskController.PlayerStaticCollisionsMask
+            )
+        )
         {
             if (CheckObstacleForVault(hit, player.VaultingParameters.VaultingHeight))
             {

@@ -1,9 +1,9 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using Comfort.Common;
 using EFT;
 using SAIN.Components;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -293,7 +293,7 @@ public class SAINBotUnstuckClass : BotComponentClassBase
 
     private float teleportTimer;
 
-    public PathControllerClass PathController { get; private set; }
+    public BotPathController PathController { get; private set; }
 
     private static NavMeshPath CalcPath(Vector3 start, Vector3 end, out float pathLength)
     {
@@ -322,7 +322,8 @@ public class SAINBotUnstuckClass : BotComponentClassBase
         }
         if (path.status == NavMeshPathStatus.PathPartial)
         {
-            Vector3 lastCorner = path.corners[path.corners.Length - 1];
+            Vector3[] corners = path.corners;
+            Vector3 lastCorner = corners[corners.Length - 1];
             float sqrMag = (lastCorner - end).magnitude;
             float combinedLength = sqrMag + pathLength;
             if (combinedLength < _minDistancePathLength)

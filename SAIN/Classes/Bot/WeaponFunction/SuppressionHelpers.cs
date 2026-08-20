@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
-using SAIN.Models.Enums;
-using SAIN.Preset.GlobalSettings;
+using System.Collections.Generic;
+using SAIN.Preset.Shared.GlobalSettings;
+using SAIN.Preset.Shared.Models;
+using SAIN.Preset.Shared.Models.Enums;
 
 namespace SAIN.SAINComponent.Classes.WeaponFunction;
 

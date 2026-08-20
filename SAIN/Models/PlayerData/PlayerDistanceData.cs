@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using SAIN.Components.PlayerComponentSpace;
-using SAIN.SAINComponent.Classes.EnemyClasses;
+﻿using SAIN.Components.PlayerComponentSpace;
 using UnityEngine;
 
 namespace SAIN.Models.PlayerData;

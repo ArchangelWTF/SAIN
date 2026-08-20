@@ -1,5 +1,6 @@
-﻿using EFT;
+using EFT;
 using SAIN.Components;
+using SAIN.Preset.Shared.Enums;
 using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes.Decision;

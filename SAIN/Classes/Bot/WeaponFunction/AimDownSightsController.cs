@@ -1,6 +1,7 @@
-﻿using EFT;
+using EFT;
 using SAIN.Components;
 using SAIN.Models.Enums;
+using SAIN.Preset.Shared.Enums;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
 
@@ -123,7 +124,7 @@ public class AimDownSightsController : BotComponentClassBase
         {
             return; // Avoid rapid toggling of ADS
         }
-        if (BotOwner.AimingManager.CurrentAiming is BotAimingClass aimingClass)
+        if (BotOwner.AimingManager.CurrentAiming is BotAimingData aimingClass)
         {
             aimingClass.HardAim = value;
         }
@@ -143,7 +144,7 @@ public class AimDownSightsController : BotComponentClassBase
 
     public EAimDownSightsStatus GetADSStatus(Vector3 targetPosition, Enemy enemy)
     {
-        if (Bot.Mover.ActivePath?.Status == Mover.EBotMoveStatus.DoorInteraction)
+        if (Bot.Mover.ActivePath?.Status == EBotMoveStatus.DoorInteraction)
         {
             return EAimDownSightsStatus.None;
         }

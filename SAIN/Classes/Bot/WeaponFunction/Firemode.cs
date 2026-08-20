@@ -1,7 +1,8 @@
-﻿using EFT;
+using EFT;
 using EFT.InventoryLogic;
 using SAIN.Components;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.GlobalSettings;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.SAINComponent.Classes.Info;
 using UnityEngine;

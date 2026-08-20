@@ -1,6 +1,7 @@
-﻿using DrakiaXYZ.BigBrain.Brains;
+using DrakiaXYZ.BigBrain.Brains;
 using EFT;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Models.Enums;
+using SAIN.Preset.Shared.GlobalSettings;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
 using UnityEngine.AI;
@@ -39,7 +40,7 @@ internal class RushEnemyAction(BotOwner bot) : BotAction(bot, nameof(RushEnemyAc
         checkJumpEnemyInSight();
         if (Bot.Mover.Running)
         {
-            Bot.Mover.ActivePath?.RequestEndSprint(SAINComponent.Classes.Mover.ESprintUrgency.None, "enemy in sight");
+            Bot.Mover.ActivePath?.RequestEndSprint(ESprintUrgency.None, "enemy in sight");
         }
 
         Bot.Mover.DogFight.DogFightMove(true, _enemy);
@@ -66,8 +67,9 @@ internal class RushEnemyAction(BotOwner bot) : BotAction(bot, nameof(RushEnemyAc
         if (_shallTryJump && TryJumpTimer < Time.time && Bot.Player.IsSprintEnabled)
         {
             //&& Bot.Enemy.Path.PathDistance > 3f
-            NavMeshPath enemyPath = _enemy.Path.PathToEnemy;
-            if (enemyPath.corners.Length > 2 && (enemyPath.corners[enemyPath.corners.Length - 2] - Bot.Position).sqrMagnitude < 1f)
+            Vector3[] corners = _enemy.Path.PathCorners;
+            int cornerCount = _enemy.Path.PathCornerCount;
+            if (cornerCount > 2 && (corners[cornerCount - 2] - Bot.Position).sqrMagnitude < 1f)
             {
                 TryJumpTimer = Time.time + 3f;
                 Bot.Mover.TryJump();
@@ -139,7 +141,7 @@ internal class RushEnemyAction(BotOwner bot) : BotAction(bot, nameof(RushEnemyAc
         _lastMovePos = lastKnown.Value;
         if (
             pathDistance > BotOwner.Settings.FileSettings.Move.RUN_TO_COVER_MIN
-            && sprintController.RunToPointByWay(enemy.Path.PathToEnemy, true, -1, SAINComponent.Classes.Mover.ESprintUrgency.High, true)
+            && sprintController.RunToPointByWay(enemy.Path.PathToEnemy, true, -1, ESprintUrgency.High, true)
         )
         {
             return true;

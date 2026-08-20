@@ -12,9 +12,9 @@ namespace SAIN.Components;
 
 public class VisionRaycastJob : BotManagerBase
 {
-    private static readonly QueryParameters _losParams = new(LayerMaskClass.HighPolyWithTerrainNoGrassMask);
-    private static readonly QueryParameters _visParams = new(LayerMaskClass.AI);
-    private static readonly QueryParameters _shootParams = new(LayerMaskClass.HighPolyWithTerrainMaskAI);
+    private static readonly QueryParameters _losParams = new(LayersMaskController.HighPolyWithTerrainNoGrassMask);
+    private static readonly QueryParameters _visParams = new(LayersMaskController.AI);
+    private static readonly QueryParameters _shootParams = new(LayersMaskController.HighPolyWithTerrainMaskAI);
 
     private const float VISION_UPDATE_INTERVAL = 1f / 30f;
     private const float VISION_JOB_INTERVAL = 1f / 30f;
@@ -45,19 +45,23 @@ public class VisionRaycastJob : BotManagerBase
                 int enemyCount = _enemies.Count;
                 if (enemyCount > 0)
                 {
-                    int partCount = _enemies[0].Vision.EnemyParts.PartsArray.Length;
-                    int totalRaycasts = enemyCount * partCount * RAYCAST_CHECKS;
+                    int totalParts = 0;
+                    for (int i = 0; i < enemyCount; i++)
+                    {
+                        totalParts += _enemies[i].Vision.EnemyParts.PartsArray.Length;
+                    }
+                    int totalRaycasts = totalParts * RAYCAST_CHECKS;
 
                     NativeArray<RaycastHit> hits = new(totalRaycasts, Allocator.TempJob);
                     NativeArray<RaycastCommand> commands = new(totalRaycasts, Allocator.TempJob);
 
-                    CreateCommands(commands, enemyCount, partCount);
+                    CreateCommands(commands, enemyCount);
                     _handle = RaycastCommand.ScheduleBatch(commands, hits, 32);
 
                     yield return null;
 
                     _handle.Complete();
-                    AnalyzeHits(hits, commands, enemyCount, partCount);
+                    AnalyzeHits(hits, commands, enemyCount);
 
                     hits.Dispose();
                     commands.Dispose();
@@ -122,7 +126,7 @@ public class VisionRaycastJob : BotManagerBase
 
     private JobHandle _handle;
 
-    private void CreateCommands(NativeArray<RaycastCommand> raycastCommands, int enemyCount, int partCount)
+    private void CreateCommands(NativeArray<RaycastCommand> raycastCommands, int enemyCount)
     {
         _colliderTypes.Clear();
         _castPoints.Clear();
@@ -142,7 +146,7 @@ public class VisionRaycastJob : BotManagerBase
 
             var parts = enemy.Vision.EnemyParts.PartsArray;
 
-            for (int j = 0; j < partCount; j++)
+            for (int j = 0; j < parts.Length; j++)
             {
                 var part = parts[j];
 
@@ -160,7 +164,7 @@ public class VisionRaycastJob : BotManagerBase
                 Vector3 weaponVec = castPoint - weaponFirePort;
                 float weaponMag = weaponVec.magnitude;
                 Vector3 weaponDir = weaponMag > 1e-6f ? (weaponVec / weaponMag) : Vector3.forward;
-                float weaponDist = Mathf.Max(eyeMag, MinDist);
+                float weaponDist = Mathf.Max(weaponMag, MinDist);
 
                 raycastCommands[commands++] = new RaycastCommand(eyePosition, eyeDir, _losParams, eyeDist + Padding);
                 raycastCommands[commands++] = new RaycastCommand(eyePosition, eyeDir, _visParams, eyeDist + Padding);
@@ -169,7 +173,7 @@ public class VisionRaycastJob : BotManagerBase
         }
     }
 
-    private void AnalyzeHits(NativeArray<RaycastHit> raycastHits, NativeArray<RaycastCommand> commands, int enemyCount, int partCount)
+    private void AnalyzeHits(NativeArray<RaycastHit> raycastHits, NativeArray<RaycastCommand> commands, int enemyCount)
     {
         float time = Time.time;
         int hits = 0;
@@ -179,7 +183,7 @@ public class VisionRaycastJob : BotManagerBase
         {
             var enemy = _enemies[i];
             var parts = enemy.Vision.EnemyParts.PartsArray;
-            for (int j = 0; j < partCount; j++)
+            for (int j = 0; j < parts.Length; j++)
             {
                 var part = parts[j];
                 EBodyPartColliderType colliderType = _colliderTypes[colliderTypeCount];

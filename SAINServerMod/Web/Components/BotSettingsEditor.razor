@@ -1,0 +1,199 @@
+@namespace SAINServerMod.Web.Components
+@using System.Reflection
+@using SAIN.Preset.Shared.BotSettings.SAINSettings
+@using SAINServerMod.Generators
+@using SAINServerMod.Utils
+@inject ISnackbar Snackbar
+
+<MudChipSet T="string" SelectedValue="_sectionFilter" SelectedValueChanged="OnSectionChanged"
+            SelectionMode="SelectionMode.SingleSelection" Variant="Variant.Text" Color="Color.Primary" Class="sain-section-chips mb-2">
+    @foreach (var name in _sectionNames)
+    {
+        <MudChip T="string" Value="@name" Text="@name" />
+    }
+</MudChipSet>
+
+<MudStack Row Spacing="3" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Class="mb-3">
+    <MudSelect T="ESainWildSpawnType" Value="_botType" ValueChanged="OnBotChanged" Label="Bot type"
+               Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Style="min-width:260px;">
+        @foreach (var bot in _filteredBots)
+        {
+            <MudSelectItem T="ESainWildSpawnType" Value="bot.Type">@bot.Name</MudSelectItem>
+        }
+    </MudSelect>
+
+    <MudSelect T="ESainBotDifficulty" Value="_difficulty" ValueChanged="OnDifficultyChanged" Label="Difficulty"
+               Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Style="min-width:160px;">
+        @foreach (var diff in _difficulties)
+        {
+            <MudSelectItem T="ESainBotDifficulty" Value="diff">@diff</MudSelectItem>
+        }
+    </MudSelect>
+</MudStack>
+
+@if (_group != null)
+{
+    <MudPaper Elevation="0" Class="spt-panel pa-3 mb-3">
+        <SainFieldEditor Value="_difficultyModifier!" OnChanged="OnChanged" />
+
+        <MudDivider Class="my-3" />
+
+        <MudText Typo="Typo.subtitle2" Class="mb-1">Copy <b>@BotName</b> · <b>@_difficulty</b> settings to…</MudText>
+        <MudText Typo="Typo.caption" Class="spt-muted mb-2">
+            Overwrites the target slots with the values shown below. Personalities and gear stealth are not affected.
+        </MudText>
+        <MudStack Row Spacing="3" Wrap="Wrap.Wrap">
+            <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary"
+                       StartIcon="@Icons.Material.Outlined.ContentCopy" OnClick="CopyToAllDifficulties">
+                Every difficulty of @BotName
+            </MudButton>
+            <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary"
+                       StartIcon="@Icons.Material.Outlined.CopyAll" OnClick="CopyToAllBots">
+                Every bot type (@_difficulty)
+            </MudButton>
+        </MudStack>
+    </MudPaper>
+}
+
+@if (_settings != null)
+{
+    <SainSectionEditor Target="_settings" OnChanged="OnChanged" />
+}
+else
+{
+    <MudText Typo="Typo.caption" Class="spt-muted">No settings for this bot/difficulty combination.</MudText>
+}
+
+@code {
+    [Parameter, EditorRequired] public SAINPresetBundle Bundle { get; set; } = default!;
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private const string AllSections = "All";
+    private readonly record struct BotOption(ESainWildSpawnType Type, string Name, string Section);
+
+    private ESainWildSpawnType _botType;
+    private ESainBotDifficulty _difficulty = ESainBotDifficulty.hard;
+    private SAINSettingsGroupClass? _group;
+    private SAINSettingsClass? _settings;
+    private SainValue? _difficultyModifier;
+
+    private List<BotOption> _allBots = new();
+    private List<BotOption> _filteredBots = new();
+    private List<string> _sectionNames = new();
+    private string _sectionFilter = AllSections;
+
+    private readonly ESainBotDifficulty[] _difficulties =
+        { ESainBotDifficulty.easy, ESainBotDifficulty.normal, ESainBotDifficulty.hard, ESainBotDifficulty.impossible };
+
+    private string BotName
+    {
+        get { return _group?.Name ?? _botType.ToString(); }
+    }
+
+    protected override void OnInitialized()
+    {
+        var sectionByType = DefaultBotTypes.All().ToDictionary(b => b.WildSpawnType, b => b.Section ?? "Other");
+
+        _allBots = Bundle.BotSettings
+            .Select(kv => new BotOption(
+                kv.Key,
+                kv.Value.Name ?? kv.Key.ToString(),
+                sectionByType.TryGetValue(kv.Key, out var s) ? s : "Other"))
+            .OrderBy(b => b.Section).ThenBy(b => b.Name)
+            .ToList();
+
+        _sectionNames = new List<string> { AllSections };
+        _sectionNames.AddRange(_allBots.Select(b => b.Section).Distinct().OrderBy(s => s));
+
+        _filteredBots = _allBots;
+        _botType = _allBots.FirstOrDefault().Type;
+        Select();
+    }
+
+    private void ApplyFilter()
+    {
+        _filteredBots = _sectionFilter == AllSections
+            ? _allBots
+            : _allBots.Where(b => b.Section == _sectionFilter).ToList();
+    }
+
+    private void OnSectionChanged(string? section)
+    {
+        _sectionFilter = string.IsNullOrEmpty(section) ? AllSections : section;
+        ApplyFilter();
+        if (_filteredBots.All(b => b.Type != _botType) && _filteredBots.Count > 0)
+        {
+            _botType = _filteredBots[0].Type;
+            Select();
+        }
+    }
+
+    private void Select()
+    {
+        Bundle.BotSettings.TryGetValue(_botType, out _group);
+        _settings = _group != null && _group.Settings.TryGetValue(_difficulty, out var s) ? s : null;
+
+        if (_group != null)
+        {
+            var field = typeof(SAINSettingsGroupClass).GetField(nameof(SAINSettingsGroupClass.DifficultyModifier));
+            _difficultyModifier = field != null ? new SainMember(_group, field).ToValue() : null;
+        }
+        else
+        {
+            _difficultyModifier = null;
+        }
+    }
+
+    private void OnBotChanged(ESainWildSpawnType type)
+    {
+        _botType = type;
+        Select();
+    }
+
+    private void OnDifficultyChanged(ESainBotDifficulty diff)
+    {
+        _difficulty = diff;
+        Select();
+    }
+
+    private static SAINSettingsClass Clone(SAINSettingsClass source)
+    {
+        return SAINJsonUtil.Deserialize<SAINSettingsClass>(SAINJsonUtil.Serialize(source))!;
+    }
+
+    private async Task CopyToAllDifficulties()
+    {
+        if (_group == null || _settings == null)
+        {
+            return;
+        }
+        foreach (var key in _group.Settings.Keys.ToList())
+        {
+            if (key != _difficulty)
+            {
+                _group.Settings[key] = Clone(_settings);
+            }
+        }
+        Snackbar.Add($"Copied {BotName} · {_difficulty} to every difficulty of {BotName}.", Severity.Success);
+        await OnChanged.InvokeAsync();
+    }
+
+    private async Task CopyToAllBots()
+    {
+        if (_settings == null)
+        {
+            return;
+        }
+        var count = 0;
+        foreach (var group in Bundle.BotSettings.Values)
+        {
+            if (group != _group && group.Settings.ContainsKey(_difficulty))
+            {
+                group.Settings[_difficulty] = Clone(_settings);
+                count++;
+            }
+        }
+        Snackbar.Add($"Copied {BotName} · {_difficulty} to {count} other bot type(s).", Severity.Success);
+        await OnChanged.InvokeAsync();
+    }
+}

@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using EFT;
+using EFT.Ballistics;
 using SAIN.Components;
 using SAIN.Components.PlayerComponentSpace;
 using SAIN.Helpers;
@@ -8,6 +9,7 @@ using SAIN.Models.Enums;
 using SAIN.Models.Structs;
 using SAIN.Plugin;
 using SAIN.Preset;
+using SAIN.Preset.Shared.Enums;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
 using UnityEngine.AI;
@@ -22,9 +24,9 @@ public class Squad
 
     public event Action<Squad> OnSquadEmpty;
 
-    public event Action<IPlayer, DamageInfoStruct, float> LeaderKilled;
+    public event Action<IPlayer, DamageInfo, float> LeaderKilled;
 
-    public event Action<IPlayer, DamageInfoStruct, float> OnMemberKilled;
+    public event Action<IPlayer, DamageInfo, float> OnMemberKilled;
 
     public event Action<BotComponent, float> NewLeaderFound;
 
@@ -556,7 +558,7 @@ public class Squad
         }
     }
 
-    private void memberWasKilled(Player player, IPlayer lastAggressor, DamageInfoStruct lastDamageInfoStruct, EBodyPart lastBodyPart)
+    private void memberWasKilled(Player player, IPlayer lastAggressor, DamageInfo lastDamageInfoStruct, EBodyPart lastBodyPart)
     {
 #if DEBUG
         if (SAINPlugin.DebugMode)

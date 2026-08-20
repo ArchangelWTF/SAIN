@@ -1,24 +1,11 @@
-﻿using SAIN.Models.Structs;
+﻿using SAIN.SAINComponent;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace SAIN.SAINComponent.Classes.Search;
+namespace SAIN.Classes.Bot.Search;
 
-public enum EPathCalcFailReason
-{
-    None,
-    NullDestination,
-    NoTarget,
-    NullPlace,
-    TooClose,
-    SampleStart,
-    SampleEnd,
-    CalcPath,
-    LastCorner,
-}
-
-public class SearchPathFinder : BotSubClass<SAINSearchClass>
+public class SearchPathFinder : BotSubClass<SearchClass>
 {
     public EnemyPlace TargetPlace { get; private set; }
     public bool SearchedTargetPosition
@@ -28,11 +15,8 @@ public class SearchPathFinder : BotSubClass<SAINSearchClass>
 
     public bool FinishedPeeking { get; set; }
 
-    public SearchPathFinder(SAINSearchClass searchClass)
-        : base(searchClass)
-    {
-        CanEverTick = false;
-    }
+    public SearchPathFinder(SearchClass searchClass)
+        : base(searchClass) { }
 
     public bool HasPathToSearchTarget(Enemy enemy, out string failReason)
     {
@@ -49,10 +33,6 @@ public class SearchPathFinder : BotSubClass<SAINSearchClass>
         if (_nextCheckPosTime < Time.time || SearchedTargetPosition || TargetPlace == null)
         {
             _nextCheckPosTime = Time.time + 4f;
-            if (!CheckEnemyPath(enemy, out string failReason))
-            {
-                //Logger.LogDebug($"Failed to calc path during search for reason: [{failReason}]");
-            }
         }
     }
 
@@ -80,8 +60,7 @@ public class SearchPathFinder : BotSubClass<SAINSearchClass>
             return;
         }
 
-        var pathToEnemy = enemy.Path.PathToEnemy;
-        if (pathToEnemy.corners.Length > 2)
+        if (enemy.Path.PathCornerCount > 2)
         {
             return;
         }
@@ -115,13 +94,14 @@ public class SearchPathFinder : BotSubClass<SAINSearchClass>
             failReason = "path Invalid";
             return false;
         }
-        int length = path.corners.Length;
+        Vector3[] corners = enemy.Path.PathCorners;
+        int length = enemy.Path.PathCornerCount;
         if (length < 2)
         {
             failReason = "path Invalid corner length";
             return false;
         }
-        Vector3 destination = path.corners[length - 1];
+        Vector3 destination = corners[length - 1];
         if ((destination - Bot.Position).sqrMagnitude <= 0.33f)
         {
             failReason = "tooClose";
@@ -130,7 +110,7 @@ public class SearchPathFinder : BotSubClass<SAINSearchClass>
 
         if (
             (destination - lastKnownPlace.Position).sqrMagnitude > 0.5f
-            && Physics.SphereCast(destination + Vector3.up, 0.1f, lastKnownPlace.Position - destination, out RaycastHit hit, 1f)
+            && Physics.SphereCast(destination + Vector3.up, 0.1f, lastKnownPlace.Position - destination, out _, 1f)
         )
         {
             failReason = "path not complete";

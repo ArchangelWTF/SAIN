@@ -1,7 +1,8 @@
-﻿using System.Reflection;
+using System.Reflection;
+using EFT.InventoryLogic;
 using HarmonyLib;
 using SAIN.Components;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings;
 using SPT.Reflection.Patching;
 
 namespace SAIN.Patches.Shoot.Grenades;
@@ -10,17 +11,17 @@ public class SetGrenadePatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(BotGrenadeController), nameof(BotGrenadeController.method_3));
+        return AccessTools.Method(typeof(BotGrenadeController), nameof(BotGrenadeController.SetThrowParams));
     }
 
     [PatchPostfix]
-    public static void Patch(ThrowWeapItemClass potentialGrenade, BotGrenadeController __instance)
+    public static void Patch(ThrowWeap potentialGrenade, BotGrenadeController __instance)
     {
         if (potentialGrenade == null)
         {
             return;
         }
-        if (!BotManagerComponent.Instance.GetSAIN(__instance.BotOwner_0, out var botComponent))
+        if (!BotManagerComponent.Instance.GetSAIN(__instance._owner, out var botComponent))
         {
             return;
         }
@@ -33,17 +34,17 @@ public class ResetGrenadePatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(BotGrenadeController), nameof(BotGrenadeController.method_2));
+        return AccessTools.Method(typeof(BotGrenadeController), nameof(BotGrenadeController.CheckGrenade));
     }
 
     [PatchPostfix]
     public static void Patch(BotGrenadeController __instance)
     {
-        if (!BotManagerComponent.Instance.GetSAIN(__instance.BotOwner_0, out var botComponent))
+        if (!BotManagerComponent.Instance.GetSAIN(__instance._owner, out var botComponent))
         {
             return;
         }
-        botComponent.Grenade.MyGrenade = __instance.Grenade;
+        botComponent.Grenade.MyGrenade = __instance.grenade;
     }
 }
 
@@ -69,7 +70,7 @@ public class DisableGrenadesPatch : ModulePatch
             return;
         }
 
-        if (SAINEnableClass.GetSAIN(__instance.BotOwner_0.ProfileId, out BotComponent bot))
+        if (SAINEnableClass.GetSAIN(__instance._owner.ProfileId, out BotComponent bot))
         {
             if (!bot.Info.FileSettings.Core.CanGrenade)
             {

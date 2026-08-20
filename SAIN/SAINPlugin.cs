@@ -1,18 +1,22 @@
-global using EFTMath = GClass856;
+global using EFTMath = MyExtensions;
 using BepInEx;
 using BepInEx.Configuration;
+using SAIN.Components.BotController;
 using SAIN.Editor;
 using SAIN.Helpers;
 using SAIN.Plugin;
 using SAIN.Preset;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Server;
+using SAIN.Preset.Shared;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.GlobalSettings.Categories.General;
 using SPT.Reflection.Patching;
 using UnityEngine;
 using static SAIN.AssemblyInfoClass;
 
 namespace SAIN;
 
-[BepInPlugin(SAINGUID, SAINName, SAINVersion)]
+[BepInPlugin(SAINGUID, SAINName, SAINVersionInfo.SAINVersion)]
 [BepInDependency(BigBrainGUID, BigBrainVersion)]
 //[BepInDependency(SPTGUID, SPTVersion)]
 [BepInProcess(EscapeFromTarkov)]
@@ -57,7 +61,15 @@ public class SAINPlugin : BaseUnityPlugin
     {
         _patchManager = new(this, true);
 
-        PresetHandler.Init();
+        if (!PresetHandler.Init() || !EFTCoreSettings.Load())
+        {
+            Logger.LogError(
+                "[SAIN] Startup aborted: could not load the presets and core overrides from the SAIN server mod, re-install SAIN correctly and restart."
+            );
+
+            return;
+        }
+        BotSpawnController.LoadExclusionList();
         BindConfigs();
         _patchManager.EnablePatches();
         BigBrainHandler.Init();
@@ -86,6 +98,8 @@ public class SAINPlugin : BaseUnityPlugin
 
     public void Update()
     {
+        PresetSyncWebSocket.Resync();
+
         ModDetection.ManualUpdate();
         SAINEditor.ManualUpdate();
         DebugGizmos.ManualUpdate();
@@ -94,6 +108,11 @@ public class SAINPlugin : BaseUnityPlugin
     public void Start()
     {
         SAINEditor.Init();
+    }
+
+    public void OnDestroy()
+    {
+        PresetSyncWebSocket.Instance?.Close();
     }
 
     public void LateUpdate()

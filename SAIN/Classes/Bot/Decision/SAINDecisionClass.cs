@@ -1,4 +1,5 @@
-﻿using SAIN.Components;
+using SAIN.Components;
+using SAIN.Preset.Shared.Enums;
 
 namespace SAIN.SAINComponent.Classes.Decision;
 

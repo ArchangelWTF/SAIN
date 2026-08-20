@@ -1,8 +1,9 @@
-﻿using System.Text;
+using System.Text;
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Helpers;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.GlobalSettings;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.SAINComponent.SubComponents.CoverFinder;
 using UnityEngine;
@@ -127,7 +128,7 @@ internal class SeekCoverAction(BotOwner bot) : BotAction(bot, nameof(SeekCoverAc
         {
             case LeanSetting.Right:
             case LeanSetting.Left:
-                return Vector.Raycast(headPos, rayEnd * RAYCAST_LEAN_HITOBJECT_DIST, LayerMaskClass.HighPolyWithTerrainMask);
+                return Vector.Raycast(headPos, rayEnd * RAYCAST_LEAN_HITOBJECT_DIST, LayersMaskController.HighPolyWithTerrainMask);
 
             default:
                 return false;

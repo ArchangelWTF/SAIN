@@ -1,7 +1,9 @@
-﻿using System;
+using System;
 using System.Collections;
 using EFT;
+using EFT.Ballistics;
 using SAIN.Components.PlayerComponentSpace;
+using SAIN.Preset.Shared.Enums;
 using UnityEngine;
 
 namespace SAIN.Components.BotControllerSpace.Classes;
@@ -12,12 +14,12 @@ public class BotHearingClass : BotManagerBase
 
     public event Action<SAINSoundType, Vector3, PlayerComponent, float, float> AISoundPlayed;
 
-    public event Action<EftBulletClass> BulletImpact;
+    public event Action<Shot> BulletImpact;
 
     public BotHearingClass(BotManagerComponent botController)
         : base(botController) { }
 
-    public void BulletImpacted(EftBulletClass bullet)
+    public void BulletImpacted(Shot bullet)
     {
         //Logger.LogInfo($"Shot By: {bullet.Player?.iPlayer?.Profile.Nickname} at Time: {Time.time}");
         //DebugGizmos.Sphere(bullet.CurrentPosition);
@@ -97,7 +99,7 @@ public class BotHearingClass : BotManagerBase
 
         playerComponent.PlayAISound(soundType, position, range, volume);
         AISoundPlayed?.Invoke(soundType, position, playerComponent, range, volume);
-        
+
         BotController.StartCoroutine(WaitDelayThenPlayDefaultBotEvent(soundType, playerComponent, position, range, volume));
     }
 

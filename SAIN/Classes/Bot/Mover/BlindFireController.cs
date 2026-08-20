@@ -2,7 +2,8 @@ using EFT;
 using SAIN.Components;
 using SAIN.Helpers;
 using SAIN.Models.Enums;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.GlobalSettings;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
 
@@ -172,7 +173,7 @@ public class BlindFireController : BotBase, IBotClass
 
     private int checkBlindFire(Vector3 targetPos)
     {
-        LayerMask mask = LayerMaskClass.HighPolyWithTerrainMask;
+        LayerMask mask = LayersMaskController.HighPolyWithTerrainMask;
         Vector3 firePort = Bot.Transform.WeaponData.FirePort;
         Vector3 direction = targetPos - firePort;
 

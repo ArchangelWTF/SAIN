@@ -1,0 +1,141 @@
+@page "/sain/updates"
+@implements IDisposable
+@attribute [Authorize(Policy = "Administrator")]
+@layout BaseMudBlazorLayout
+@using SAINServerMod.Web.Updates
+@inject GitHubReleaseService ReleaseService
+
+<PageTitle>SAIN Updates</PageTitle>
+<HeadContent>
+    <link rel="stylesheet" href="/SAIN/css/sain.css" />
+</HeadContent>
+
+<div class="spt-page">
+    <MudContainer MaxWidth="MaxWidth.False" Class="sain-container pa-4">
+        <SainNav Current="updates" />
+
+        <MudPaper Elevation="0" Class="spt-panel sain-hero pa-4 mb-4">
+            <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap" Spacing="3">
+                <MudStack Row AlignItems="AlignItems.Center" Spacing="3">
+                    <div class="sain-hero-icon">
+                        <MudIcon Icon="@Icons.Material.Filled.SystemUpdateAlt" Color="Color.Warning" Size="Size.Large" />
+                    </div>
+                    <div>
+                        <MudText Typo="Typo.h5" Class="spt-title">Updates</MudText>
+                        <MudText Typo="Typo.caption" Class="spt-muted">You are running SAIN v@(ReleaseService.CurrentVersion).</MudText>
+                    </div>
+                </MudStack>
+                <MudButton OnClick="OnRefreshClicked" Disabled="@(ReleaseService.State == ReleaseFeedState.Loading)"
+                           Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh">Refresh</MudButton>
+            </MudStack>
+        </MudPaper>
+
+        <MudStack Spacing="4">
+            @if (ReleaseService.UpdateAvailable && ReleaseService.LatestStable is { } latest)
+            {
+                <MudPaper Elevation="0" Class="spt-panel sain-update-banner pa-4">
+                    <MudIcon Icon="@Icons.Material.Filled.SystemUpdateAlt" Color="Color.Warning" Size="Size.Large" />
+                    <div class="sain-update-banner-copy">
+                        <strong>@latest.DisplayTitle is available</strong>
+                        <span class="spt-muted">You are running v@(ReleaseService.CurrentVersion).</span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(latest.HtmlUrl))
+                    {
+                        <MudButton Href="@latest.HtmlUrl" Target="_blank" Variant="Variant.Filled" Color="Color.Warning"
+                                   EndIcon="@Icons.Material.Filled.OpenInNew">Get it</MudButton>
+                    }
+                </MudPaper>
+            }
+
+            @if (ReleaseService.State == ReleaseFeedState.Loading && ReleaseService.Releases.Count == 0)
+            {
+                <MudPaper Elevation="0" Class="spt-panel pa-4 sain-release-status">
+                    <MudProgressCircular Indeterminate="true" Size="Size.Small" Color="Color.Warning" />
+                    <span>Checking GitHub for releases…</span>
+                </MudPaper>
+            }
+            else if (ReleaseService.State == ReleaseFeedState.Unavailable)
+            {
+                <MudPaper Elevation="0" Class="spt-panel pa-4 sain-release-status">
+                    <MudIcon Icon="@Icons.Material.Filled.CloudOff" Color="Color.Default" />
+                    <span>Couldn't reach GitHub. Release history will show up once this server is online.</span>
+                </MudPaper>
+            }
+            else
+            {
+                <ol class="sain-timeline">
+                    @foreach (var release in ReleaseService.Releases)
+                    {
+                        <li class="@TimelineItemClass(release)">
+                            <span class="sain-timeline-marker"></span>
+                            <div class="sain-timeline-card spt-card">
+                                <div class="sain-timeline-header">
+                                    <div>
+                                        <strong>@release.DisplayTitle</strong>
+                                        <span class="spt-muted">@(release.PublishedAt?.ToString("d MMMM yyyy") ?? "Unreleased")</span>
+                                    </div>
+                                    <div class="sain-timeline-tags">
+                                        @foreach (var tag in ReleaseDirectives.ParseCompatibility(release.Body))
+                                        {
+                                            var matches = GitHubReleaseService.MatchesRunningPlatform(tag);
+                                            <MudChip T="string" Size="Size.Small" Color="@(matches ? Color.Success : Color.Default)"
+                                                     Variant="Variant.Outlined">@tag.Text</MudChip>
+                                        }
+                                        @if (IsRunningVersion(release))
+                                        {
+                                            <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Outlined">Running</MudChip>
+                                        }
+                                        @if (release.Prerelease)
+                                        {
+                                            <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">Pre-release</MudChip>
+                                        }
+                                        @if (!string.IsNullOrEmpty(release.HtmlUrl))
+                                        {
+                                            <MudIconButton Href="@release.HtmlUrl" Target="_blank" Size="Size.Small"
+                                                           Icon="@Icons.Material.Filled.OpenInNew" Title="View on GitHub" />
+                                        }
+                                    </div>
+                                </div>
+                                <ReleaseNotes Body="@release.Body" />
+                            </div>
+                        </li>
+                    }
+                </ol>
+            }
+        </MudStack>
+    </MudContainer>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        ReleaseService.FeedChanged += OnFeedChanged;
+        await ReleaseService.EnsureLoadedAsync();
+    }
+
+    public void Dispose()
+    {
+        ReleaseService.FeedChanged -= OnFeedChanged;
+    }
+
+    private void OnFeedChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OnRefreshClicked()
+    {
+        await ReleaseService.RefreshAsync();
+    }
+
+    private bool IsRunningVersion(GitHubRelease release)
+    {
+        return GitHubReleaseService.TryParseVersion(release.TagName, out var version)
+            && version == ReleaseService.CurrentVersion;
+    }
+
+    private string TimelineItemClass(GitHubRelease release)
+    {
+        return IsRunningVersion(release) ? "sain-timeline-item sain-timeline-item-current" : "sain-timeline-item";
+    }
+}

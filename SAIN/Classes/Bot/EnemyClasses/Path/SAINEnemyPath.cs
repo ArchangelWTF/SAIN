@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using SAIN.Preset.GlobalSettings;
+using System.Collections.Generic;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.GlobalSettings.Categories;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -94,9 +95,25 @@ public class SAINEnemyPath(EnemyData enemyData) : EnemyBase(enemyData, enemyData
         get { return PathToEnemy.status; }
     }
 
+    private const int MAX_PATH_CORNERS = 1024;
+    private Vector3[] _pathCorners = new Vector3[64];
+
     public Vector3[] PathCorners
     {
-        get { return PathToEnemy.corners; }
+        get { return _pathCorners; }
+    }
+
+    public int PathCornerCount { get; private set; }
+
+    private void CacheCorners()
+    {
+        int count = PathToEnemy.GetCornersNonAlloc(_pathCorners);
+        while (count == _pathCorners.Length && _pathCorners.Length < MAX_PATH_CORNERS)
+        {
+            _pathCorners = new Vector3[_pathCorners.Length * 2];
+            count = PathToEnemy.GetCornersNonAlloc(_pathCorners);
+        }
+        PathCornerCount = count;
     }
 
     public BotVisiblePathNode[] AllPathNodes { get; } =
@@ -126,13 +143,21 @@ public class SAINEnemyPath(EnemyData enemyData) : EnemyBase(enemyData, enemyData
             Vector3 enemyPosition = Enemy.KnownPlaces.LastKnownPosition.Value;
             PathToEnemy.ClearCorners();
             NavMesh.CalculatePath(Bot.NavMeshPosition, enemyPosition, NavMesh.AllAreas, PathToEnemy);
+            CacheCorners();
             _newPath = true;
             int max = AllPathNodes.Length;
-            PathLength = CalcPathLengthCreateVisionNodes(pathVisibilityConfig, AllPathNodes, PathCorners, out int nodeCount, max);
+            PathLength = CalcPathLengthCreateVisionNodes(
+                pathVisibilityConfig,
+                AllPathNodes,
+                _pathCorners,
+                PathCornerCount,
+                out int nodeCount,
+                max
+            );
             AllPathNodeCount = nodeCount;
-            if (PathCorners.Length > 0)
+            if (PathCornerCount > 0)
             {
-                DistanceToEnemyPositionFromLastCorner = (Enemy.LastKnownPosition.Value - PathCorners[PathCorners.Length - 1]).magnitude;
+                DistanceToEnemyPositionFromLastCorner = (Enemy.LastKnownPosition.Value - _pathCorners[PathCornerCount - 1]).magnitude;
             }
             else
             {
@@ -223,6 +248,7 @@ public class SAINEnemyPath(EnemyData enemyData) : EnemyBase(enemyData, enemyData
         PathVisibilityConfig pathVisibilityConfig,
         BotVisiblePathNode[] allPathPoints,
         Vector3[] pathCorners,
+        int cornerCount,
         out int nodeCount,
         int max
     )
@@ -238,7 +264,7 @@ public class SAINEnemyPath(EnemyData enemyData) : EnemyBase(enemyData, enemyData
         float pathLength = 0f;
         nodeCount = 0;
         bool full = false;
-        for (int i = 0; i < pathCorners.Length - 1; i++)
+        for (int i = 0; i < cornerCount - 1; i++)
         {
             Vector3 cornerA = pathCorners[i];
             Vector3 cornerB = pathCorners[i + 1];
@@ -364,6 +390,7 @@ public class SAINEnemyPath(EnemyData enemyData) : EnemyBase(enemyData, enemyData
     {
         _calcPathTime = 0;
         PathToEnemy.ClearCorners();
+        PathCornerCount = 0;
         PathLength = float.MaxValue;
         DistanceToEnemyPositionFromLastCorner = 0;
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SAIN.Models.Enums;
 using UnityEngine;
 using UnityEngine.AI;
 

@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using SAIN.Helpers;
 using SAIN.Models.Enums;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings;
 using UnityEngine;
 
 namespace SAIN.Components.BotController;

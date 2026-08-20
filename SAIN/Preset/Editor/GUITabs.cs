@@ -1,10 +1,11 @@
-﻿using EFT.UI;
+using EFT.UI;
 using SAIN.Attributes;
 using SAIN.Components;
 using SAIN.Editor.GUISections;
 using SAIN.Helpers;
 using SAIN.Plugin;
 using SAIN.Preset;
+using SAIN.Preset.Shared.Enums;
 using static SAIN.Editor.SAINLayout;
 
 namespace SAIN.Editor;
@@ -51,7 +52,7 @@ public static class GUITabs
             SAINPlugin.LoadedPreset.GlobalSettings,
             out bool newEdit,
             "Global Settings",
-            $"SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name}",
+            $"Server preset '{SAINPlugin.LoadedPreset.Info.Name}'",
             35f,
             out bool saved
         );

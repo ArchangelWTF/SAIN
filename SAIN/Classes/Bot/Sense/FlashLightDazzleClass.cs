@@ -45,16 +45,7 @@ public class FlashLightDazzleClass : BotBase
         float dist = enemy.RealDistance;
         if (dist < 80f && FlashlightVisionCheck(enemy.EnemyPlayer))
         {
-            Vector3 botPos = BotOwner.MyHead.position;
-            Vector3 weaponRoot = enemy.EnemyPlayer.WeaponRoot.position;
-            if (
-                !Physics.Raycast(
-                    weaponRoot,
-                    (botPos - weaponRoot).normalized,
-                    (botPos - weaponRoot).magnitude,
-                    LayerMaskClass.HighPolyWithTerrainMask
-                )
-            )
+            if (LineOfSightClear(enemy))
             {
                 float gainSight = 1.33f;
                 float dazzlemodifier = dist < MaxDazzleRange ? GetDazzleModifier(enemy) : 1f;
@@ -66,6 +57,14 @@ public class FlashLightDazzleClass : BotBase
         return false;
     }
 
+    private bool LineOfSightClear(Enemy enemy)
+    {
+        Vector3 botPos = BotOwner.MyHead.position;
+        Vector3 weaponRoot = enemy.EnemyPlayer.WeaponRoot.position;
+        Vector3 toBot = botPos - weaponRoot;
+        return !Physics.Raycast(weaponRoot, toBot.normalized, toBot.magnitude, LayersMaskController.HighPolyWithTerrainMask);
+    }
+
     /// <summary>
     /// Applies dazzle to the enemy if they are within the Max dazzle range and the raycast between the BotOwner and the enemy is not blocked.
     /// </summary>
@@ -74,16 +73,7 @@ public class FlashLightDazzleClass : BotBase
         float dist = enemy.RealDistance;
         if (dist < 100f && LaserVisionCheck(enemy.EnemyPlayer))
         {
-            Vector3 botPos = BotOwner.MyHead.position;
-            Vector3 weaponRoot = enemy.EnemyPlayer.WeaponRoot.position;
-            if (
-                !Physics.Raycast(
-                    weaponRoot,
-                    (botPos - weaponRoot).normalized,
-                    (botPos - weaponRoot).magnitude,
-                    LayerMaskClass.HighPolyWithTerrainMask
-                )
-            )
+            if (LineOfSightClear(enemy))
             {
                 float gainSight = 1.33f;
                 float dazzlemodifier = dist < MaxDazzleRange ? GetDazzleModifier(enemy) : 1f;
@@ -137,7 +127,6 @@ public class FlashLightDazzleClass : BotBase
 
     private float GetDazzleModifier(Enemy enemy)
     {
-        float enemyDist = enemy.RealDistance;
         float max = MaxDazzleRange;
         float min = max / 2f;
 

@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Components;

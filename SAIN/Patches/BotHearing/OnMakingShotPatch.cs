@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using EFT;
+using EFT.InventoryLogic;
 using HarmonyLib;
 using SAIN.Components;
 using SAIN.Components.PlayerComponentSpace;

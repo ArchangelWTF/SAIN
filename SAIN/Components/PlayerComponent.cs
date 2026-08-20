@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using EFT;
 using EFT.Ballistics;
-using EFT.Interactive;
 using EFT.InventoryLogic;
 using SAIN.Classes;
 using SAIN.Components.BotController;
@@ -12,9 +11,9 @@ using SAIN.Components.PlayerComponentSpace.Classes;
 using SAIN.Components.PlayerComponentSpace.Classes.Equipment;
 using SAIN.Components.PlayerComponentSpace.PersonClasses;
 using SAIN.Helpers;
+using SAIN.Preset.Shared.Enums;
 using SAIN.SAINComponent.Classes.Info;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace SAIN.Components.PlayerComponentSpace;
 
@@ -29,7 +28,7 @@ public class PlayerComponent : MonoBehaviour, IDisposable, ISPlayer
 
     public event Action<WeaponInfo, Vector3> OnShoot;
 
-    public event Action<PlayerComponent, EftBulletClass> OnBulletFlyBy;
+    public event Action<PlayerComponent, Shot> OnBulletFlyBy;
 
     public event Action<PlayerComponent> OnComponentDestroyed;
 
@@ -106,7 +105,9 @@ public class PlayerComponent : MonoBehaviour, IDisposable, ISPlayer
             {
                 Weapon LastWeapon = _currentWeapon;
 #if DEBUG
-                Logger.LogDebug($"[{Player?.Profile.Nickname}] Equipped Weapon [{value?.ShortName?.Localized()}] Last Weapon [{LastWeapon?.ShortName?.Localized()}]");
+                Logger.LogDebug(
+                    $"[{Player?.Profile.Nickname}] Equipped Weapon [{value?.ShortName?.Localized()}] Last Weapon [{LastWeapon?.ShortName?.Localized()}]"
+                );
 #endif
                 _currentWeapon = value;
                 OnWeaponEquipped?.Invoke(value, LastWeapon);
@@ -125,7 +126,9 @@ public class PlayerComponent : MonoBehaviour, IDisposable, ISPlayer
             {
                 Item LastItem = _currentItem;
 #if DEBUG
-                Logger.LogDebug($"[{Player?.Profile.Nickname}] Equipped Item [{value?.ShortName?.Localized()}] Last Item [{LastItem?.ShortName?.Localized()}]");
+                Logger.LogDebug(
+                    $"[{Player?.Profile.Nickname}] Equipped Item [{value?.ShortName?.Localized()}] Last Item [{LastItem?.ShortName?.Localized()}]"
+                );
 #endif
                 _currentItem = value;
                 OnItemEquipped?.Invoke(value, LastItem);
@@ -253,7 +256,6 @@ public class PlayerComponent : MonoBehaviour, IDisposable, ISPlayer
 #if DEBUG
                 drawTransformGizmos();
 #endif
-                Flashlight.Update();
                 Equipment.Update();
             }
         }
@@ -272,7 +274,7 @@ public class PlayerComponent : MonoBehaviour, IDisposable, ISPlayer
         PlayerTickData = data;
     }
 
-    public void RegisterFlyBy(PlayerComponent Source, EftBulletClass Bullet)
+    public void RegisterFlyBy(PlayerComponent Source, Shot Bullet)
     {
         OnBulletFlyBy?.Invoke(Source, Bullet);
     }

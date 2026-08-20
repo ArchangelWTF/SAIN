@@ -1,11 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using EFT.UI;
 using SAIN.Attributes;
 using SAIN.Editor.Util;
+using SAIN.Extensions;
 using SAIN.Plugin;
 using SAIN.Preset;
-using SAIN.Preset.BotSettings.SAINSettings;
+using SAIN.Preset.Shared.BotSettings.SAINSettings;
 using UnityEngine;
 using static SAIN.Editor.SAINLayout;
 
@@ -37,7 +38,7 @@ public static class BotSelectionClass
         FlexibleSpace();
         string toolTip =
             $"Apply Values set below to selected Bot Type. "
-            + $"Exports edited values to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name}/BotSettings folder";
+            + $"Saves edited values to the SAIN server for preset '{SAINPlugin.LoadedPreset.Info.Name}'";
         if (BuilderClass.SaveChanges(ConfigEditingTracker.GetUnsavedValuesString(), 35f))
         {
             SAINPresetClass.ExportAll(SAINPlugin.LoadedPreset);
@@ -191,7 +192,7 @@ public static class BotSelectionClass
                             for (int t = 0; t < SelectedDifficulties.Count; t++)
                             {
                                 var difficulty = SelectedDifficulties[t];
-                                if (settings.Settings.TryGetValue(difficulty, out var SAINSettings))
+                                if (settings.Settings.TryGetValue(difficulty.ToESain(), out var SAINSettings))
                                 {
                                     BeginHorizontal();
                                     Space(60);

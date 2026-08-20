@@ -1,0 +1,320 @@
+@page "/sain/presets"
+@attribute [Authorize(Policy = "Administrator")]
+@implements IDisposable
+@layout BaseMudBlazorLayout
+@inject SainPresetEditService Presets
+@inject PresetService PresetService
+@inject ISnackbar Snackbar
+
+<PageTitle>SAIN Presets</PageTitle>
+<HeadContent>
+    <link rel="stylesheet" href="/SAIN/css/sain.css" />
+</HeadContent>
+
+<div class="spt-page">
+    <MudContainer MaxWidth="MaxWidth.False" Class="sain-container pa-4">
+        <SainNav Current="presets" />
+        <MudPaper Elevation="0" Class="spt-panel sain-hero pa-4 mb-4">
+            <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap" Spacing="3">
+                <MudStack Row AlignItems="AlignItems.Center" Spacing="3">
+                    <div class="sain-hero-icon">
+                        <MudIcon Icon="@Icons.Material.Filled.Tune" Color="Color.Warning" Size="Size.Large" />
+                    </div>
+                    <div>
+                        <MudText Typo="Typo.h5" Class="spt-title">SAIN Presets</MudText>
+                        <MudText Typo="Typo.caption" Class="spt-muted">
+                            @if (_bundle != null)
+                            {
+                                @($"Editing {_bundle.Info.Name}")
+                                @if (_opened!.IsNewCustom)
+                                {
+                                    <span> (a default, saving creates an editable copy)</span>
+                                }
+                            }
+                            else
+                            {
+                                <text>Pick a preset to edit. Default presets clone into an editable copy on first edit.</text>
+                            }
+                        </MudText>
+                    </div>
+                </MudStack>
+                <MudStack Row AlignItems="AlignItems.Center" Spacing="3">
+                    <div class="sain-stat">
+                        <MudText Typo="Typo.caption">Presets</MudText>
+                        <MudText Typo="Typo.h5">@_items.Count</MudText>
+                    </div>
+                    <div class="sain-stat">
+                        <MudText Typo="Typo.caption">Custom</MudText>
+                        <MudText Typo="Typo.h5">@_items.Count(i => i.IsCustom)</MudText>
+                    </div>
+                    @if (_bundle != null)
+                    {
+                        @if (_dirty)
+                        {
+                            <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Filled">Unsaved changes</MudChip>
+                        }
+                        <MudSwitch T="bool" @bind-Value="_showAdvanced" Color="Color.Primary" Label="Advanced" />
+                        <MudSwitch T="bool" @bind-Value="_showDeveloper" Color="Color.Secondary" Label="Developer" />
+                        <MudButton Variant="Variant.Filled" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Save"
+                                   OnClick="SaveAsync">Save</MudButton>
+                    }
+                </MudStack>
+            </MudStack>
+        </MudPaper>
+
+        <div class="sain-shell">
+            <div class="sain-shell-nav">
+                <MudPaper Elevation="0" Class="spt-panel pa-4">
+                    <MudList T="string" SelectedValue="_selectedName" SelectedValueChanged="SelectAsync" Dense="true" Color="Color.Primary">
+                        <MudListSubheader>
+                            <MudText Typo="Typo.overline" Class="spt-muted">Default</MudText>
+                        </MudListSubheader>
+                        @foreach (var item in _items.Where(i => !i.IsCustom))
+                        {
+                            <MudListItem T="string" Value="@item.Name" Class="@(item.Disabled ? "sain-preset-disabled" : null)">
+                                <div class="sain-preset-item">
+                                    <div class="sain-preset-name">
+                                        <MudText Typo="Typo.body2">@item.Name</MudText>
+                                        @if (item.Disabled)
+                                        {
+                                            <MudChip T="string" Size="Size.Small" Color="Color.Default" Variant="Variant.Outlined">Hidden</MudChip>
+                                        }
+                                    </div>
+                                    <MudTooltip Text="Duplicate">
+                                        <MudIconButton Icon="@Icons.Material.Outlined.ContentCopy" Size="Size.Small"
+                                                       OnClick="@(() => DuplicateAsync(item.Name))" OnClick:stopPropagation="true" />
+                                    </MudTooltip>
+                                </div>
+                            </MudListItem>
+                        }
+                        <MudListSubheader>
+                            <MudText Typo="Typo.overline" Class="spt-muted">Custom</MudText>
+                        </MudListSubheader>
+                        @if (!_items.Any(i => i.IsCustom))
+                        {
+                            <MudListItem T="string" Disabled="true">
+                                <MudText Typo="Typo.caption" Class="spt-muted">None yet</MudText>
+                            </MudListItem>
+                        }
+                        @foreach (var item in _items.Where(i => i.IsCustom))
+                        {
+                            <MudListItem T="string" Value="@item.Name">
+                                <div class="sain-preset-item">
+                                    <MudText Typo="Typo.body2">@item.Name</MudText>
+                                    <span>
+                                        <MudTooltip Text="Duplicate">
+                                            <MudIconButton Icon="@Icons.Material.Outlined.ContentCopy" Size="Size.Small"
+                                                           OnClick="@(() => DuplicateAsync(item.Name))" OnClick:stopPropagation="true" />
+                                        </MudTooltip>
+                                        @if (_pendingDelete == item.Name)
+                                        {
+                                            <MudIconButton Icon="@Icons.Material.Filled.Check" Size="Size.Small" Color="Color.Error"
+                                                           OnClick="@(() => DeleteAsync(item.Name))" OnClick:stopPropagation="true" />
+                                            <MudIconButton Icon="@Icons.Material.Outlined.Close" Size="Size.Small"
+                                                           OnClick="@(() => _pendingDelete = null)" OnClick:stopPropagation="true" />
+                                        }
+                                        else
+                                        {
+                                            <MudTooltip Text="Delete">
+                                                <MudIconButton Icon="@Icons.Material.Outlined.Delete" Size="Size.Small" Color="Color.Error"
+                                                               OnClick="@(() => _pendingDelete = item.Name)" OnClick:stopPropagation="true" />
+                                            </MudTooltip>
+                                        }
+                                    </span>
+                                </div>
+                            </MudListItem>
+                        }
+                    </MudList>
+
+                    <MudDivider Class="my-4" />
+
+                    <div class="sain-new-preset">
+                        <MudText Typo="Typo.overline" Class="spt-muted">New preset</MudText>
+                        <MudTextField T="string" @bind-Value="_newName" Placeholder="Name" Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" />
+                        <MudSelect T="string" @bind-Value="_baseName" Label="Based on" Variant="Variant.Outlined"
+                                   Margin="Margin.Dense" Dense="true">
+                            @foreach (var def in _items.Where(i => !i.IsCustom))
+                            {
+                                <MudSelectItem T="string" Value="@def.Name">@def.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                        <MudButton Variant="Variant.Filled" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Add"
+                                   FullWidth="true" OnClick="CreateAsync">Create</MudButton>
+                    </div>
+                </MudPaper>
+            </div>
+
+            <div class="sain-shell-main">
+                <MudPaper Elevation="0" Class="spt-panel pa-4">
+                    @if (_bundle != null)
+                    {
+                        <CascadingValue Name="ShowAdvanced" Value="_showAdvanced">
+                        <CascadingValue Name="ShowDeveloper" Value="_showDeveloper">
+                            <PresetEditorBody Bundle="_bundle" OnChanged="MarkDirty" />
+                        </CascadingValue>
+                        </CascadingValue>
+                    }
+                    else
+                    {
+                        <div class="sain-empty">
+                            <MudIcon Icon="@Icons.Material.Outlined.TouchApp" Size="Size.Large" Class="spt-muted" />
+                            <MudText Typo="Typo.body1" Class="spt-muted mt-2">Select a preset from the left to start editing.</MudText>
+                        </div>
+                    }
+                </MudPaper>
+            </div>
+        </div>
+    </MudContainer>
+</div>
+
+@code {
+    private IReadOnlyList<PresetListItem> _items = Array.Empty<PresetListItem>();
+    private string? _selectedName;
+    private OpenedPreset? _opened;
+    private SAINPresetBundle? _bundle;
+    private bool _dirty;
+    private bool _showAdvanced;
+    private bool _showDeveloper;
+    private string? _pendingDelete;
+    private string _newName = string.Empty;
+    private string _baseName = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        Reload();
+        PresetService.CustomPresetsChanged += OnPresetsChangedExternally;
+    }
+
+    public void Dispose()
+    {
+        PresetService.CustomPresetsChanged -= OnPresetsChangedExternally;
+    }
+
+    // A save/delete from another web session or an in-game client: refresh the sidebar list without
+    // touching the preset the admin currently has open.
+    private void OnPresetsChangedExternally()
+    {
+        _ = InvokeAsync(() =>
+        {
+            Reload();
+            StateHasChanged();
+        });
+    }
+
+    private void Reload()
+    {
+        _items = Presets.ListAll();
+        if (string.IsNullOrEmpty(_baseName))
+        {
+            _baseName = _items.FirstOrDefault(i => !i.IsCustom)?.Name ?? string.Empty;
+        }
+    }
+
+    private async Task SelectAsync(string? name)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            return;
+        }
+        if (_dirty)
+        {
+            Snackbar.Add("Discarded unsaved changes.", Severity.Info);
+        }
+        _selectedName = name;
+        _opened = await Presets.OpenAsync(name);
+        _bundle = _opened?.Bundle;
+        _dirty = false; // defaults stay untouched until an actual edit; the working copy is deep-cloned
+        _pendingDelete = null;
+    }
+
+    private void MarkDirty()
+    {
+        _dirty = true;
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_bundle == null || _opened == null)
+        {
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(_bundle.Info.Name))
+        {
+            Snackbar.Add("Preset needs a name.", Severity.Warning);
+            return;
+        }
+
+        // Saving a default's working copy creates a distinct custom. If the user didn't rename it,
+        // suffix "[Modified]" so the original default stays intact and the two don't collide.
+        if (_opened.IsNewCustom && string.Equals(_bundle.Info.Name, _opened.OriginalName, StringComparison.Ordinal))
+        {
+            _bundle.Info.Name = $"{_opened.OriginalName} [Modified]";
+        }
+
+        var renamedFrom = _opened.IsNewCustom ? null : _opened.OriginalName;
+        var savedName = _bundle.Info.Name;
+        await Presets.SaveAsync(_bundle, renamedFrom);
+        Snackbar.Add($"Saved '{savedName}'. Connected game clients will reload it.", Severity.Success);
+
+        Reload();
+        await SelectAsync(savedName); // re-open as an existing custom so further edits don't re-clone
+        _dirty = false;
+    }
+
+    private async Task CreateAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_newName) || string.IsNullOrWhiteSpace(_baseName))
+        {
+            Snackbar.Add("Enter a name and a base preset.", Severity.Warning);
+            return;
+        }
+        if (Presets.CustomExists(_newName))
+        {
+            Snackbar.Add($"A custom preset named '{_newName}' already exists.", Severity.Warning);
+            return;
+        }
+        var created = await Presets.DuplicateAsync(_baseName, _newName.Trim());
+        if (created != null)
+        {
+            _newName = string.Empty;
+            Reload();
+            await SelectAsync(created);
+            Snackbar.Add($"Created '{created}'.", Severity.Success);
+        }
+    }
+
+    private async Task DuplicateAsync(string source)
+    {
+        var name = $"{source} Copy";
+        var i = 2;
+        while (Presets.CustomExists(name))
+        {
+            name = $"{source} Copy {i++}";
+        }
+        var created = await Presets.DuplicateAsync(source, name);
+        if (created != null)
+        {
+            Reload();
+            await SelectAsync(created);
+            Snackbar.Add($"Duplicated to '{created}'.", Severity.Success);
+        }
+    }
+
+    private async Task DeleteAsync(string name)
+    {
+        _pendingDelete = null;
+        if (await Presets.DeleteAsync(name))
+        {
+            if (string.Equals(_selectedName, name, StringComparison.Ordinal))
+            {
+                _selectedName = null;
+                _bundle = null;
+                _opened = null;
+                _dirty = false;
+            }
+            Reload();
+            Snackbar.Add($"Deleted '{name}'.", Severity.Success);
+        }
+    }
+}

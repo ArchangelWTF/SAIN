@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using EFT;
 using SAIN.Components;
 using SAIN.Helpers.Events;
 using SAIN.Models.Enums;
+using SAIN.Preset.Shared.Enums;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.SAINComponent.SubComponents.CoverFinder;
 using UnityEngine;
@@ -12,6 +13,9 @@ namespace SAIN.SAINComponent.Classes.Decision;
 public class BotDecisionManager(SAINDecisionClass decisionClass) : BotSubClass<SAINDecisionClass>(decisionClass), IBotClass
 {
     private const float DECISION_FREQUENCY = 1f / 10;
+    private const float MELEE_CHARGE_COMMIT_TIME = 4f;
+    private const float MELEE_CHARGE_MIN_PROGRESS = 0.75f;
+    private const float MELEE_SWAP_RETRY_TIME = 2f;
 
     public event Action<ECombatDecision, ESquadDecision, ESelfActionType, Enemy, BotComponent> OnDecisionMade;
 
@@ -82,11 +86,13 @@ public class BotDecisionManager(SAINDecisionClass decisionClass) : BotSubClass<S
             if (enemy.RealDistance < 35 && enemy.Path.PathLength < 30 && enemy.Status.VulnerableAction != EEnemyAction.None)
             {
                 enemy.BotOwner.WeaponManager.Melee.ShallEndRun = false;
+                BeginMeleeCharge(enemy);
                 return true;
             }
             if (enemy.RealDistance < 20 && enemy.Path.PathLength < 15)
             {
                 enemy.BotOwner.WeaponManager.Melee.ShallEndRun = false;
+                BeginMeleeCharge(enemy);
                 return true;
             }
             return false;
@@ -95,6 +101,28 @@ public class BotDecisionManager(SAINDecisionClass decisionClass) : BotSubClass<S
         {
             return false;
         }
+
+        if (_meleeChargeEnemy != enemy)
+        {
+            BeginMeleeCharge(enemy);
+        }
+
+        UpdateGunDryState();
+
+        if (!_gunIsDry)
+        {
+            if (enemy.Path.PathToEnemyStatus != UnityEngine.AI.NavMeshPathStatus.PathComplete)
+            {
+                return false;
+            }
+            if (
+                Time.time - _meleeChargeStartTime > MELEE_CHARGE_COMMIT_TIME
+                && enemy.Path.PathLength > _meleeChargeStartPathLength * MELEE_CHARGE_MIN_PROGRESS
+            )
+            {
+                return false;
+            }
+        }
         if (status != ETagStatus.Dying && enemy.RealDistance < 40 && enemy.Path.PathLength < 35)
         {
             return true;
@@ -102,9 +130,62 @@ public class BotDecisionManager(SAINDecisionClass decisionClass) : BotSubClass<S
         return false;
     }
 
+    private float _nextMeleeSwapTime;
+
+    private void UpdateGunDryState()
+    {
+        var weaponManager = BotOwner.WeaponManager;
+        if (weaponManager == null || weaponManager.IsMelee)
+        {
+            return;
+        }
+        _gunIsDry = !weaponManager.HaveBullets;
+    }
+
+    private bool _gunIsDry;
+
+    private void RequestMainWeapon()
+    {
+        if (!BotOwner.WeaponManager.IsMelee)
+        {
+            _nextMeleeSwapTime = 0f;
+            return;
+        }
+        if (_gunIsDry)
+        {
+            // Nothing to switch to. Keep the melee weapon rather than drawing a weapon that cannot fire.
+            return;
+        }
+        if (_nextMeleeSwapTime > Time.time)
+        {
+            return;
+        }
+
+        _nextMeleeSwapTime = Time.time + MELEE_SWAP_RETRY_TIME;
+        BotOwner.WeaponManager.Selector.ChangeToMain();
+    }
+
+    private Enemy _meleeChargeEnemy;
+    private float _meleeChargeStartTime;
+    private float _meleeChargeStartPathLength;
+
+    private void BeginMeleeCharge(Enemy enemy)
+    {
+        _meleeChargeEnemy = enemy;
+        _meleeChargeStartTime = Time.time;
+        _meleeChargeStartPathLength = enemy.Path.PathLength;
+    }
+
     private void getDecision()
     {
         Enemy enemy = Bot.EnemyController.ChooseEnemy();
+
+        if (Bot.Grenade.GrenadeReactionClass.ShallAvoidGrenade())
+        {
+            SetDecisions(ECombatDecision.AvoidGrenade, ESquadDecision.None, ESelfActionType.None, enemy);
+            return;
+        }
+
         if (enemy == null)
         {
             SetDecisions(ECombatDecision.None, ESquadDecision.None, ESelfActionType.None, enemy);
@@ -125,10 +206,7 @@ public class BotDecisionManager(SAINDecisionClass decisionClass) : BotSubClass<S
                 SetDecisions(ECombatDecision.MeleeAttack, ESquadDecision.None, ESelfActionType.None, enemy);
                 return;
             }
-            if (BotOwner.WeaponManager.IsMelee)
-            {
-                BotOwner.WeaponManager.Selector.ChangeToMain();
-            }
+            RequestMainWeapon();
         }
 
         if (enemy != null && enemy.IsZombie)

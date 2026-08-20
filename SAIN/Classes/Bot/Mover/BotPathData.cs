@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using EFT;
 using SAIN.Components;
 using SAIN.Helpers;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Models.Enums;
+using SAIN.Preset.Shared.GlobalSettings;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -80,7 +81,7 @@ public class BotPathDataManual(BotComponent bot, IBotPathFinder pathFinder) : IB
 #endif
 
         CurrentSprintStatus = GetSprintStatus(botPosition);
-        SetSprint(CurrentSprintStatus == EBotSprintStatus.Running, $"{CurrentSprintStatus}");
+        SetSprint(CurrentSprintStatus == EBotSprintStatus.Running);
 
         bool slowAtCorners =
             Bot.GoalEnemy != null && Bot.GoalEnemy.Events.OnSearch.Value && Bot.Info.PersonalitySettings.Search.SlowAtCorners;
@@ -429,7 +430,7 @@ public class BotPathDataManual(BotComponent bot, IBotPathFinder pathFinder) : IB
         if (Bot.DoorOpener.SelectDoor(out EInteractionType type, out DoorDataStruct data, this))
         {
             Bot.Mover.Prone.SetProne(false);
-            SetSprint(false, "door");
+            SetSprint(false);
             Bot.Mover.SetTargetPose(1f);
             Bot.Mover.SetTargetMoveSpeed(1f);
             Bot.AimDownSightsController.SetADS(false);
@@ -473,7 +474,7 @@ public class BotPathDataManual(BotComponent bot, IBotPathFinder pathFinder) : IB
             else if (_pauseStartTime < Time.time)
             {
                 //Logger.LogDebug($"[{Bot.name}]:[{Id}]: paused");
-                SetSprint(false, "paused");
+                SetSprint(false);
                 return true;
             }
         }
@@ -562,7 +563,7 @@ public class BotPathDataManual(BotComponent bot, IBotPathFinder pathFinder) : IB
                 direction,
                 out RaycastHit hit,
                 maxDist,
-                LayerMaskClass.PlayerStaticCollisionsMask
+                LayersMaskController.PlayerStaticCollisionsMask
             )
         )
         {
@@ -607,7 +608,7 @@ public class BotPathDataManual(BotComponent bot, IBotPathFinder pathFinder) : IB
         PathCorners[i] = completeCorner;
     }
 
-    private void SetSprint(bool value, string reason)
+    private void SetSprint(bool value)
     {
         Bot.PlayerComponent.CharacterController.SetWantToSprint(value);
     }

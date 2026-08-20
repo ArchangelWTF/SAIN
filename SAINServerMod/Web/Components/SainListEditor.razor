@@ -1,0 +1,138 @@
+@namespace SAINServerMod.Web.Components
+@using System.Collections
+
+@if (_list == null)
+{
+    <MudText Typo="Typo.caption" Class="spt-muted">No list.</MudText>
+}
+else if (_elemKind is SainFieldKind.Nested)
+{
+    @for (var i = 0; i < _list.Count; i++)
+    {
+        var index = i;
+        <MudExpansionPanels Elevation="0" Class="sain-panels">
+            <MudExpansionPanel Class="sain-subpanel">
+                <TitleContent>
+                    <div class="sain-list-item-head">
+                        <MudText Typo="Typo.body2">@ItemTitle(index)</MudText>
+                        <MudIconButton Icon="@Icons.Material.Outlined.Delete" Size="Size.Small" Color="Color.Error"
+                                       OnClick="() => RemoveAt(index)" />
+                    </div>
+                </TitleContent>
+                <ChildContent>
+                    <SainSettingsEditor Target="_list[index]" Depth="Depth + 1" OnChanged="OnChanged" />
+                </ChildContent>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    }
+    <MudButton StartIcon="@Icons.Material.Outlined.Add" Size="Size.Small" Variant="Variant.Text"
+               Color="Color.Primary" OnClick="AddNested" Class="mt-2">Add item</MudButton>
+}
+else if (_isLeaf)
+{
+    <div class="sain-chips">
+        @for (var i = 0; i < _list.Count; i++)
+        {
+            var index = i;
+            <MudChip T="string" Color="Color.Default" OnClose="() => RemoveAt(index)" Class="sain-chip">
+                @(_list[index]?.ToString())
+            </MudChip>
+        }
+    </div>
+    <div class="sain-add-row">
+        @if (_elemType.IsEnum)
+        {
+            <MudSelect T="string" @bind-Value="_addText" Variant="Variant.Outlined" Margin="Margin.Dense"
+                       Dense="true" Class="sain-select" Placeholder="Add…">
+                @foreach (var name in Enum.GetNames(_elemType))
+                {
+                    <MudSelectItem T="string" Value="@name">@name</MudSelectItem>
+                }
+            </MudSelect>
+        }
+        else
+        {
+            <MudTextField T="string" @bind-Value="_addText" Variant="Variant.Outlined" Margin="Margin.Dense"
+                          Placeholder="Add…" Class="sain-text" />
+        }
+        <MudButton StartIcon="@Icons.Material.Outlined.Add" Size="Size.Small" Variant="Variant.Text"
+                   Color="Color.Primary" OnClick="AddLeaf">Add</MudButton>
+    </div>
+}
+else
+{
+    <MudText Typo="Typo.caption" Class="spt-muted">Unsupported list of @_elemType.Name.</MudText>
+}
+
+@code {
+    [Parameter, EditorRequired] public SainValue Value { get; set; } = default!;
+    [Parameter] public int Depth { get; set; }
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private IList? _list;
+    private Type _elemType = typeof(object);
+    private SainFieldKind _elemKind;
+    private bool _isLeaf;
+    private string _addText = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        _list = Value.Get() as IList;
+        _elemType = Value.ValueType.IsArray
+            ? Value.ValueType.GetElementType() ?? typeof(object)
+            : (Value.ValueType.IsGenericType ? Value.ValueType.GetGenericArguments()[0] : typeof(object));
+        _elemKind = SainValue.Classify(_elemType);
+        _isLeaf = _elemKind is SainFieldKind.Bool or SainFieldKind.Int or SainFieldKind.Float
+            or SainFieldKind.String or SainFieldKind.Enum;
+    }
+
+    private string ItemTitle(int index)
+    {
+        var item = _list?[index];
+        var nameProp = item?.GetType().GetField("Name")?.GetValue(item) as string;
+        return string.IsNullOrWhiteSpace(nameProp) ? $"Item {index + 1}" : nameProp;
+    }
+
+    private Task RemoveAt(int index)
+    {
+        _list?.RemoveAt(index);
+        return Changed();
+    }
+
+    private Task AddNested()
+    {
+        if (_list != null)
+        {
+            try
+            {
+                _list.Add(Activator.CreateInstance(_elemType));
+            }
+            catch { /* no parameterless ctor */ }
+        }
+        return Changed();
+    }
+
+    private Task AddLeaf()
+    {
+        if (_list == null || string.IsNullOrWhiteSpace(_addText))
+        {
+            return Task.CompletedTask;
+        }
+        try
+        {
+            object parsed = _elemType.IsEnum
+                ? Enum.Parse(_elemType, _addText)
+                : Convert.ChangeType(_addText, _elemType);
+            _list.Add(parsed);
+            _addText = string.Empty;
+        }
+        catch { /* ignore invalid input */ }
+        return Changed();
+    }
+
+    private async Task Changed()
+    {
+        StateHasChanged();
+        await OnChanged.InvokeAsync();
+    }
+}

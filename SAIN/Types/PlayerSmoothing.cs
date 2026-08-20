@@ -1,5 +1,4 @@
-﻿using EFT;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SAIN.Types.PlayerSmoothing;
 
@@ -124,98 +123,5 @@ public class PredictivePositionSmoother
         _targetVelocity = Vector3.zero;
         _currentVelocity = Vector3.zero;
         _velocitySmoothing = Vector3.zero;
-    }
-}
-
-public class SmoothingDebugger : MonoBehaviour
-{
-    public Player player;
-
-    private GameObject _sphere1;
-    private LineRenderer _line1;
-
-    private GameObject _sphere2;
-    private LineRenderer _line2;
-
-    private Vector3 _naiveSmoothedPosition;
-    private Vector3 _naiveSmoothedVelocity;
-
-    private readonly PredictivePositionSmoother _positionSmoother = new();
-
-    private void Awake()
-    {
-        // Create first sphere
-        _sphere1 = CreateSphere(Color.magenta);
-        _line1 = CreateLine(_sphere1, Color.gray, Color.magenta, 0.05f);
-
-        // Create second sphere
-        _sphere2 = CreateSphere(Color.green);
-        _line2 = CreateLine(_sphere2, Color.gray, Color.green, 0.05f);
-    }
-
-    private void FixedUpdate()
-    {
-        var targetPosition = player.PlayerBones.Head.Original.position;
-        var smoothedPos = _positionSmoother.Update(targetPosition, player.Velocity, Time.fixedDeltaTime);
-
-        _naiveSmoothedPosition = Vector3.SmoothDamp(
-            _naiveSmoothedPosition,
-            targetPosition,
-            ref _naiveSmoothedVelocity,
-            0.35f,
-            Mathf.Infinity,
-            Time.fixedDeltaTime
-        );
-
-        UpdatePositions(_naiveSmoothedPosition, targetPosition, _sphere1, _line1);
-        UpdatePositions(smoothedPos, targetPosition, _sphere2, _line2);
-    }
-
-    private void UpdatePositions(Vector3 smoothedPosition, Vector3 targetPosition, GameObject sphere, LineRenderer line)
-    {
-        sphere.transform.position = smoothedPosition;
-        line.SetPosition(0, targetPosition);
-        line.SetPosition(1, smoothedPosition);
-    }
-
-    private LineRenderer CreateLine(GameObject sphere, Color startColor, Color endColor, float width)
-    {
-        var line = sphere.AddComponent<LineRenderer>();
-
-        line.material = new Material(Shader.Find("Sprites/Default"));
-        line.startColor = startColor;
-        line.endColor = endColor;
-
-        line.startWidth = width;
-        line.endWidth = width;
-
-        SAIN.Logger.LogInfo($"Smoothing createline> posCount");
-
-        line.positionCount = 2;
-
-        return line;
-    }
-
-    private GameObject CreateSphere(Color color)
-    {
-        // Create sphere primitive
-        var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-
-        var sphereRenderer = sphere.GetComponent<Renderer>();
-        sphereRenderer.material = new Material(Shader.Find("Sprites/Default")) { color = color };
-
-        sphere.transform.localScale = Vector3.one * 0.1f;
-
-        // Remove the collider
-        var collider = sphere.GetComponent<Collider>();
-        if (collider != null)
-        {
-            DestroyImmediate(collider);
-        }
-
-        // Set this GameObject as parent
-        sphere.transform.SetParent(transform);
-
-        return sphere;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using DrakiaXYZ.BigBrain.Brains;
 using EFT;
+using SAIN.Models.Enums;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
 
@@ -74,7 +75,7 @@ internal class MoveToEngageAction(BotOwner bot) : BotAction(bot, nameof(MoveToEn
 
         if (Bot.Mover.Moving)
         {
-            Bot.Mover.ActivePath?.RequestStartSprint(SAINComponent.Classes.Mover.ESprintUrgency.None, "enemy in sight");
+            Bot.Mover.ActivePath?.RequestStartSprint(ESprintUrgency.None, "enemy in sight");
         }
 
         if (RecalcPathTimer < Time.time)

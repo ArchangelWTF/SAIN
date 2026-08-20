@@ -1,6 +1,7 @@
-﻿using SAIN.Helpers;
+using SAIN.Helpers;
 using SAIN.Models.Enums;
 using SAIN.Models.Structs;
+using SAIN.Preset.Shared.Enums;
 using SAIN.SAINComponent.Classes;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
@@ -60,7 +61,7 @@ public class EnemyHearing(EnemyData enemyData) : EnemyBase(enemyData, enemyData.
 
     public EnemyPlace SetHeard(SAINHearingReport report, float currentTime)
     {
-        if (Bot.Hearing.SoundInput.IsIgnoringSounds(report.soundType.IsGunShot()))
+        if (Bot.Hearing.HearingInput.IsIgnoringSounds(report.soundType.IsGunShot()))
         {
             return null;
         }

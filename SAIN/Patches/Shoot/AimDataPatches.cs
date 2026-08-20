@@ -1,14 +1,13 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text;
 using EFT;
-using EFT.InventoryLogic;
 using HarmonyLib;
 using RootMotion.FinalIK;
 using SAIN.Components;
 using SAIN.Components.PlayerComponentSpace;
 using SAIN.Helpers;
-using SAIN.Preset.BotSettings.SAINSettings.Categories;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.BotSettings.SAINSettings.Categories;
+using SAIN.Preset.Shared.GlobalSettings;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.SAINComponent.SubComponents.CoverFinder;
 using SPT.Reflection.Patching;
@@ -23,17 +22,17 @@ internal class BotAimSteerPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(BotAimingClass), nameof(BotAimingClass.method_11));
+        return AccessTools.Method(typeof(BotAimingData), nameof(BotAimingData.LookTo));
     }
 
     [PatchPrefix]
-    public static bool Patch(BotAimingClass __instance, Vector3 dir)
+    public static bool Patch(BotAimingData __instance, Vector3 dir)
     {
-        if (!SAINEnableClass.IsBotInCombat(__instance.BotOwner_0))
+        if (!SAINEnableClass.IsBotInCombat(__instance._owner))
         {
             return true;
         }
-        //__instance.botOwner_0.Steering.LookToDirection(dir, float.MaxValue);
+
         return false;
     }
 }
@@ -46,13 +45,13 @@ internal class HardAimDisablePatch1 : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(BotAimingClass), nameof(BotAimingClass.LoseTarget));
+        return AccessTools.Method(typeof(BotAimingData), nameof(BotAimingData.LoseTarget));
     }
 
     [PatchPrefix]
-    public static bool Patch(BotAimingClass __instance)
+    public static bool Patch(BotAimingData __instance)
     {
-        if (SAINEnableClass.IsBotInCombat(__instance.BotOwner_0))
+        if (SAINEnableClass.IsBotInCombat(__instance._owner))
         {
             __instance.Status = AimStatus.NoTarget;
             return false;
@@ -69,18 +68,18 @@ internal class HardAimDisablePatch2 : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.PropertySetter(typeof(BotAimingClass), nameof(BotAimingClass.Status));
+        return AccessTools.PropertySetter(typeof(BotAimingData), nameof(BotAimingData.Status));
     }
 
     [PatchPrefix]
-    public static bool Patch(BotAimingClass __instance, AimStatus value)
+    public static bool Patch(BotAimingData __instance, AimStatus value)
     {
-        if (__instance.AimStatus_0 == value)
+        if (__instance._status == value)
         {
             return false;
         }
 
-        BotOwner botOwner = __instance.BotOwner_0;
+        BotOwner botOwner = __instance._owner;
         if (botOwner == null || botOwner.BotState != EBotState.Active)
         {
             return false;
@@ -91,7 +90,7 @@ internal class HardAimDisablePatch2 : ModulePatch
             return true;
         }
 
-        __instance.AimStatus_0 = value;
+        __instance._status = value;
         return false;
     }
 }
@@ -118,17 +117,17 @@ internal class HitAffectApplyPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(BotHitAffectClass), nameof(BotHitAffectClass.Affect));
+        return AccessTools.Method(typeof(AimingAffection), nameof(AimingAffection.Affect));
     }
 
     [PatchPrefix]
-    public static bool Patch(BotHitAffectClass __instance, ref Vector3 __result, Vector3 dir)
+    public static bool Patch(AimingAffection __instance, ref Vector3 __result, Vector3 dir)
     {
         if (!GlobalSettingsClass.Instance.Aiming.HitEffects.HIT_REACTION_TOGGLE)
         {
             return true;
         }
-        if (SAINEnableClass.GetSAIN(__instance.BotOwner_0.ProfileId, out var bot))
+        if (SAINEnableClass.GetSAIN(__instance._owner.ProfileId, out var bot))
         {
             __result = bot.Medical.HitReaction.AimHitEffect.ApplyEffect(dir);
             return false;
@@ -141,17 +140,17 @@ internal class DoHitAffectPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(BotHitAffectClass), nameof(BotHitAffectClass.DoAffection));
+        return AccessTools.Method(typeof(AimingAffection), nameof(AimingAffection.DoAffection));
     }
 
     [PatchPrefix]
-    public static bool Patch(BotHitAffectClass __instance)
+    public static bool Patch(AimingAffection __instance)
     {
         if (!GlobalSettingsClass.Instance.Aiming.HitEffects.HIT_REACTION_TOGGLE)
         {
             return true;
         }
-        if (SAINEnableClass.GetSAIN(__instance.BotOwner_0.ProfileId, out _))
+        if (SAINEnableClass.GetSAIN(__instance._owner.ProfileId, out _))
         {
             return false;
         }
@@ -163,13 +162,13 @@ internal class AimOffsetPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(BotAimingClass), nameof(BotAimingClass.method_13));
+        return AccessTools.Method(typeof(BotAimingData), nameof(BotAimingData.UpdateEndTargetPoint));
     }
 
     [PatchPrefix]
-    public static bool PatchPrefix(BotAimingClass __instance)
+    public static bool PatchPrefix(BotAimingData __instance)
     {
-        if (!SAINEnableClass.IsBotInCombat(__instance.BotOwner_0))
+        if (!SAINEnableClass.IsBotInCombat(__instance._owner))
         {
             return true;
         }
@@ -177,8 +176,8 @@ internal class AimOffsetPatch : ModulePatch
         // Applies aiming offset, recoil offset, and scatter offsets
         // Default Setup :: Vector3 finalTarget = __instance.RealTargetPoint + badShootOffset + (AimUpgradeByTime * (AimOffset + ___botOwner_0.RecoilData.RecoilOffset));
 
-        float aimUpgradeByTime = __instance.Float_13;
-        Vector3 aimOffset = __instance.Vector3_4;
+        float aimUpgradeByTime = __instance._timeCoef;
+        Vector3 aimOffset = __instance._offsetStandart;
         Vector3 realTargetPoint = __instance.RealTargetPoint;
         Vector3 result = realTargetPoint + (aimOffset * aimUpgradeByTime);
 
@@ -187,7 +186,7 @@ internal class AimOffsetPatch : ModulePatch
 #if DEBUG
         if (SAINPlugin.LoadedPreset.GlobalSettings.General.Debug.Gizmos.DebugDrawAimGizmos)
         {
-            Vector3 weaponRoot = __instance.BotOwner_0.WeaponRoot.position;
+            Vector3 weaponRoot = __instance._owner.WeaponRoot.position;
             DebugGizmos.DrawLine(weaponRoot, result, Color.red, 0.02f, 0.25f, true);
             DebugGizmos.DrawSphere(result, 0.025f, Color.red, 10f);
             DebugGizmos.DrawLine(result, realTargetPoint, Color.white, 0.02f, 0.25f, true);
@@ -201,18 +200,18 @@ public class AimTimePatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(BotAimingClass), nameof(BotAimingClass.method_7));
+        return AccessTools.Method(typeof(BotAimingData), nameof(BotAimingData.CalcTimeShoot));
     }
 
     [PatchPrefix]
-    public static bool PatchPrefix(BotAimingClass __instance, float dist, float ang, ref float __result)
+    public static bool PatchPrefix(BotAimingData __instance, float dist, float ang, ref float __result)
     {
-        if (!SAINEnableClass.GetSAIN(__instance.BotOwner_0.ProfileId, out var bot))
+        if (!SAINEnableClass.GetSAIN(__instance._owner.ProfileId, out var bot))
         {
             return true;
         }
 
-        __result = CalculateAim(bot, dist, ang, __instance.Bool_1, __instance.Bool_0, __instance.Float_10);
+        __result = CalculateAim(bot, dist, ang, __instance._lastFrameMove, __instance._aimingOnWay, __instance._nextAimingDelay);
         bot.Aim.LastAimTime = __result;
 
         return false;
@@ -396,7 +395,7 @@ public class SmoothTurnPatch : ModulePatch
     [PatchPrefix]
     public static bool Patch(BotSteering __instance)
     {
-        BotOwner botOwner = __instance.BotOwner_0;
+        BotOwner botOwner = __instance._owner;
         if (GameWorldComponent.TryGetPlayerComponent(botOwner, out PlayerComponent playerComponent) && playerComponent.BotComponent != null)
         {
             if (playerComponent.BotComponent.SAINLayersActive)
@@ -410,11 +409,11 @@ public class SmoothTurnPatch : ModulePatch
                 );
                 controller.UpdateBotTurnData(Time.deltaTime);
                 controller.RotatePlayer(playerComponent);
-                __instance.LookDirection_1 = playerComponent.CharacterController.TurnData.CurrentLookDirection;
+                __instance._lookDirection = playerComponent.CharacterController.TurnData.CurrentLookDirection;
                 return false;
             }
             var turnData = playerComponent.CharacterController.TurnData;
-            var steeringDir = __instance.LookDirection_1;
+            var steeringDir = __instance._lookDirection;
             turnData.CurrentLookDirection = steeringDir;
             turnData.NewTargetLookDirection = steeringDir;
             turnData.LastTargetLookDirection = steeringDir;

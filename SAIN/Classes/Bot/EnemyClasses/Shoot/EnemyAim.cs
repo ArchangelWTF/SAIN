@@ -1,4 +1,4 @@
-﻿using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings.Categories;
 using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes.EnemyClasses;

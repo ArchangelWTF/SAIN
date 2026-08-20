@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using EFT;
 using EFT.UI;
 using SAIN.Helpers;
 using SAIN.Plugin;
 using SAIN.Preset;
 using SAIN.Preset.GlobalSettings.Categories;
+using SAIN.Preset.Shared.Enums;
 using UnityEngine;
 using static SAIN.Editor.SAINLayout;
 
@@ -158,10 +159,10 @@ public static class ModifyLists
     {
         wasEdited = false;
         int i = StartListEdit(optionsPerLine, out var options);
-        List<EBrain> botList = BotBrains.AllBrainsList;
-        for (int b = 0; b < botList.Count; b++)
+        EBrain[] allBots = AIBrains.AllBrains;
+        for (int b = 0; b < allBots.Length; b++)
         {
-            EBrain brain = botList[b];
+            EBrain brain = allBots[b];
             AddOrRemove(brain, list, out bool newEdit, null, null, options);
             if (newEdit)
             {

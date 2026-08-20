@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
+using SAIN.Models.Enums;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -27,10 +28,7 @@ internal class RunningAction(BotOwner bot) : BotAction(bot, nameof(RunningAction
             return;
         }
 
-        if (
-            findRandomPlace(out var path)
-            && Bot.Mover.RunToPoint(_runDestination, false, -1, SAINComponent.Classes.Mover.ESprintUrgency.High, true)
-        )
+        if (findRandomPlace(out var path) && Bot.Mover.RunToPoint(_runDestination, false, -1, ESprintUrgency.High, true))
         {
             nextRandomRunTime = Time.time + 20f;
         }
@@ -49,7 +47,8 @@ internal class RunningAction(BotOwner bot) : BotAction(bot, nameof(RunningAction
                 path = new NavMeshPath();
                 if (NavMesh.CalculatePath(Bot.Position, hit.position, -1, path))
                 {
-                    _runDestination = path.corners[path.corners.Length - 1];
+                    Vector3[] corners = path.corners;
+                    _runDestination = corners[corners.Length - 1];
                     return true;
                 }
             }

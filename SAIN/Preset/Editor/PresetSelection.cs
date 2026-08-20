@@ -1,20 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using System.Text.RegularExpressions;
 using EFT.UI;
 using SAIN.Plugin;
 using SAIN.Preset;
+using SAIN.Preset.Server;
+using SAIN.Preset.Shared;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.Preset;
 using UnityEngine;
 using static SAIN.Editor.SAINLayout;
-using JsonUtility = SAIN.Helpers.JsonUtility;
 
 namespace SAIN.Editor.GUISections;
 
 public static class PresetSelection
 {
-    private static readonly List<SAINPresetDefinition> defaultPresets = SAINDifficultyClass.DefaultPresetDefinitions.Values.ToList();
-
     private const float PRESET_LABEL_HEIGHT = 55f;
     private const float PRESET_OPTION_HEIGHT = 25f;
     private const float PRESET_OPTION_WIDTH = 500;
@@ -24,6 +23,16 @@ public static class PresetSelection
     public static void PresetSelectionMenu()
     {
         SAINPresetDefinition selectedPreset = SAINPlugin.LoadedPreset.Info;
+
+        if (SAIN.Preset.Server.ServerConfigClient.PresetLocked)
+        {
+            string reason = SAIN.Preset.Server.ServerConfigClient.ForcedActive
+                ? $"The server has forced the preset '{selectedPreset.Name}'."
+                : "SAIN presets are disabled by the server.";
+            Label($"{reason} Preset selection is locked.");
+            return;
+        }
+
         checkCreateWarning(selectedPreset);
 
         /////
@@ -57,11 +66,11 @@ public static class PresetSelection
         }
         GUIContent content = new(
             $"Warning: The selected preset version is: [{sainPresetV}], "
-                + $"but current SAIN preset version is: [{AssemblyInfoClass.SAINPresetVersion}] (SAIN version [{AssemblyInfoClass.SAINVersion}]), default bot config values may be set incorrectly due to updates to SAIN. THIS DOESN'T MEAN YOUR GAME IS BROKEN, just be aware bots might not act as intended."
+                + $"but current SAIN preset version is: [{SAINVersionInfo.SAINPresetVersion}] (SAIN version [{SAINVersionInfo.SAINVersion}]), default bot config values may be set incorrectly due to updates to SAIN. THIS DOESN'T MEAN YOUR GAME IS BROKEN, just be aware bots might not act as intended."
         );
 
         Rect rect = GUILayoutUtility.GetRect(content, GetStyle(Style.alert), Height(PRESET_ALERT_HEIGHT));
-        if (selectedPreset.IsCustom && sainPresetV != AssemblyInfoClass.SAINPresetVersion)
+        if (selectedPreset.IsCustom && sainPresetV != SAINVersionInfo.SAINPresetVersion)
         {
             GUI.Box(rect, content, GetStyle(Style.alert));
         }
@@ -104,29 +113,28 @@ public static class PresetSelection
         BeginVertical();
         Label("Default Presets", Width(PRESET_OPTION_WIDTH));
 
+        var defaultPresets = PresetHandler.DefaultPresetOptions();
         for (int i = 0; i < defaultPresets.Count; i++)
         {
             var preset = defaultPresets[i];
-            if (SAINDifficultyClass.DefaultPresetDefinitions.TryGetKey(preset, out var sainDifficulty))
-            {
-                bool selected = SAINPlugin.EditorDefaults.SelectedDefaultPreset == sainDifficulty;
+            SAINDifficulty sainDifficulty = preset.BaseSAINDifficulty;
+            bool selected = SAINPlugin.EditorDefaults.SelectedDefaultPreset == sainDifficulty;
 
-                if (
-                    Toggle(
-                        selected,
-                        $"{preset.Name}",
-                        preset.Description,
-                        EUISoundType.MenuCheckBox,
-                        Height(PRESET_OPTION_HEIGHT),
-                        Width(PRESET_OPTION_WIDTH)
-                    )
+            if (
+                Toggle(
+                    selected,
+                    $"{preset.Name}",
+                    preset.Description,
+                    EUISoundType.MenuCheckBox,
+                    Height(PRESET_OPTION_HEIGHT),
+                    Width(PRESET_OPTION_WIDTH)
                 )
+            )
+            {
+                if (!selected)
                 {
-                    if (!selected)
-                    {
-                        SAINPlugin.EditorDefaults.SelectedDefaultPreset = sainDifficulty;
-                        selectedPreset = preset;
-                    }
+                    SAINPlugin.EditorDefaults.SelectedDefaultPreset = sainDifficulty;
+                    selectedPreset = preset;
                 }
             }
         }
@@ -194,7 +202,7 @@ public static class PresetSelection
                 newInfo.Description = NewDescription;
                 newInfo.Creator = NewCreator;
 
-                JsonUtility.DeletePreset(info);
+                DeletePreset(info);
 
                 PresetHandler.SavePresetDefinition(newInfo);
                 PresetHandler.InitPresetFromDefinition(newInfo, true);
@@ -207,7 +215,7 @@ public static class PresetSelection
                 newPreset.Name = NewName;
                 newPreset.Description = NewDescription;
                 newPreset.Creator = NewCreator;
-                newPreset.SAINVersion = AssemblyInfoClass.SAINPresetVersion;
+                newPreset.SAINVersion = SAINVersionInfo.SAINPresetVersion;
                 newPreset.DateCreated = DateTime.Today.ToString();
 
                 PresetHandler.SavePresetDefinition(newPreset);
@@ -241,7 +249,7 @@ public static class PresetSelection
                     {
                         var deletedInfo = SAINPresetClass.Instance.Info;
                         PresetHandler.loadDefault();
-                        JsonUtility.DeletePreset(deletedInfo);
+                        DeletePreset(deletedInfo);
                         Sounds.PlaySound(EUISoundType.MalfunctionExamined);
                         PresetHandler.LoadCustomPresetOptions();
                         _deletePresetConfirmation2 = false;
@@ -266,6 +274,14 @@ public static class PresetSelection
         EndHorizontal();
 
         return Regex.Replace(value, @"[^\w \-]", "");
+    }
+
+    public static void DeletePreset(SAINPresetDefinition preset)
+    {
+        if (preset.IsCustom)
+        {
+            PresetSync.DeleteCustomPreset(preset.Name);
+        }
     }
 
     private static bool _makeNewPresetMenuToggle;

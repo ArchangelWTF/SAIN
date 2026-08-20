@@ -2,7 +2,6 @@
 using System.Reflection;
 using HarmonyLib;
 using SAIN.Components;
-using SAIN.Preset.GlobalSettings;
 using SPT.Reflection.Patching;
 using UnityEngine;
 
@@ -27,7 +26,7 @@ public class BodyPartToShootPatch : ModulePatch
 
     protected override MethodBase GetTargetMethod()
     {
-        return AccessTools.Method(typeof(EnemyInfo), nameof(EnemyInfo.method_8));
+        return AccessTools.Method(typeof(EnemyInfo), nameof(EnemyInfo.GetVisiblePartToShoot));
     }
 
     [PatchPrefix]
@@ -41,17 +40,17 @@ public class BodyPartToShootPatch : ModulePatch
                 return false;
             }
 
-            __instance.ActiveParts = _nonHeadshotBodyPartTypes;
+            __instance._activeParts = _nonHeadshotBodyPartTypes;
 
             var aim = bot.Info.FileSettings.Aiming;
             var canBeHead = EFTMath.RandomBool(aim.AimForHeadChance) && aim.AimForHead;
 
             if (canBeHead)
             {
-                __instance.ActiveParts = _upperBodyPartTypes;
+                __instance._activeParts = _upperBodyPartTypes;
             }
 
-            __instance.method_16(true, canBeHead);
+            __instance.FindLastPartRnd(true, canBeHead);
 
             if (__instance.LastPartToShoot == null)
             {

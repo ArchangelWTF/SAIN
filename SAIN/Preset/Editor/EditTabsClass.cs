@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using static SAIN.Editor.RectLayout;
 using static SAIN.Editor.SAINLayout;

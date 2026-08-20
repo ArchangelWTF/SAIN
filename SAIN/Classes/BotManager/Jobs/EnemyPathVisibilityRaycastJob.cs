@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using SAIN.Plugin;
 using SAIN.Preset;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.Types.Jobs;
 using Unity.Collections;
@@ -33,8 +33,8 @@ public class EnemyPathVisibilityRaycastJob : SainJobTemplate, IDisposable
     public EnemyPathVisibilityRaycastJob(MonoBehaviour botcontroller)
         : base("Path Visibility Job", botcontroller, true, 1f / 20f)
     {
-        LayerMask HighPolyWithTerrain = LayerMaskClass.HighPolyWithTerrainMask;
-        LayerMask DoorLayer = LayerMaskClass.DoorLayer;
+        LayerMask HighPolyWithTerrain = LayersMaskController.HighPolyWithTerrainMask;
+        LayerMask DoorLayer = LayersMaskController.DoorLayer;
         LayerMask Mask = HighPolyWithTerrain & ~(1 << DoorLayer);
         queryParams = new(Mask, false, QueryTriggerInteraction.Ignore);
     }
@@ -146,7 +146,7 @@ public class EnemyPathVisibilityRaycastJob : SainJobTemplate, IDisposable
                 }
                 if (visibleNodes.Count == 0)
                 {
-                    if (enemy.Path.PathCorners.Length > 1)
+                    if (enemy.Path.PathCornerCount > 1)
                     {
                         enemy.SetLastCornerAsVisiblePathPoint(enemy.Path.PathCorners[1]);
                     }

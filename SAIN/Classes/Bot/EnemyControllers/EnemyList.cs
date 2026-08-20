@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -82,26 +82,6 @@ public class EnemyList(string name) : List<Enemy>
             //Logger.LogDebug($"EnemyList {Name} removed {enemy.EnemyName} IsAI? {enemy.IsAI}");
             this.RemoveEnemy(enemy);
         }
-    }
-
-    private void sortByLastUpdated()
-    {
-        this.Sort((x, y) => x.KnownPlaces.TimeSinceLastKnownUpdated.CompareTo(y.KnownPlaces.TimeSinceLastKnownUpdated));
-    }
-
-    public Enemy First()
-    {
-        switch (this.Count)
-        {
-            case 0:
-                return null;
-            case 1:
-                break;
-            default:
-                sortByLastUpdated();
-                break;
-        }
-        return this[0];
     }
 
     public void AddEnemy(Enemy enemy)

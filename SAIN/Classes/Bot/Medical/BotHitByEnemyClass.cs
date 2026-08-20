@@ -1,4 +1,5 @@
-﻿using SAIN.Components;
+﻿using EFT.Ballistics;
+using SAIN.Components;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 
 namespace SAIN.SAINComponent.Classes;
@@ -8,10 +9,7 @@ public class BotHitByEnemyClass : BotBase
     public Enemy EnemyWhoLastShotMe { get; private set; }
 
     public BotHitByEnemyClass(BotComponent bot)
-        : base(bot)
-    {
-        CanEverTick = false;
-    }
+        : base(bot) { }
 
     public override void Init()
     {
@@ -19,9 +17,9 @@ public class BotHitByEnemyClass : BotBase
         base.Init();
     }
 
-    public void GetHit(DamageInfoStruct DamageInfoStruct, EBodyPart bodyPart, float floatVal)
+    public void GetHit(DamageInfo DamageInfo, EBodyPart bodyPart, float floatVal)
     {
-        var player = DamageInfoStruct.Player?.iPlayer;
+        var player = DamageInfo.Player?.iPlayer;
         if (player == null)
         {
             return;
@@ -32,7 +30,7 @@ public class BotHitByEnemyClass : BotBase
             return;
         }
         EnemyWhoLastShotMe = enemy;
-        enemy.Status.GetHit(DamageInfoStruct);
+        enemy.Status.GetHit(DamageInfo);
     }
 
     private void clearEnemy(string profileId, Enemy enemy)

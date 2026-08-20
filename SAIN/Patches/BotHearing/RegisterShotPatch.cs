@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using EFT;
+using EFT.Ballistics;
 using EFT.InventoryLogic;
 using HarmonyLib;
 using SAIN.Components;
@@ -18,7 +19,7 @@ public class RegisterShotPatch : ModulePatch
     }
 
     [PatchPrefix]
-    public static void PatchPrefix(Player ____player, Item weapon, EftBulletClass shot)
+    public static void PatchPrefix(Player ____player, Item weapon, Shot shot)
     {
         GameWorldComponent.Instance?.RegisterShot(____player, shot, weapon);
     }

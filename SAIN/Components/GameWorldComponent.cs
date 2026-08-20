@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using EFT;
+using EFT.Ballistics;
 using EFT.Game.Spawning;
 using EFT.InventoryLogic;
-using SAIN.Components.CoverFinder;
 using SAIN.Components.PlayerComponentSpace;
 using SAIN.Helpers;
 using UnityEngine;
@@ -33,7 +32,7 @@ public class GameWorldComponent : MonoBehaviour
         return PlayerComponent != null;
     }
 
-    public void RegisterShot(Player Player, EftBulletClass Bullet, Item Weapon)
+    public void RegisterShot(Player Player, Shot Bullet, Item Weapon)
     {
         if (TryGetPlayerComponent(Player, out PlayerComponent PlayerComponent))
         {
@@ -58,20 +57,26 @@ public class GameWorldComponent : MonoBehaviour
         }
     }
 
-    private IEnumerator TrackBullet(PlayerComponent Player, EftBulletClass Bullet)
+    private IEnumerator TrackBullet(PlayerComponent Player, Shot Bullet)
     {
         //Vector3 LastPosition = Bullet.StartPosition;
         var OtherPlayerData = Player.OtherPlayersData.DataDictionary;
         Vector3 PlayerLookDir = Player.LookDirection;
 
         List<OtherPlayerData> PlayersToCheck = [];
-        PlayersToCheck.AddRange(
-            from Data in OtherPlayerData
-            let OtherPlayerDirNormal = Data.Value.DistanceData.DirectionNormal
-            let PlayerComponent = Data.Value.OtherPlayerComponent
-            where PlayerComponent?.IsAI == true && PlayerComponent.IsActive && Vector3.Dot(OtherPlayerDirNormal, PlayerLookDir) > 0.75f
-            select Data.Value
-        );
+        foreach (var Data in OtherPlayerData)
+        {
+            OtherPlayerData data = Data.Value;
+            PlayerComponent PlayerComponent = data.OtherPlayerComponent;
+            if (
+                PlayerComponent?.IsAI == true
+                && PlayerComponent.IsActive
+                && Vector3.Dot(data.DistanceData.DirectionNormal, PlayerLookDir) > 0.75f
+            )
+            {
+                PlayersToCheck.Add(data);
+            }
+        }
 
         const float MaxFlyByDistSqr = 10 * 10;
 
@@ -174,7 +179,7 @@ public class GameWorldComponent : MonoBehaviour
                 BotComponent Bot = playerComponent?.BotComponent;
                 if (Bot != null && Bot.BotOwner?.BotState == EBotState.Active)
                 {
-                    Bot.Hearing.SoundInput.ProcessAISoundCache();
+                    Bot.Hearing.HearingInput.ProcessAISoundCache();
                 }
             }
         }
@@ -209,7 +214,7 @@ public class GameWorldComponent : MonoBehaviour
                                 continue;
                             }
 
-                            OtherPlayer.BotComponent?.Hearing.SoundInput.CheckAddSoundToCache(soundEvent, Distance);
+                            OtherPlayer.BotComponent?.Hearing.HearingInput.CheckAddSoundToCache(soundEvent, Distance);
                         }
                     }
                 }

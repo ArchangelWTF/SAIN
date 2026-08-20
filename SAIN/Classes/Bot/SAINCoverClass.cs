@@ -1,10 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using EFT;
+using EFT.Ballistics;
 using SAIN.Components;
 using SAIN.Components.CoverFinder;
 using SAIN.Helpers;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Models.Enums;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.GlobalSettings;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.SAINComponent.SubComponents.CoverFinder;
 using UnityEngine;
@@ -101,7 +104,7 @@ public class SAINCoverClass : BotComponentClassBase
         for (int i = 0; i < _coverPoints.Count; i++)
         {
             CoverPoint coverPoint = _coverPoints[i];
-            if (Bot.Mover.GoToCoverPoint(coverPoint, _shallSprint, Mover.ESprintUrgency.High))
+            if (Bot.Mover.GoToCoverPoint(coverPoint, _shallSprint, ESprintUrgency.High))
             {
                 return coverPoint;
             }
@@ -194,7 +197,7 @@ public class SAINCoverClass : BotComponentClassBase
             //if (!CoverInUse.CoverData.IsBad && CoverPoints.Contains(CoverInUse))
             if (!CoverInUse.CoverData.IsBad)
             {
-                Bot.Mover.GoToCoverPoint(CoverInUse, false, Mover.ESprintUrgency.High);
+                Bot.Mover.GoToCoverPoint(CoverInUse, false, ESprintUrgency.High);
                 _shallSprint = false;
                 SetCoverSeekingState(ECoverSeekingState.HoldInCover);
                 return;
@@ -207,11 +210,11 @@ public class SAINCoverClass : BotComponentClassBase
         {
             if (_shallSprint)
             {
-                Bot.Mover.ActivePath?.RequestStartSprint(Mover.ESprintUrgency.High, $"runToCover, {reason}");
+                Bot.Mover.ActivePath?.RequestStartSprint(ESprintUrgency.High, $"runToCover, {reason}");
             }
             else
             {
-                Bot.Mover.ActivePath?.RequestEndSprint(Mover.ESprintUrgency.High, $"noRunToCover, {reason}");
+                Bot.Mover.ActivePath?.RequestEndSprint(ESprintUrgency.High, $"noRunToCover, {reason}");
             }
 
             var pathStatus = CoverPoint_MovingTo.PathDistanceStatus;
@@ -224,7 +227,7 @@ public class SAINCoverClass : BotComponentClassBase
                 SetCoverSeekingState(ECoverSeekingState.HoldInCover);
                 return;
             }
-            if (CoverPoint_MovingTo != null && Bot.Mover.GoToCoverPoint(CoverPoint_MovingTo, _shallSprint, Mover.ESprintUrgency.High))
+            if (CoverPoint_MovingTo != null && Bot.Mover.GoToCoverPoint(CoverPoint_MovingTo, _shallSprint, ESprintUrgency.High))
             {
                 SetCoverSeekingState(ECoverSeekingState.MoveTo);
                 return;
@@ -314,7 +317,7 @@ public class SAINCoverClass : BotComponentClassBase
 
     private bool CheckMoveToCover(CoverPoint coverPoint, bool sprint)
     {
-        if (coverPoint != null && !coverPoint.CoverData.IsBad && Bot.Mover.GoToCoverPoint(coverPoint, sprint, Mover.ESprintUrgency.High))
+        if (coverPoint != null && !coverPoint.CoverData.IsBad && Bot.Mover.GoToCoverPoint(coverPoint, sprint, ESprintUrgency.High))
         {
             return true;
         }
@@ -370,13 +373,13 @@ public class SAINCoverClass : BotComponentClassBase
 #endif
     }
 
-    public void GetHit(DamageInfoStruct DamageInfoStruct, EBodyPart bodyPart, float floatVal)
+    public void GetHit(DamageInfo DamageInfo, EBodyPart bodyPart, float floatVal)
     {
         if (CoverInUse != null)
         {
             bool wasSpotted = CoverInUse.Spotted;
             LastHitInCoverTime = Time.time;
-            CoverInUse.GetHit(DamageInfoStruct, bodyPart, Bot.GoalEnemy);
+            CoverInUse.GetHit(DamageInfo, bodyPart, Bot.GoalEnemy);
             if (CoverInUse.Spotted && !wasSpotted)
             {
                 _spottedTime = Time.time + SpottedCoverPoint.SPOTTED_PERIOD;
@@ -454,6 +457,11 @@ public class SAINCoverClass : BotComponentClassBase
 
     public bool CheckLimbsForCover(Enemy enemy)
     {
+        if (enemy?.EnemyTransform == null)
+        {
+            return false;
+        }
+
         var target = enemy.EnemyTransform.WeaponData.WeaponRoot;
         const float rayDistance = 3f;
         if (CheckLimbForCover(BodyPartType.leftLeg, target, rayDistance) || CheckLimbForCover(BodyPartType.leftArm, target, rayDistance))
@@ -473,7 +481,7 @@ public class SAINCoverClass : BotComponentClassBase
     {
         var position = BotOwner.MainParts[bodyPartType].Position;
         Vector3 direction = target - position;
-        return Physics.Raycast(position, direction, dist, LayerMaskClass.HighPolyWithTerrainMask);
+        return Physics.Raycast(position, direction, dist, LayersMaskController.HighPolyWithTerrainMask);
     }
 
     private DebugLabel _debugCoverObject;

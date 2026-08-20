@@ -1,10 +1,13 @@
-﻿using System;
+using System;
 using EFT;
 using SAIN.Components;
 using SAIN.Helpers;
 using SAIN.Models.Enums;
-using SAIN.Preset.GlobalSettings;
-using SAIN.Preset.GlobalSettings.Categories;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings.Categories;
+using SAIN.Preset.Shared.Models;
+using SAIN.Preset.Shared.Models.Enums;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.SAINComponent.Classes.Info;
 using UnityEngine;
@@ -136,8 +139,8 @@ public class SAINBotSuppressClass : BotComponentClassBase
         if (
             Bot.Mover.Running
             && (
-                Bot.Mover.ActivePath.CurrentSprintStatus == Mover.EBotSprintStatus.Running
-                || Bot.Mover.ActivePath.CurrentSprintStatus == Mover.EBotSprintStatus.Turning
+                Bot.Mover.ActivePath.CurrentSprintStatus == EBotSprintStatus.Running
+                || Bot.Mover.ActivePath.CurrentSprintStatus == EBotSprintStatus.Turning
             )
         )
         {
@@ -227,7 +230,7 @@ public class SAINBotSuppressClass : BotComponentClassBase
             return 0f;
         }
         currentAmmoCount = weaponManager.Reload.BulletCount;
-        return (float) currentAmmoCount / weaponManager.Reload.MaxBulletCount;
+        return (float)currentAmmoCount / weaponManager.Reload.MaxBulletCount;
     }
 
     public float TimeSinceSeenToSuppress
@@ -409,7 +412,7 @@ public class SAINBotSuppressClass : BotComponentClassBase
         }
 #endif
 
-        if (GlobalSettings.Mind.SUPP_AMOUNTS.TryGetValue(ECaliber.Default, out result))
+        if (GlobalSettings.Mind.SUPP_AMOUNTS.TryGetValue(Calibers.Default, out result))
         {
             return result;
         }

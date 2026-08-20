@@ -2,7 +2,7 @@ using EFT;
 using SAIN.Extensions;
 using SAIN.Layers.Extract;
 using SAIN.Models.Enums;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings;
 using SAIN.SAINComponent.Classes.Memory;
 using UnityEngine;
 
@@ -155,7 +155,9 @@ internal class ExtractLayer : SAINLayer
         if (!_loggedExtractLoot)
         {
             _loggedExtractLoot = true;
-            Logger.LogInfo($"[{BotOwner.name}] Is Moving to Extract because of Loot found in raid. Net Loot Value: [{SAINLootingBotsIntegration.NetLootValue}]");
+            Logger.LogInfo(
+                $"[{BotOwner.name}] Is Moving to Extract because of Loot found in raid. Net Loot Value: [{SAINLootingBotsIntegration.NetLootValue}]"
+            );
         }
 
         Bot.Memory.Extract.ExtractReason = EExtractReason.Loot;

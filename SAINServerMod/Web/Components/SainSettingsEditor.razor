@@ -1,0 +1,88 @@
+@namespace SAINServerMod.Web.Components
+
+@if (Target == null)
+{
+    <MudText Typo="Typo.caption" Class="spt-muted">Nothing to edit.</MudText>
+}
+else
+{
+    @foreach (var category in Categories)
+    {
+        var leaves = category.Members.Where(m => IsLeaf(m) && Visible(m)).ToList();
+        var complex = category.Members.Where(m => !IsLeaf(m) && Visible(m)).ToList();
+
+        @if (leaves.Count == 0 && complex.Count == 0)
+        {
+            continue;
+        }
+
+        @if (ShowCategoryHeader(category.Name))
+        {
+            <MudText Typo="Typo.overline" Class="sain-category spt-muted">@category.Name</MudText>
+        }
+
+        @if (leaves.Count > 0)
+        {
+            <div class="sain-leaf-group">
+                @foreach (var member in leaves)
+                {
+                    <SainFieldEditor Value="member.ToValue()" OnChanged="OnChanged" />
+                }
+            </div>
+        }
+
+        @if (complex.Count > 0)
+        {
+            <MudExpansionPanels MultiExpansion="true" Elevation="0" Class="sain-panels">
+                @foreach (var member in complex)
+                {
+                    <MudExpansionPanel Text="@member.Meta.Name" Class="sain-subpanel">
+                        @switch (member.Kind)
+                        {
+                            case SainFieldKind.Nested:
+                                <SainSettingsEditor Target="member.GetValue()" Depth="Depth + 1" OnChanged="OnChanged" />
+                                break;
+                            case SainFieldKind.Dictionary:
+                                <SainDictionaryEditor Member="member" OnChanged="OnChanged" />
+                                break;
+                            case SainFieldKind.List:
+                                <SainListEditor Value="member.ToValue()" OnChanged="OnChanged" />
+                                break;
+                        }
+                    </MudExpansionPanel>
+                }
+            </MudExpansionPanels>
+        }
+    }
+}
+
+@code {
+    [Parameter, EditorRequired] public object? Target { get; set; }
+    [Parameter] public int Depth { get; set; }
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    [CascadingParameter(Name = "ShowAdvanced")] public bool ShowAdvanced { get; set; } = true;
+    [CascadingParameter(Name = "ShowDeveloper")] public bool ShowDeveloper { get; set; }
+
+    private List<SainCategory> Categories = new();
+
+    protected override void OnParametersSet()
+    {
+        Categories = Target == null ? new() : SainReflection.Categories(Target);
+    }
+
+    private bool Visible(SainMember m)
+    {
+        return SainReflection.IsVisible(m.Meta, ShowAdvanced, ShowDeveloper);
+    }
+
+    private static bool IsLeaf(SainMember m)
+    {
+        return m.Kind is SainFieldKind.Bool or SainFieldKind.Float or SainFieldKind.Int or SainFieldKind.String or SainFieldKind.Enum;
+    }
+
+    private bool ShowCategoryHeader(string name)
+    {
+        return Categories.Count > 1 || !string.Equals(name, "General", StringComparison.Ordinal);
+    }
+}

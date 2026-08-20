@@ -1,9 +1,10 @@
-﻿using System.Text;
+using System.Text;
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Components;
 using SAIN.Components.BotController;
 using SAIN.Models.Enums;
+using SAIN.Preset.Shared.Enums;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
 
@@ -76,7 +77,8 @@ public abstract class SAINLayer : CustomLayer
 
     private string _currentLayerName;
 
-    protected SAINLayer(BotOwner botOwner, int priority, string layerName, ESAINLayer eSainLayer) : base(botOwner, priority)
+    protected SAINLayer(BotOwner botOwner, int priority, string layerName, ESAINLayer eSainLayer)
+        : base(botOwner, priority)
     {
         LayerName = layerName;
         ELayer = eSainLayer;
@@ -84,7 +86,7 @@ public abstract class SAINLayer : CustomLayer
         botOwner.Brain.BaseBrain.OnLayerChangedTo += OnLayerChanged;
     }
 
-    private void OnLayerChanged(AICoreLayerClass<BotLogicDecision> layer)
+    private void OnLayerChanged(AICoreLayer<BotLogicDecision> layer)
     {
         var newLayerName = layer.Name();
 
@@ -99,10 +101,10 @@ public abstract class SAINLayer : CustomLayer
         {
             // If we switched away from this layer to a different one, set the player to the navmesh to ensure it has a consistent state
             var playerPosition = BotOwner.GetPlayer.Position;
-            mover.LastGoodCastPoint = mover.PrevSuccessLinkedFrom_1 = mover.PrevLinkPos = mover.PositionOnWayInner = playerPosition;
-            mover.LastGoodCastPointTime = Time.time;
+            mover._lastGoodCastPoint = mover._prevSuccessLinkedFrom = mover._prevLinkPos = mover.PositionOnWayInner = playerPosition;
+            mover._lastGoodCastPointTime = Time.time;
             // Prevents the mover from re-issuing a move command to it's last target in SetPlayerToNavMesh
-            mover.PrevPosLinkedTime_1 = 0f;
+            mover._prevPosLinkedTime = 0f;
             // Final insurance that the bot is set to the navmesh before we hand over the brain
             mover.SetPlayerToNavMesh(playerPosition);
         }

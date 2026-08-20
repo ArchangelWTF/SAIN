@@ -9,6 +9,11 @@
     <Folder Name="/Solution Items/">
         <File Path=".editorconfig" />
     </Folder>
+    <Project Path="SAIN.Preset.Shared/SAIN.Preset.Shared.csproj">
+        <BuildType Solution="3.10.0|*" Project="Release" />
+        <BuildType Solution="3.8.0|*" Project="Debug" />
+        <BuildType Solution="3.9.0|*" Project="Debug" />
+    </Project>
     <Project Path="SAIN/SAIN.csproj" />
     <Project Path="SAINServerMod/SAINServerMod.csproj" />
 </Solution>

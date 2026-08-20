@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using SeasonController = Class444;
+using SAIN.Preset.Shared.Enums;
+using UnityEngine;
 
 namespace SAIN.Components;
 
@@ -38,12 +38,12 @@ public class LocationClass : GameWorldBase, IGameWorldClass
         }
         _nextCheckWeatherTime = Time.time + 0.5f;
 
-        if (SeasonController.Controller == null)
+        if (SeasonsController.Controller == null)
         {
             return;
         }
 
-        Season = SeasonController.Controller.Season;
+        Season = SeasonsController.Controller.Season;
         Logger.LogDebug($"Got Season {Season}");
         _weatherFound = true;
     }

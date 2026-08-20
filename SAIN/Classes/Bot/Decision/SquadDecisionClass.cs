@@ -1,6 +1,7 @@
-﻿using EFT;
+using EFT;
 using SAIN.Components;
 using SAIN.Models.Enums;
+using SAIN.Preset.Shared.Enums;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.SAINComponent.Classes.Info;
 using UnityEngine;
@@ -10,10 +11,7 @@ namespace SAIN.SAINComponent.Classes.Decision;
 public class SquadDecisionClass : BotBase
 {
     public SquadDecisionClass(BotComponent sain)
-        : base(sain)
-    {
-        CanEverTick = false;
-    }
+        : base(sain) { }
 
     private BotSquadContainer Squad
     {

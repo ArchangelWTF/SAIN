@@ -1,4 +1,5 @@
-﻿using SAIN.Components;
+using SAIN.Components;
+using SAIN.Preset.Shared.Enums;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
 
@@ -12,10 +13,7 @@ public class DogFightDecisionClass : BotBase
     }
 
     public DogFightDecisionClass(BotComponent bot)
-        : base(bot)
-    {
-        CanEverTick = false;
-    }
+        : base(bot) { }
 
     public override void Init()
     {

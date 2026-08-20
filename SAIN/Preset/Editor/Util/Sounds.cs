@@ -17,7 +17,7 @@ internal class Sounds
 
     private static void getWrapper()
     {
-        _soundsWrapper = AccessTools.Field(typeof(GUISounds), "uisoundsWrapper_0").GetValue(GUISounds) as UISoundsWrapper;
+        _soundsWrapper = AccessTools.Field(typeof(GUISounds), "_UISounds").GetValue(GUISounds) as UISoundsWrapper;
         _audioSource = AccessTools.Field(typeof(GUISounds), "audioSource_0").GetValue(GUISounds) as AudioSource;
     }
 

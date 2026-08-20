@@ -1,5 +1,6 @@
 ﻿using DrakiaXYZ.BigBrain.Brains;
 using EFT;
+using SAIN.Models.Enums;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
 using UnityEngine.AI;
@@ -71,10 +72,7 @@ internal class FollowSearchParty(BotOwner bot) : BotAction(bot, nameof(FollowSea
             return;
         }
 
-        if (
-            moveDistance > 20f * 20f
-            && Bot.Mover.RunToPoint(movePosition.Value, false, -1, SAINComponent.Classes.Mover.ESprintUrgency.Middle, true)
-        )
+        if (moveDistance > 20f * 20f && Bot.Mover.RunToPoint(movePosition.Value, false, -1, ESprintUrgency.Middle, true))
         {
             nextUpdateTime = 2f;
             return;

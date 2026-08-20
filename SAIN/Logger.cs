@@ -76,7 +76,7 @@ internal static class Logger
     {
         Log(LogLevel.Error, data);
         string message = CreateErrorMessage(data);
-        NotificationManagerClass.DisplayMessageNotification(message, duration, ENotificationIconType.Alert, Color.red);
+        NotificationManager.DisplayMessageNotification(message, duration, ENotificationIconType.Alert, Color.red);
     }
 
     public static void NotifyMessage(
@@ -92,7 +92,7 @@ internal static class Logger
         {
             _nextNotification = Time.time + 0.1f;
             string message = Error ? CreateErrorMessage(data) : data.ToString();
-            NotificationManagerClass.DisplayMessageNotification(message, durationType, iconType, textColor);
+            NotificationManager.DisplayMessageNotification(message, durationType, iconType, textColor);
         }
 #endif
     }

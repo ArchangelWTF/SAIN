@@ -15,8 +15,7 @@ public class PlayerSpawnTracker
 
     public PlayerComponent GetPlayerComponent(IPlayer Player)
     {
-        if (Player != null &&
-            AlivePlayersDictionary.TryGetValue(Player.ProfileId, out PlayerComponent component))
+        if (Player != null && AlivePlayersDictionary.TryGetValue(Player.ProfileId, out PlayerComponent component))
         {
             return component;
         }
@@ -25,8 +24,7 @@ public class PlayerSpawnTracker
 
     public PlayerComponent GetPlayerComponent(string profileId)
     {
-        if (!profileId.IsNullOrEmpty() &&
-            AlivePlayersDictionary.TryGetValue(profileId, out PlayerComponent component))
+        if (!profileId.IsNullOrEmpty() && AlivePlayersDictionary.TryGetValue(profileId, out PlayerComponent component))
         {
             return component;
         }
@@ -41,9 +39,7 @@ public class PlayerSpawnTracker
 
         foreach (var component in AlivePlayersDictionary.Values)
         {
-            if (component != null &&
-                component.Player != null &&
-                !component.IsAI)
+            if (component != null && component.Player != null && !component.IsAI)
             {
                 float sqrMag = (component.Position - targetPosition).sqrMagnitude;
                 if (sqrMag < closestPlayerSqrMag)
@@ -222,8 +218,7 @@ public class PlayerSpawnTracker
     {
         foreach ((string profileId, PlayerComponent playerComponent) in AlivePlayersDictionary)
         {
-            if (playerComponent == null ||
-                playerComponent.Player == null)
+            if (playerComponent == null || playerComponent.Player == null)
             {
                 _ids.Add(profileId);
 #if DEBUG

@@ -1,6 +1,7 @@
-﻿using SAIN.Attributes;
 using SAIN.Plugin;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.Attributes;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.GlobalSettings;
 
 namespace SAIN.Editor;
 

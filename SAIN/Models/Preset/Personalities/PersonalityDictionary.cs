@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using EFT;
-using SAIN.Preset.GlobalSettings;
-using SAIN.Preset.Personalities;
+using SAIN.Extensions;
+using SAIN.Preset.Shared.GlobalSettings;
+using SAIN.Preset.Shared.Models.Preset.Personalities;
+using SAIN.Preset.Shared.Personalities.BasePersonality;
 using SAIN.SAINComponent.Classes.Info;
 using SPT.Common.Http;
 using SPT.Common.Utils;
-using SPT.Custom.Models;
 using UnityEngine;
-using JsonUtility = SAIN.Helpers.JsonUtility;
 
 namespace SAIN.Models.Preset.Personalities;
 
@@ -110,7 +110,7 @@ public sealed class PersonalityDictionary : Dictionary<EPersonality, Personality
 
     private EPersonality setBossPersonality(WildSpawnType wildSpawnType)
     {
-        if (GlobalSettingsClass.Instance.Mind.PERS_BOSSES.TryGetValue(wildSpawnType, out EPersonality bossPersonality))
+        if (GlobalSettingsClass.Instance.Mind.PERS_BOSSES.TryGetValue(wildSpawnType.ToESain(), out EPersonality bossPersonality))
         {
             return bossPersonality;
         }
@@ -151,7 +151,7 @@ public sealed class PersonalityDictionary : Dictionary<EPersonality, Personality
     private bool meetsRequirements(SAINBotInfoClass infoClass, PersonalitySettingsClass settings)
     {
         var assignment = settings.Assignment;
-        return assignment.AllowedTypes.Contains(infoClass.Profile.WildSpawnType)
+        return assignment.AllowedTypes.Contains(infoClass.Profile.WildSpawnType.ToESain())
             && infoClass.Profile.PowerLevel <= assignment.PowerLevelMax
             && infoClass.Profile.PowerLevel > assignment.PowerLevelMin
             && infoClass.Profile.PlayerLevel <= assignment.MaxLevel

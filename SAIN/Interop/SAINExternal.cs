@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using EFT;
 using SAIN.Components;
+using SAIN.Preset.Shared.Enums;
 using SAIN.SAINComponent.Classes;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
@@ -21,7 +22,7 @@ public static class SAINExternal
             return false;
         }
 
-        bool result = component.Hearing.SoundInput.SetIgnoreHearingExternal(value, ignoreUnderFire, duration, out string reason);
+        bool result = component.Hearing.HearingInput.SetIgnoreHearingExternal(value, ignoreUnderFire, duration, out string reason);
         return result;
     }
 
@@ -251,7 +252,7 @@ public static class SAINExternal
             reason = ECombatReason.EnemyHeardRecently;
             return true;
         }
-        BotMemoryClass memory = component.BotOwner.Memory;
+        BotMemory memory = component.BotOwner.Memory;
         if (memory.IsUnderFire)
         {
             reason = ECombatReason.UnderFireNow;

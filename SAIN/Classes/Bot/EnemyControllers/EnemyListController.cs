@@ -47,10 +47,10 @@ public class EnemyListController : BotSubClass<SAINEnemyController>, IBotClass
         {
             foreach (Enemy enemy in Bot.EnemyController.VisibleEnemies)
             {
-                if (enemy.Path.PathCorners != null && enemy.Path.PathCorners.Length > 0)
+                if (enemy.Path.PathCornerCount > 0)
                 {
                     GameObject pathObject = DebugGizmos.DrawLine(Vector3.zero, Vector3.forward, Color.red, 0.1f, 0.02f);
-                    DebugGizmos.SetLinePositions(pathObject, enemy.Path.PathCorners);
+                    DebugGizmos.SetLinePositions(pathObject, enemy.Path.PathCorners, enemy.Path.PathCornerCount);
                 }
                 //DebugGizmos.DrawLine(Bot.Transform.EyePosition, enemy.EnemyPosition, Color.red, 0.025f, 0.02f);
                 //if (enemy.LastKnownPosition != null)
@@ -58,10 +58,10 @@ public class EnemyListController : BotSubClass<SAINEnemyController>, IBotClass
             }
             foreach (Enemy enemy in Bot.EnemyController.EnemiesInLineOfSight)
             {
-                if (enemy.Path.PathCorners != null && enemy.Path.PathCorners.Length > 0)
+                if (enemy.Path.PathCornerCount > 0)
                 {
                     GameObject pathObject = DebugGizmos.DrawLine(Vector3.zero, Vector3.forward, Color.yellow, 0.1f, 0.02f);
-                    DebugGizmos.SetLinePositions(pathObject, enemy.Path.PathCorners);
+                    DebugGizmos.SetLinePositions(pathObject, enemy.Path.PathCorners, enemy.Path.PathCornerCount);
                 }
                 //DebugGizmos.DrawLine(Bot.Transform.EyePosition, enemy.EnemyPosition, Color.yellow, 0.025f, 0.02f);
                 //if (enemy.LastKnownPosition != null)
@@ -69,10 +69,10 @@ public class EnemyListController : BotSubClass<SAINEnemyController>, IBotClass
             }
             foreach (Enemy enemy in Bot.EnemyController.KnownEnemies)
             {
-                if (enemy.Path.PathCorners != null && enemy.Path.PathCorners.Length > 0)
+                if (enemy.Path.PathCornerCount > 0)
                 {
                     GameObject pathObject = DebugGizmos.DrawLine(Vector3.zero, Vector3.forward, Color.blue, 0.1f, 0.02f);
-                    DebugGizmos.SetLinePositions(pathObject, enemy.Path.PathCorners);
+                    DebugGizmos.SetLinePositions(pathObject, enemy.Path.PathCorners, enemy.Path.PathCornerCount);
                 }
                 //DebugGizmos.DrawLine(Bot.Transform.EyePosition, enemy.EnemyPosition, Color.blue, 0.025f, 0.02f);
                 //if (enemy.LastKnownPosition != null)
@@ -87,7 +87,7 @@ public class EnemyListController : BotSubClass<SAINEnemyController>, IBotClass
     public override void Dispose()
     {
         GameWorldComponent.Instance.PlayerTracker.OnPlayerRemoved -= RemoveEnemy;
-        BotMemoryClass memory = BotOwner?.Memory;
+        BotMemory memory = BotOwner?.Memory;
         if (memory != null)
         {
             memory.OnAddEnemy -= enemyAdded;
@@ -280,7 +280,7 @@ public class EnemyListController : BotSubClass<SAINEnemyController>, IBotClass
     {
         if (
             !BotOwner.EnemiesController.EnemyInfos.TryGetValue(enemyPlayer, out EnemyInfo enemyInfo)
-            && BotOwner.BotsGroup.Enemies.TryGetValue(enemyPlayer, out BotSettingsClass value)
+            && BotOwner.BotsGroup.Enemies.TryGetValue(enemyPlayer, out BotGroupEnemyInfo value)
         )
         {
             //Logger.LogDebug($"Got EnemyInfo from Bot's Group Enemies.");
@@ -310,52 +310,6 @@ public class EnemyListController : BotSubClass<SAINEnemyController>, IBotClass
     public bool IsPlayerAnEnemy(string profileID)
     {
         return !profileID.IsNullOrEmpty() && Enemies.ContainsKey(profileID);
-    }
-
-    public bool IsPlayerFriendly(IPlayer iPlayer)
-    {
-        if (iPlayer == null)
-        {
-            return false;
-        }
-        if (iPlayer.ProfileId == Bot.ProfileId)
-        {
-            return true;
-        }
-
-        if (Enemies.ContainsKey(iPlayer.ProfileId))
-        {
-            return false;
-        }
-
-        // Check that the source isn't from a member of the bot's group.
-        if (iPlayer.AIData.IsAI && BotOwner.BotsGroup.Contains(iPlayer.AIData.BotOwner))
-        {
-            return true;
-        }
-
-        // Checks if the player is not an active enemy and that they are a neutral party
-        if (!BotOwner.BotsGroup.IsPlayerEnemy(iPlayer) && BotOwner.BotsGroup.Neutrals.ContainsKey(iPlayer))
-        {
-            return true;
-        }
-
-        // Check that the source isn't an ally
-        if (BotOwner.BotsGroup.Allies.Contains(iPlayer))
-        {
-            return true;
-        }
-
-        if (iPlayer.IsAI && iPlayer.AIData?.BotOwner?.Memory.GoalEnemy?.ProfileId == Bot.ProfileId)
-        {
-            return false;
-        }
-
-        if (!BotOwner.BotsGroup.Enemies.ContainsKey(iPlayer))
-        {
-            return true;
-        }
-        return false;
     }
 
     private void removeEnemyInfo(Enemy enemy)

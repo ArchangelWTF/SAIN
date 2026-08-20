@@ -1,12 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using EFT;
+using SAIN.Classes.Bot.Search;
+using SAIN.Classes.Bot.Sense.Hearing;
 using SAIN.Components.PlayerComponentSpace;
 using SAIN.Layers;
 using SAIN.Models.Enums;
-using SAIN.Preset.GlobalSettings;
 using SAIN.Preset.GlobalSettings.Categories;
+using SAIN.Preset.Shared.Enums;
+using SAIN.Preset.Shared.GlobalSettings;
 using SAIN.SAINComponent.Classes;
 using SAIN.SAINComponent.Classes.Debug;
 using SAIN.SAINComponent.Classes.Decision;
@@ -14,7 +17,7 @@ using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.SAINComponent.Classes.Info;
 using SAIN.SAINComponent.Classes.Memory;
 using SAIN.SAINComponent.Classes.Mover;
-using SAIN.SAINComponent.Classes.Search;
+using SAIN.SAINComponent.Classes.Sense;
 using SAIN.SAINComponent.Classes.Talk;
 using SAIN.SAINComponent.Classes.WeaponFunction;
 using UnityEngine;
@@ -114,13 +117,13 @@ public class BotComponent : BotComponentBase, ISPlayer
     }
 
     public BotGlobalEventsClass GlobalEvents { get; private set; }
-    public BotBusyHandsDetector BusyHandsDetector { get; private set; }
     public SAINShootData Shoot { get; private set; }
     public BotWeightManagement WeightManagement { get; private set; }
     public SAINBotMedicalClass Medical { get; private set; }
     public SAINActivationClass BotActivation { get; private set; }
     public DoorOpener DoorOpener { get; private set; }
     public ManualShootClass ManualShoot { get; private set; }
+    public BotFlashedClass Flashed { get; private set; }
     public CurrentTargetClass CurrentTarget { get; private set; }
     public BotBackpackDropClass BackpackDropper { get; private set; }
     public BotLightController BotLight { get; private set; }
@@ -129,14 +132,14 @@ public class BotComponent : BotComponentBase, ISPlayer
     public SAINAILimit AILimit { get; private set; }
     public SAINBotSuppressClass Suppression { get; private set; }
     public SAINVaultClass Vault { get; private set; }
-    public SAINSearchClass Search { get; private set; }
+    public SearchClass Search { get; private set; }
     public SAINMemoryClass Memory { get; private set; }
     public SAINEnemyController EnemyController { get; private set; }
     public SAINFriendlyFireClass FriendlyFire { get; private set; }
     public SAINVisionClass Vision { get; private set; }
     public SAINMoverClass Mover { get; private set; }
     public SAINBotUnstuckClass BotStuck { get; private set; }
-    public SAINHearingSensorClass Hearing { get; private set; }
+    public HearingSensor Hearing { get; private set; }
     public SAINBotTalkClass Talk { get; private set; }
     public SAINDecisionClass Decision { get; private set; }
     public SAINCoverClass Cover { get; private set; }
@@ -257,13 +260,12 @@ public class BotComponent : BotComponentBase, ISPlayer
             Info = new SAINBotInfoClass(this);
 
             Squad = new BotSquadContainer(this);
-            BusyHandsDetector = new BotBusyHandsDetector(this);
             GlobalEvents = new BotGlobalEventsClass(this);
             Shoot = new SAINShootData(this);
             WeightManagement = new BotWeightManagement(this);
             Memory = new SAINMemoryClass(this);
             BotStuck = new SAINBotUnstuckClass(this);
-            Hearing = new SAINHearingSensorClass(this);
+            Hearing = new HearingSensor(this);
             Talk = new SAINBotTalkClass(this);
             Decision = new SAINDecisionClass(this);
             Cover = new SAINCoverClass(this);
@@ -274,7 +276,7 @@ public class BotComponent : BotComponentBase, ISPlayer
             EnemyController = new SAINEnemyController(this);
             FriendlyFire = new SAINFriendlyFireClass(this);
             Vision = new SAINVisionClass(this);
-            Search = new SAINSearchClass(this);
+            Search = new SearchClass(this);
             Vault = new SAINVaultClass(this);
             Suppression = new SAINBotSuppressClass(this);
             AILimit = new SAINAILimit(this);
@@ -286,6 +288,7 @@ public class BotComponent : BotComponentBase, ISPlayer
             BackpackDropper = new BotBackpackDropClass(this);
             CurrentTarget = new CurrentTargetClass(this);
             ManualShoot = new ManualShootClass(this);
+            Flashed = new BotFlashedClass(this);
             BotActivation = new SAINActivationClass(this);
             Aim = new AimClass(this);
         }
@@ -379,7 +382,7 @@ public class BotComponent : BotComponentBase, ISPlayer
             try
             {
                 BotOwner.LookSensor.MaxShootDist = float.MaxValue;
-                if (BotOwner.AIData is PlayerAIDataClass aiData)
+                if (BotOwner.AIData is AIData aiData)
                 {
                     aiData.IsNoOffsetShooting = false;
                 }
@@ -463,14 +466,6 @@ public class BotComponent : BotComponentBase, ISPlayer
     {
         BotActivation.SetActive(false);
         StopAllCoroutines();
-    }
-
-    private void OnEnable() { }
-
-    public void LateUpdate()
-    {
-        //BotActivation?.LateUpdate();
-        //EnemyController?.LateUpdate();
     }
 
     private void HandleDumbShit()

@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using BepInEx;
 using EFT.Console.Core;
 using EFT.UI;
 using SAIN.Editor.Util;
 using SAIN.Plugin;
 using SAIN.Preset;
+using SAIN.Preset.Shared;
 using UnityEngine;
 using static SAIN.Editor.RectLayout;
 using static SAIN.Editor.SAINLayout;
@@ -33,6 +34,10 @@ public static class SAINEditor
     [ConsoleCommand("Toggle SAIN GUI Editor")]
     private static void ToggleGUI()
     {
+        if (!DisplayingWindow && !PresetHandler.CanEditCurrentPreset)
+        {
+            return;
+        }
         DisplayingWindow = !DisplayingWindow;
     }
 
@@ -56,6 +61,12 @@ public static class SAINEditor
 
     public static void ManualUpdate()
     {
+        // If the server locks editing (forced default, presets off, or access revoked) while the panel is open, close it.
+        if (DisplayingWindow && !PresetHandler.CanEditCurrentPreset)
+        {
+            DisplayingWindow = false;
+        }
+
         if (DisplayingWindow)
         {
             CursorSettings.SetUnlockCursor(0, true);
@@ -97,7 +108,6 @@ public static class SAINEditor
                 StylesClass.CreateCache();
             }
 
-            MouseFunctions.OnGUI();
             CursorSettings.SetUnlockCursor(0, true);
             GUIUtility.ScaleAroundPivot(ScaledPivot, Vector2.zero);
             MainWindow = GUI.Window(0, MainWindow, MainWindowFunc, "SAIN AI Settings Editor", GetStyle(Style.window));
@@ -123,7 +133,6 @@ public static class SAINEditor
         float space = DragRect.height + EditTabsClass.TabMenuRect.height;
         Space(space);
         GUITabs.CreateTabs(selectedTab);
-        MouseFunctions.OnGUI();
         DrawTooltip();
     }
 
@@ -132,7 +141,7 @@ public static class SAINEditor
         GUI.DrawTexture(DragRect, DragBackgroundTexture, ScaleMode.StretchToFill, true, 0);
         GUI.Box(
             DragRect,
-            $"SAIN {AssemblyInfoClass.SAINVersion} GUI Editor | Preset: {SAINPlugin.LoadedPreset.Info.Name}",
+            $"SAIN {SAINVersionInfo.SAINVersion} GUI Editor | Preset: {SAINPlugin.LoadedPreset.Info.Name}",
             GetStyle(Style.dragBar)
         );
         GUI.DragWindow(DragRect);
@@ -142,7 +151,7 @@ public static class SAINEditor
 
     private static readonly GUIContent SaveContent = new(
         "Save All Changes",
-        $"Export All Changes to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name}"
+        $"Save all changes to the SAIN server mod for preset '{SAINPlugin.LoadedPreset.Info.Name}'"
     );
 
     private static void CreateTopBarOptions()
@@ -163,11 +172,13 @@ public static class SAINEditor
             PresetHandler.ExportEditorDefaults();
         }
 
+        GUI.enabled = PresetHandler.CanEditCurrentPreset;
         if (GUI.Button(SaveAllRect, SaveContent, GetStyle(Style.botTypeGrid)))
         {
             PlaySound(EUISoundType.InsuranceInsured);
             SAINPresetClass.ExportAll(SAINPlugin.LoadedPreset);
         }
+        GUI.enabled = true;
 
         if (GUI.Button(ExitRect, "X", GetStyle(Style.botTypeGrid)))
         {

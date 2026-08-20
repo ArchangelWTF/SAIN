@@ -1,8 +1,9 @@
-﻿using EFT;
+using EFT;
 using EFT.InventoryLogic;
 using SAIN.Components;
 using SAIN.Helpers;
-using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings.Categories;
 using SAIN.SAINComponent.Classes.Info;
 using UnityEngine;
 

@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using EFT;
-using SAIN.Models.Preset.Personalities;
+using SAIN.Preset.Shared.Enums;
 
 namespace SAIN.Helpers;
 
@@ -39,6 +39,26 @@ internal static class EnumValues
             return Goons.Contains(type);
         }
 
+        public static bool IsNormalBoss(WildSpawnType type)
+        {
+            return NormalBosses.Contains(type);
+        }
+
+        public static bool IsNormalFollower(WildSpawnType type)
+        {
+            return NormalFollowers.Contains(type);
+        }
+
+        public static bool IsLabyrinthBot(WildSpawnType type)
+        {
+            return LabyrinthBots.Contains(type);
+        }
+
+        public static bool IsSpecialBot(WildSpawnType type)
+        {
+            return SpecialBots.Contains(type);
+        }
+
         public static WildSpawnType[] Scavs =
         [
             WildSpawnType.assault,
@@ -50,8 +70,47 @@ internal static class EnumValues
 
         public static WildSpawnType[] Goons = [WildSpawnType.bossKnight, WildSpawnType.followerBigPipe, WildSpawnType.followerBirdEye];
 
+        public static WildSpawnType[] LabyrinthBots =
+        [
+            WildSpawnType.bossTagillaAgro,
+            WildSpawnType.bossKillaAgro,
+            WildSpawnType.tagillaHelperAgro,
+        ];
+
+        public static WildSpawnType[] SpecialBots = [WildSpawnType.crazyAssaultEvent, WildSpawnType.gifter];
+
         public static List<WildSpawnType> Bosses;
         public static List<WildSpawnType> Followers;
+
+        public static WildSpawnType[] NormalBosses =
+        [
+            WildSpawnType.bossBully,
+            WildSpawnType.bossGluhar,
+            WildSpawnType.bossKojaniy,
+            WildSpawnType.bossSanitar,
+            WildSpawnType.bossTagilla,
+            WildSpawnType.bossTest,
+            WildSpawnType.bossKilla,
+            WildSpawnType.bossBoar,
+            WildSpawnType.bossKolontay,
+            WildSpawnType.bossPartisan,
+        ];
+
+        public static WildSpawnType[] NormalFollowers =
+        [
+            WildSpawnType.followerBully,
+            WildSpawnType.followerGluharAssault,
+            WildSpawnType.followerGluharSecurity,
+            WildSpawnType.followerGluharScout,
+            WildSpawnType.followerKojaniy,
+            WildSpawnType.followerSanitar,
+            WildSpawnType.followerTagilla,
+            WildSpawnType.followerBoar,
+            WildSpawnType.followerBoarClose1,
+            WildSpawnType.followerBoarClose2,
+            WildSpawnType.followerKolontayAssault,
+            WildSpawnType.followerKolontaySecurity,
+        ];
     }
 
     public static T Parse<T>(string value)
@@ -66,26 +125,6 @@ internal static class EnumValues
         BotDifficulty.hard,
         BotDifficulty.impossible,
     ];
-    public static readonly WildSpawnType[] WildSpawnTypes = GetEnum<WildSpawnType>();
-
-    public static readonly ECaliber[] AmmoCalibers = GetEnum<ECaliber>();
-    public static readonly EWeaponClass[] WeaponClasses = GetEnum<EWeaponClass>();
-
-    public static readonly EPersonality[] Personalities = GetEnum<EPersonality>();
-
-    public static readonly ECombatDecision[] SoloDecisions = GetEnum<ECombatDecision>();
-    public static readonly ESquadDecision[] SquadDecisions = GetEnum<ESquadDecision>();
-    public static readonly ESelfActionType[] SelfDecisions = GetEnum<ESelfActionType>();
-
-    public static ECaliber ParseCaliber(string caliber)
-    {
-        if (Enum.TryParse(caliber, out ECaliber result))
-        {
-            return result;
-        }
-        Logger.LogError($"Caliber [{caliber}] does not exist in Caliber Enum!");
-        return ECaliber.Default;
-    }
 
     public static EWeaponClass ParseWeaponClass(string weaponClass)
     {
@@ -110,6 +149,11 @@ internal static class EnumValues
 
     public static T[] GetEnum<T>()
     {
-        return (T[])Enum.GetValues(typeof(T));
+        return EnumCache<T>.Values;
+    }
+
+    private static class EnumCache<T>
+    {
+        public static readonly T[] Values = (T[])Enum.GetValues(typeof(T));
     }
 }

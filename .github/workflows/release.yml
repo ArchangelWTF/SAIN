@@ -13,7 +13,10 @@ on:
         required: true
 
 env:
-  MOD_NAME: SAIN
+  ZIP_PREFIX: SAIN
+  PROPS: Directory.Build.props
+  PLUGIN_DIR: Build/BepInEx/plugins/SAIN
+  SERVER_MOD_DIR: Build/SPT_Runtime/user/mods/Solarint-SAIN-ServerMod
 
 jobs:
   release:
@@ -48,6 +51,16 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           echo "Building version $VERSION (prefix $PREFIX, suffix '${SUFFIX}')"
 
+      - name: Determine SPT version
+        id: spt
+        shell: bash
+        run: |
+          # The package this mod builds against is what it is compatible with
+          PKG=$(sed -n 's/.*<SptVersion>\([^<]*\)<\/SptVersion>.*/\1/p' "$PROPS")
+          COMPAT=$(echo "$PKG" | cut -d. -f1,2)
+          echo "Package $PKG -> compat SPT $COMPAT"
+          echo "compat=$COMPAT" >> "$GITHUB_OUTPUT"
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
@@ -66,7 +79,8 @@ jobs:
         id: package
         shell: bash
         run: |
-          ZIP_NAME="$MOD_NAME.${{ steps.version.outputs.version }}.zip"
+          ZIP_NAME="$ZIP_PREFIX.${{ steps.version.outputs.version }}.zip"
+          # Zip the contents of Build/ so the archive root holds BepInEx/... and SPT_Runtime/... (standard SPT layout)
           ( cd Build && zip -r "../$ZIP_NAME" . )
           echo "zip_name=$ZIP_NAME" >> "$GITHUB_OUTPUT"
 
@@ -77,9 +91,9 @@ jobs:
           vt_api_key: ${{ secrets.VIRUSTOTAL_API_KEY }}
           # One path per line. Add more files here and each gets its own link below.
           files: |
-            Build/BepInEx/plugins/SAIN/SAIN.dll
-            Build/BepInEx/plugins/SAIN/SAIN.Preset.Shared.dll
-            Build/SPT_Runtime/user/mods/Solarint-SAIN-ServerMod/SAINServerMod.dll
+            ${{ env.PLUGIN_DIR }}/SAIN.dll
+            ${{ env.PLUGIN_DIR }}/SAIN.Preset.Shared.dll
+            ${{ env.SERVER_MOD_DIR }}/SAINServerMod.dll
 
       - name: Build release notes
         id: notes
@@ -89,6 +103,11 @@ jobs:
         run: |
           {
             echo "notes<<EOF"
+            # Read by the mod's own release feed, invisible on the rendered page
+            echo "<!-- compat: SPT ${{ steps.spt.outputs.compat }} -->"
+            echo ""
+            echo "# This release is for SPT ${{ steps.spt.outputs.compat }}"
+            echo ""
             echo "## SAIN ${{ steps.version.outputs.version }}"
             echo ""
             echo "_Changelog goes here._"

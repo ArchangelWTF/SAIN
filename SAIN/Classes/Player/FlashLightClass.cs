@@ -56,14 +56,14 @@ public class FlashLightClass(PlayerComponent component) : PlayerComponentBase(co
         CheckUsingLightModes();
 
         bool wasUsingLight = UsingLight;
-        UsingLight = (ActiveModes & (DeviceMode.WhiteLight | DeviceMode.IRLight)) == (DeviceMode.WhiteLight | DeviceMode.IRLight);
+        UsingLight = (ActiveModes & (DeviceMode.WhiteLight | DeviceMode.IRLight)) != 0;
         if (wasUsingLight != UsingLight)
         {
             OnLightToggle?.Invoke(UsingLight);
         }
 
         bool wasUsingLaser = UsingLaser;
-        UsingLaser = (ActiveModes & (DeviceMode.VisibleLaser | DeviceMode.IRLaser)) == (DeviceMode.VisibleLaser | DeviceMode.IRLaser);
+        UsingLaser = (ActiveModes & (DeviceMode.VisibleLaser | DeviceMode.IRLaser)) != 0;
         if (wasUsingLaser != UsingLaser)
         {
             OnLaserToggle?.Invoke(UsingLaser);

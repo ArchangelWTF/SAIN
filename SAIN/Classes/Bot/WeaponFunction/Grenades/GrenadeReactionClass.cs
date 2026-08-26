@@ -285,7 +285,10 @@ public class GrenadeReactionClass : BotSubClass<BotGrenadeManager>, IBotClass
 
         // Aggressive bots advance on the thrower, but only once clear of the blast, and only if the
         // thrower is not on the far side of the grenade.
-        if (Reaction == EGrenadeReaction.Push && (Bot.Position - dangerPoint).sqrMagnitude > BLAST_OVERRIDE_DISTANCE * BLAST_OVERRIDE_DISTANCE)
+        if (
+            Reaction == EGrenadeReaction.Push
+            && (Bot.Position - dangerPoint).sqrMagnitude > BLAST_OVERRIDE_DISTANCE * BLAST_OVERRIDE_DISTANCE
+        )
         {
             Enemy goalEnemy = Bot.GoalEnemy;
             if (goalEnemy != null)

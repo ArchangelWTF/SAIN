@@ -109,7 +109,7 @@ public sealed class PresetSyncWebSocket
             {
                 return;
             }
-            
+
             if (message.Change != EPresetSyncChange.ConfigChanged && string.IsNullOrEmpty(message.PresetName))
             {
                 return;

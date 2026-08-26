@@ -145,7 +145,7 @@ public class EnemyPlaceRaycastJob : BotManagerBase
             {
                 EnemyPlace Place = PlacesToCheck[i];
                 PlacePositions[i] = Place.Position;
-                BotPositions[i] = Place.PlaceData.Owner.Transform.EyePosition;
+                BotPositions[i] = Place.PlaceData.Owner.Transform.Position;
                 EnemyPositions[i] = Place.PlaceData.OwnerEnemy.EnemyTransform.Position;
             }
 

@@ -100,19 +100,16 @@ public class SAINEnemyController : BotComponentClassBase
     {
         EnemyEvents events = enemy.Events;
         KnownEnemies.Subscribe(ref events.OnEnemyKnownChanged.OnToggle);
-        EnemiesInLineOfSight.Subscribe(ref events.OnVisionChange.OnToggle);
-        VisibleEnemies.Subscribe(ref events.OnEnemyLineOfSightChanged.OnToggle);
+        VisibleEnemies.Subscribe(ref events.OnVisionChange.OnToggle);
+        EnemiesInLineOfSight.Subscribe(ref events.OnEnemyLineOfSightChanged.OnToggle);
     }
 
     private void EnemyRemoved(string profileID, Enemy enemy)
     {
         EnemyEvents events = enemy.Events;
         KnownEnemies.Unsubscribe(ref events.OnEnemyKnownChanged.OnToggle, enemy);
-        EnemiesInLineOfSight.Unsubscribe(ref events.OnVisionChange.OnToggle, enemy);
-        VisibleEnemies.Unsubscribe(ref events.OnEnemyLineOfSightChanged.OnToggle, enemy);
-        KnownEnemies.RemoveEnemy(enemy);
-        EnemiesInLineOfSight.RemoveEnemy(enemy);
-        VisibleEnemies.RemoveEnemy(enemy);
+        VisibleEnemies.Unsubscribe(ref events.OnVisionChange.OnToggle, enemy);
+        EnemiesInLineOfSight.Unsubscribe(ref events.OnEnemyLineOfSightChanged.OnToggle, enemy);
         if (GoalEnemy != null && GoalEnemy == enemy)
         {
             GoalEnemy = null;
@@ -367,7 +364,7 @@ public class SAINEnemyController : BotComponentClassBase
                 return lastEngagedEnemy;
             }
 
-            for (int i = 0; i < KnownEnemies.Count; i++)
+            for (int i = 0; i < enemiesWhoEngagedMe.Count; i++)
             {
                 Enemy engagedEnemy = enemiesWhoEngagedMe[i];
                 if (

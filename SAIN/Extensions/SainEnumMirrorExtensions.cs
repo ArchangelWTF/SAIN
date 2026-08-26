@@ -7,22 +7,11 @@ namespace SAIN.Extensions;
 
 public static class SainEnumMirrorExtensions
 {
-    private static readonly HashSet<int> _esainWildSpawnValues = ValueSet(typeof(ESainWildSpawnType));
     private static readonly HashSet<int> _esainBotDifficultyValues = ValueSet(typeof(ESainBotDifficulty));
-    private static readonly HashSet<int> _eftWildSpawnValues = ValueSet(typeof(WildSpawnType));
-
+    
     public static ESainWildSpawnType ToESain(this WildSpawnType type)
     {
-        int value = (int)type;
-        if (!_esainWildSpawnValues.Contains(value))
-        {
-            throw new ArgumentOutOfRangeException(
-                nameof(type),
-                type,
-                $"No {nameof(ESainWildSpawnType)} mapping exists for WildSpawnType '{type}' ({value})."
-            );
-        }
-        return (ESainWildSpawnType)value;
+        return (ESainWildSpawnType)(int)type;
     }
 
     public static ESainBotDifficulty ToESain(this BotDifficulty difficulty)
@@ -41,16 +30,7 @@ public static class SainEnumMirrorExtensions
 
     public static WildSpawnType ToEft(this ESainWildSpawnType type)
     {
-        int value = (int)type;
-        if (!_eftWildSpawnValues.Contains(value))
-        {
-            throw new ArgumentOutOfRangeException(
-                nameof(type),
-                type,
-                $"No {nameof(WildSpawnType)} mapping exists for ESainWildSpawnType '{type}' ({value})."
-            );
-        }
-        return (WildSpawnType)value;
+        return (WildSpawnType)(int)type;
     }
 
     public static EPhraseTrigger ToEft(this ESainPhraseTrigger trigger)

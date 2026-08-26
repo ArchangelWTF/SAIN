@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AssemblyName>SAIN.ServerInterop</AssemblyName>
+    <RootNamespace>SAIN.ServerInterop</RootNamespace>
+  </PropertyGroup>
+</Project>

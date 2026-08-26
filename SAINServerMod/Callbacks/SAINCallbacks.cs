@@ -1,4 +1,5 @@
 using SAIN.Preset.Shared.Models.WS;
+using SAIN.Preset.Shared.Preset;
 using SAINServerMod.Generation;
 using SAINServerMod.Generators;
 using SAINServerMod.Models.Requests;
@@ -33,7 +34,9 @@ public sealed class SAINCallbacks(
             EditingAllowed = serverConfig.IsEditingAllowed(sessionID),
         };
         return new ValueTask<StreamedJsonBody>(
-            SAINJsonUtil.StreamRaw(jsonUtil.Serialize(response) ?? throw new InvalidOperationException("Could not serialize client config!"))
+            SAINJsonUtil.StreamRaw(
+                jsonUtil.Serialize(response) ?? throw new InvalidOperationException("Could not serialize client config!")
+            )
         );
     }
 
@@ -41,7 +44,8 @@ public sealed class SAINCallbacks(
     {
         return new ValueTask<StreamedJsonBody>(
             SAINJsonUtil.StreamRaw(
-                jsonUtil.Serialize(configService.NicknamesModel) ?? throw new InvalidOperationException("Could not serialize personalities!")
+                jsonUtil.Serialize(configService.NicknamesModel)
+                    ?? throw new InvalidOperationException("Could not serialize personalities!")
             )
         );
     }
@@ -58,7 +62,8 @@ public sealed class SAINCallbacks(
 
     public ValueTask<StreamedJsonBody> GetBotTypes(string url, EmptyRequestData info, string sessionID)
     {
-        return new ValueTask<StreamedJsonBody>(SAINJsonUtil.StreamRaw(SAINJsonUtil.Serialize(DefaultBotTypes.Enabled())));
+        var enabled = presetGeneration.AllBotTypes().Where(t => !DefaultBotTypes.StrictExclusionList.Contains(t.WildSpawnType)).ToList();
+        return new ValueTask<StreamedJsonBody>(SAINJsonUtil.StreamRaw(SAINJsonUtil.Serialize(enabled)));
     }
 
     public ValueTask<StreamedJsonBody> GetBotTypeExclusions(string url, EmptyRequestData info, string sessionID)
@@ -70,14 +75,27 @@ public sealed class SAINCallbacks(
     {
         return new ValueTask<StreamedJsonBody>(
             SAINJsonUtil.StreamRaw(
-                jsonUtil.Serialize(presetService.ListCustom()) ?? throw new InvalidOperationException("Could not serialize custom preset list")
+                jsonUtil.Serialize(presetService.ListCustom())
+                    ?? throw new InvalidOperationException("Could not serialize custom preset list")
             )
         );
     }
 
     public async ValueTask<StreamedJsonBody> GetCustomPreset(string url, PresetNameRequest info, string sessionID)
     {
-        return SAINJsonUtil.StreamRaw(await presetService.GetCustomAsync(info.Name) ?? "null");
+        string? stored = await presetService.GetCustomAsync(info.Name);
+        if (string.IsNullOrEmpty(stored))
+        {
+            return SAINJsonUtil.StreamRaw("null");
+        }
+
+        var bundle = SAINJsonUtil.Deserialize<SAINPresetBundle>(stored);
+        if (bundle == null)
+        {
+            return SAINJsonUtil.StreamRaw("null");
+        }
+
+        return SAINJsonUtil.StreamRaw(SAINJsonUtil.Serialize(presetGeneration.ComposeCustom(bundle)));
     }
 
     public async ValueTask<string> SaveCustomPreset(string url, PresetSaveRequest info, string sessionID)

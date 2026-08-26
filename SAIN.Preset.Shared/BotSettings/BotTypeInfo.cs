@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using SAIN.Preset.Shared.Enums;
 
@@ -20,6 +21,18 @@ public sealed class BotTypeInfo
 
     [DataMember]
     public string Description;
+    
+    [DataMember]
+    public string BotDbKey;
+
+    [DataMember]
+    public List<string> BrainsToApply;
+
+    [DataMember]
+    public List<string> LayersToRemove;
+
+    [DataMember]
+    public string BaseBrain;
 
     public BotTypeInfo() { }
 

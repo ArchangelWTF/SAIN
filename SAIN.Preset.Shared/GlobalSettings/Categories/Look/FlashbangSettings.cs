@@ -26,9 +26,7 @@ public class FlashbangSettings : SAINSettingsBase<FlashbangSettings>, ISAINSetti
 
     [DataMember]
     [Name("Look Around Chance")]
-    [Description(
-        "Chance a flashed bot spends the next moment looking around at nothing in particular."
-    )]
+    [Description("Chance a flashed bot spends the next moment looking around at nothing in particular.")]
     [Percentage]
     public float SearchChance = 45f;
 

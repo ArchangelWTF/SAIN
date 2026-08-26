@@ -8,6 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\SAIN.Preset.Shared\SAIN.Preset.Shared.csproj" />
+    <ProjectReference Include="..\SAIN.ServerInterop\SAIN.ServerInterop.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="SPTushonka.Common" Version="$(SptVersion)" />

@@ -8,6 +8,7 @@ using SAIN.Layers.Combat.Run;
 using SAIN.Layers.Combat.Solo;
 using SAIN.Layers.Combat.Squad;
 using SAIN.Layers.Flashed;
+using SAIN.Preset;
 using SAIN.Preset.GlobalSettings.Categories;
 using SAIN.Preset.Shared.Enums;
 using SAIN.Preset.Shared.GlobalSettings;
@@ -132,6 +133,42 @@ public static class BigBrainHandler
 
             ToggleVanillaLayersForPMCs(false);
             ToggleVanillaLayersForAllBots();
+
+            ApplyModdedBotLayers();
+        }
+
+        /// <summary>
+        /// Attaches SAIN's layers to bot types registered by other mods through the server interop
+        /// </summary>
+        public static void ApplyModdedBotLayers()
+        {
+            foreach (BotType botType in BotTypeDefinitions.BotTypesList)
+            {
+                List<string> brains = botType.BrainsToApply;
+                if (brains == null || brains.Count == 0)
+                {
+                    if (string.IsNullOrEmpty(botType.BaseBrain))
+                    {
+                        continue;
+                    }
+
+                    brains = [botType.BaseBrain];
+                }
+
+                List<string> layers = [.. _commonVanillaLayersToRemove];
+
+                if (botType.LayersToRemove != null)
+                {
+                    layers.AddRange(botType.LayersToRemove);
+                }
+
+                List<WildSpawnType> roles = [botType.WildSpawnType];
+
+                AddCustomLayersToBrainsAndRoles(brains, roles, false);
+                ToggleVanillaLayersForBrainsAndRoles(brains, roles, layers, false);
+
+                Logger.LogInfo($"[SAIN] Applied SAIN layers to modded bot '{botType.Name}' ({botType.WildSpawnType}).");
+            }
         }
 
         public static void ToggleVanillaLayersForAllBots()

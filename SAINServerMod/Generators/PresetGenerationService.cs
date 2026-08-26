@@ -2,11 +2,14 @@ using SAIN.Preset.Shared.BotSettings;
 using SAIN.Preset.Shared.BotSettings.SAINSettings;
 using SAIN.Preset.Shared.Enums;
 using SAIN.Preset.Shared.GlobalSettings;
+using SAIN.Preset.Shared.Models.WS;
 using SAIN.Preset.Shared.Preset;
+using SAIN.ServerInterop;
 using SAINServerMod.Extensions;
 using SAINServerMod.Models.Preset;
 using SAINServerMod.Services;
 using SAINServerMod.Utils;
+using SAINServerMod.Ws;
 using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
@@ -20,10 +23,13 @@ namespace SAINServerMod.Generators;
 public sealed class PresetGenerationService(
     BotTable botTable,
     PresetService presetService,
+    SAINPresetWebSocketHandler webSocket,
     ICloner cloner,
     ISptLogger<PresetGenerationService> logger
-) : IOnLoad
+) : IOnLoad, ISainBotTypeRegistry
 {
+    // Modded bot types registered through the interop
+    private readonly List<BotTypeInfo> _registered = [];
     private static readonly ESainBotDifficulty[] _difficulties =
     [
         ESainBotDifficulty.easy,
@@ -87,7 +93,7 @@ public sealed class PresetGenerationService(
     public GeneratedPreset Generate(SAINDifficulty difficulty, string name, string description)
     {
         var global = new GlobalSettingsClass();
-        var botSettings = GenerateBotSettings(DefaultBotTypes.All(), _difficulties);
+        var botSettings = GenerateBotSettings(AllBotTypes(), _difficulties);
 
         difficulty.ApplyTuning(global, botSettings);
 
@@ -115,7 +121,7 @@ public sealed class PresetGenerationService(
 
             foreach (KeyValuePair<ESainBotDifficulty, SAINSettingsClass> pair in group.Settings)
             {
-                var defaults = GetDefaults(botType.WildSpawnType, pair.Key);
+                var defaults = GetDefaults(botType, pair.Key);
 
                 if (defaults != null)
                 {
@@ -129,16 +135,16 @@ public sealed class PresetGenerationService(
         return result;
     }
 
-    private DifficultyCategories? GetDefaults(ESainWildSpawnType type, ESainBotDifficulty difficulty)
+    private DifficultyCategories? GetDefaults(BotTypeInfo botType, ESainBotDifficulty difficulty)
     {
-        var types = botTable.Types;
+        string key = botType.BotDbKey ?? botType.WildSpawnType.ToString().ToLowerInvariant();
 
-        if (!types.TryGetValue(type.ToString().ToLowerInvariant(), out var botType) || botType?.BotDifficulty is null)
+        if (!botTable.Types.TryGetValue(key, out var dbType) || dbType?.BotDifficulty is null)
         {
             return null;
         }
 
-        return botType.BotDifficulty.TryGetValue(difficulty.ToString().ToLowerInvariant(), out var categories)
+        return dbType.BotDifficulty.TryGetValue(difficulty.ToString().ToLowerInvariant(), out var categories)
             ? cloner.Clone(categories)
             : null;
     }
@@ -155,5 +161,82 @@ public sealed class PresetGenerationService(
         Presets = result;
 
         return result;
+    }
+
+    // SAIN's defaults plus anything registered through the interop.
+    public List<BotTypeInfo> AllBotTypes()
+    {
+        var all = DefaultBotTypes.All();
+        all.AddRange(_registered);
+        return all;
+    }
+
+    public async Task RegisterAsync(SainBotTypeRegistration registration, CancellationToken cancellationToken = default)
+    {
+        var wildSpawnType = (ESainWildSpawnType)registration.WildSpawnType;
+
+        if (AllBotTypes().Any(t => t.WildSpawnType == wildSpawnType))
+        {
+            logger.Error(
+                $"[SAIN] Ignoring modded bot type '{registration.Name}': WildSpawnType {registration.WildSpawnType} is already known."
+            );
+            return;
+        }
+
+        _registered.Add(
+            new BotTypeInfo(
+                registration.Name,
+                wildSpawnType,
+                registration.DifficultyModifier,
+                registration.Section,
+                registration.Description
+            )
+            {
+                BotDbKey = registration.BotDbKey ?? wildSpawnType.ToString().ToLowerInvariant(),
+                BrainsToApply = registration.BrainsToApply,
+                LayersToRemove = registration.LayersToRemove,
+                BaseBrain = registration.BaseBrain,
+            }
+        );
+
+        logger.Info($"[SAIN] Registered modded bot type '{registration.Name}' ({wildSpawnType}).");
+
+        // Rebuild the in-memory defaults so the new type is present everywhere, then tell connected clients to re-pull.
+        GenerateDefaults();
+        await webSocket.BroadcastPresetChanged(string.Empty, EPresetSyncChange.ConfigChanged);
+    }
+
+    public SAINPresetBundle ComposeCustom(SAINPresetBundle stored)
+    {
+        var defaults = DefaultBotSettingsFor(stored.Info?.BaseSAINDifficulty ?? SAINDifficulty.hard);
+        var merged = new Dictionary<ESainWildSpawnType, SAINSettingsGroupClass>();
+
+        foreach (BotTypeInfo botType in AllBotTypes())
+        {
+            var type = botType.WildSpawnType;
+            if (stored.BotSettings.TryGetValue(type, out var group))
+            {
+                merged[type] = group;
+            }
+            else if (defaults != null && defaults.TryGetValue(type, out var fallback))
+            {
+                merged[type] = fallback;
+            }
+        }
+
+        stored.BotSettings = merged;
+        return stored;
+    }
+
+    private Dictionary<ESainWildSpawnType, SAINSettingsGroupClass>? DefaultBotSettingsFor(SAINDifficulty difficulty)
+    {
+        foreach (var preset in Presets)
+        {
+            if (preset.Info.BaseSAINDifficulty == difficulty)
+            {
+                return preset.BotSettings;
+            }
+        }
+        return Presets.FirstOrDefault()?.BotSettings;
     }
 }

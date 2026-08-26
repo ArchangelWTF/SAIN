@@ -64,7 +64,7 @@ public sealed class SainPresetEditService(
                 bundle.Info ??= new SAINPresetDefinition { Name = name };
                 bundle.Info.IsCustom = true;
                 bundle.Info.CanEditName = true;
-                return new OpenedPreset(bundle, IsNewCustom: false, OriginalName: name);
+                return new OpenedPreset(presetGeneration.ComposeCustom(bundle), IsNewCustom: false, OriginalName: name);
             }
         }
 

@@ -93,20 +93,6 @@ public static class DefaultBotTypes
         ];
     }
 
-    /// <summary>The canonical bot types the client consumes: every type except the strictly excluded ones.</summary>
-    public static List<BotTypeInfo> Enabled()
-    {
-        var result = new List<BotTypeInfo>();
-        foreach (BotTypeInfo type in All())
-        {
-            if (!StrictExclusionList.Contains(type.WildSpawnType))
-            {
-                result.Add(type);
-            }
-        }
-        return result;
-    }
-
     public static List<ESainWildSpawnType> StrictExclusionList { get; } =
     [
         ESainWildSpawnType.bossZryachiy,

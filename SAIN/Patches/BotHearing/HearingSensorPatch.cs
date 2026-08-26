@@ -17,10 +17,6 @@ public class HearingSensorPatch : ModulePatch
     [PatchPrefix]
     public static bool PatchPrefix(BotHearingSensor __instance)
     {
-        if (SAINEnableClass.IsSAINDisabledForBot(__instance._botOwner))
-        {
-            return false;
-        }
-        return true;
+        return SAINEnableClass.IsSAINDisabledForBot(__instance._botOwner);
     }
 }

@@ -8,7 +8,10 @@ namespace SAIN.Layers.Combat.Solo;
 
 internal class MoveToEngageAction(BotOwner bot) : BotAction(bot, nameof(MoveToEngageAction)), IBotAction
 {
-    private float RecalcPathTimer;
+    private const float RECALC_PATH_INTERVAL = 2f;
+    private const float SPRINT_MIN_DISTANCE = 15f;
+
+    private float _recalcPathTime;
 
     public override void Update(CustomLayer.ActionData data)
     {
@@ -16,106 +19,57 @@ internal class MoveToEngageAction(BotOwner bot) : BotAction(bot, nameof(MoveToEn
         if (enemy == null)
         {
             Bot.Steering.SteerByPriority();
-
             return;
         }
 
         Bot.Mover.SetTargetPose(1f);
         Bot.Mover.SetTargetMoveSpeed(1f);
 
-        if (CheckShoot(enemy))
+        if (enemy.IsVisible && Shoot.ShootAnyVisibleEnemies(enemy))
         {
-            Shoot.ShootAnyVisibleEnemies(enemy);
-            Bot.Steering.SteerByPriority(enemy);
-
-            return;
-        }
-
-        //if (Bot.Decision.SelfActionDecisions.LowOnAmmo(0.66f))
-        //{
-        //    Bot.SelfActions.TryReload();
-        //}
-
-        Vector3? lastKnown = enemy.KnownPlaces.LastKnownPosition;
-        Vector3 movePos;
-        if (lastKnown != null)
-        {
-            movePos = lastKnown.Value;
-        }
-        else if (enemy.TimeSinceSeen < 5f)
-        {
-            movePos = enemy.EnemyPosition;
-        }
-        else
-        {
-            Shoot.ShootAnyVisibleEnemies(enemy);
-            Bot.Steering.SteerByPriority(enemy);
-
-            return;
-        }
-
-        var cover = Bot.Cover.FindPointInDirection(movePos - Bot.Position, 0.5f, 3f);
-        if (cover != null)
-        {
-            movePos = cover.Position;
-        }
-
-        float distance = enemy.RealDistance;
-        if (distance > 40f && !BotOwner.Memory.IsUnderFire)
-        {
-            if (RecalcPathTimer < Time.time)
+            if (Bot.Mover.Moving)
             {
-                RecalcPathTimer = Time.time + 2f;
-                //BotOwner.BotRun.Run(movePos, false, SAINPlugin.LoadedPreset.GlobalSettings.General.SprintReachDistance);
-                Bot.Steering.LookToMovingDirection(true);
+                Bot.Mover.Stop();
             }
-
+            Bot.Steering.SteerByPriority(enemy);
             return;
         }
 
-        if (Bot.Mover.Moving)
+        Vector3? firingPosition = Bot.Decision.EnemyDecisions.FiringPosition;
+        if (firingPosition == null)
         {
-            Bot.Mover.ActivePath?.RequestStartSprint(ESprintUrgency.None, "enemy in sight");
+            Bot.Steering.SteerByPriority(enemy);
+            return;
         }
 
-        if (RecalcPathTimer < Time.time)
+        if (_recalcPathTime > Time.time)
         {
-            RecalcPathTimer = Time.time + 2f;
-            BotOwner.MoveToEnemyData.TryMoveToEnemy(movePos);
+            return;
         }
+        _recalcPathTime = Time.time + RECALC_PATH_INTERVAL;
 
-        if (!Bot.Steering.SteerByPriority(null, false))
+        Vector3 destination = firingPosition.Value;
+        bool sprint = !BotOwner.Memory.IsUnderFire && (destination - Bot.Position).magnitude > SPRINT_MIN_DISTANCE;
+        if (sprint && Bot.Mover.RunToPoint(destination, true, -1f, ESprintUrgency.Middle))
         {
-            Bot.Steering.LookToMovingDirection();
-            //SAIN.Steering.LookToPoint(movePos + Vector3.up * 1f);
+            return;
         }
+        Bot.Mover.WalkToPoint(destination, true);
     }
 
     public override void OnSteeringTicked()
     {
-        if (!TryShootAnyTarget(Bot.GoalEnemy) && !Bot.Steering.LookToMovingDirection())
+        Enemy enemy = Bot.GoalEnemy;
+        if (TryShootAnyTarget(enemy))
         {
-            Bot.Steering.LookToLastKnownEnemyPosition(Bot.GoalEnemy);
+            Bot.Steering.SteerByPriority(enemy, false);
+            return;
         }
-    }
-
-    private bool CheckShoot(Enemy enemy)
-    {
-        float distance = enemy.RealDistance;
-        bool enemyLookAtMe = enemy.EnemyLookingAtMe;
-        float EffDist = Bot.Info.WeaponInfo.EffectiveWeaponDistance;
-
-        if (enemy.IsVisible)
+        // Face where the shot is expected to come from once in position, otherwise watch the route.
+        if (Bot.Mover.Moving && Bot.Steering.LookToMovingDirection())
         {
-            if (enemyLookAtMe)
-            {
-                return true;
-            }
-            if (distance <= EffDist && enemy.CanShoot)
-            {
-                return true;
-            }
+            return;
         }
-        return false;
+        Bot.Steering.LookToLastKnownEnemyPosition(enemy);
     }
 }

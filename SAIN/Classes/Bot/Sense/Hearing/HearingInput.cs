@@ -23,8 +23,9 @@ public class HearingInput(HearingSensor hearingSensor) : BotSubClass<HearingSens
 
     private const float IMPACT_HEAR_FREQUENCY = 0.5f;
     private const float IMPACT_HEAR_FREQUENCY_FAR = 0.05f;
-    private const float IMPACT_MAX_HEAR_DISTANCE = 50f * 50f;
-    private const float IMPACT_DISPERSION = 5f * 5f;
+    private const float IMPACT_MAX_HEAR_DISTANCE_SQR = 50f * 50f;
+    private const float IMPACT_DANGER_DISTANCE_SQR = 25f * 25f;
+    private const float IMPACT_DISPERSION_COEF = 25f;
 
     private bool _ignoreUnderFire = false;
     private bool _ignoreHearing = false;
@@ -359,16 +360,16 @@ public class HearingInput(HearingSensor hearingSensor) : BotSubClass<HearingSens
             return;
         }
 
-        float distance = (bullet.CurrentPosition - Bot.Position).sqrMagnitude;
+        float sqrDistance = (bullet.CurrentPosition - Bot.Position).sqrMagnitude;
 
-        if (distance > IMPACT_MAX_HEAR_DISTANCE)
+        if (sqrDistance > IMPACT_MAX_HEAR_DISTANCE_SQR)
         {
             _nextHearImpactTime = currentTime + IMPACT_HEAR_FREQUENCY_FAR;
             return;
         }
         _nextHearImpactTime = currentTime + IMPACT_HEAR_FREQUENCY;
 
-        float dispersion = distance / IMPACT_DISPERSION;
+        float dispersion = Mathf.Sqrt(sqrDistance) / IMPACT_DISPERSION_COEF;
         Vector3 random = UnityEngine.Random.onUnitSphere;
         random.y = 0;
         random = random.normalized * dispersion;
@@ -379,7 +380,7 @@ public class HearingInput(HearingSensor hearingSensor) : BotSubClass<HearingSens
             position = estimatedPos,
             soundType = SAINSoundType.BulletImpact,
             placeType = EEnemyPlaceType.Hearing,
-            isDanger = distance < 25f * 25f,
+            isDanger = sqrDistance < IMPACT_DANGER_DISTANCE_SQR,
             shallReportToSquad = true,
         };
 

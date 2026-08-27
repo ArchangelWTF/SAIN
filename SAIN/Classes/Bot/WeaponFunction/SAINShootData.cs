@@ -270,22 +270,29 @@ public class SAINShootData : BotComponentClassBase
                 holsterEngageDist = holster.EngagementDistance;
             }
 
-            float minDifference = Mathf.Abs(distance - primaryEngageDist ?? 0);
+            float minDifference = float.MaxValue;
             optimalSlot = EquipmentSlot.FirstPrimaryWeapon;
 
-            float difference = Mathf.Abs(distance - secondaryEngageDist ?? 0);
-            if (difference < minDifference)
+            if (primaryEngageDist.HasValue)
             {
-                minDifference = difference;
-                optimalSlot = EquipmentSlot.SecondPrimaryWeapon;
+                minDifference = Mathf.Abs(distance - primaryEngageDist.Value);
             }
 
-            if (!BotOwner.WeaponManager.HaveBullets)
+            if (secondaryEngageDist.HasValue)
             {
-                difference = Mathf.Abs(distance - holsterEngageDist ?? 0);
+                float difference = Mathf.Abs(distance - secondaryEngageDist.Value);
                 if (difference < minDifference)
                 {
                     minDifference = difference;
+                    optimalSlot = EquipmentSlot.SecondPrimaryWeapon;
+                }
+            }
+
+            if (!BotOwner.WeaponManager.HaveBullets && holsterEngageDist.HasValue)
+            {
+                float difference = Mathf.Abs(distance - holsterEngageDist.Value);
+                if (difference < minDifference)
+                {
                     optimalSlot = EquipmentSlot.Holster;
                 }
             }

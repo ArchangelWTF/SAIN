@@ -4,6 +4,7 @@
 @using SAINServerMod.Generators
 @using SAINServerMod.Utils
 @inject ISnackbar Snackbar
+@inject PresetGenerationService PresetGeneration
 
 <MudChipSet T="string" SelectedValue="_sectionFilter" SelectedValueChanged="OnSectionChanged"
             SelectionMode="SelectionMode.SingleSelection" Variant="Variant.Text" Color="Color.Primary" Class="sain-section-chips mb-2">
@@ -92,7 +93,7 @@ else
 
     protected override void OnInitialized()
     {
-        var sectionByType = DefaultBotTypes.All().ToDictionary(b => b.WildSpawnType, b => b.Section ?? "Other");
+        var sectionByType = PresetGeneration.AllBotTypes().ToDictionary(b => b.WildSpawnType, b => b.Section ?? "Other");
 
         _allBots = Bundle.BotSettings
             .Select(kv => new BotOption(

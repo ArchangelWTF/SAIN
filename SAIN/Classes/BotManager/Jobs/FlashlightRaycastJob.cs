@@ -21,6 +21,9 @@ public class FlashlightRaycastJob : SainJobTemplate, IDisposable
     private const int Tight_FlashlightBeamPointCount = 16;
     private const float Tight_FlashlightTraceDistance = 60;
 
+    private const float LaserPathPointSpacing = 5f;
+    private const int LaserHitIndex = 0;
+
     public FlashlightRaycastJob(MonoBehaviour gameWorld)
         : base("Flashlight Detection Job", gameWorld, true, 0.1f)
     {
@@ -78,7 +81,7 @@ public class FlashlightRaycastJob : SainJobTemplate, IDisposable
                     RaycastJobs.Add(
                         new RaycastJob(
                             Directions,
-                            player.Transform.WeaponData.PointDirection,
+                            player.Transform.WeaponData.FirePort,
                             LayersMaskController.HighPolyWithTerrainMaskAI,
                             player.Player,
                             null
@@ -120,6 +123,33 @@ public class FlashlightRaycastJob : SainJobTemplate, IDisposable
                 //    }
                 //}
             }
+        }
+    }
+
+    private static void AddLaserPathPoints(PlayerComponent player, NativeArray<RaycastHit> hits, List<Vector3> lightPoints)
+    {
+        FlashLightClass flashlight = player.Flashlight;
+        if (!flashlight.Laser && !flashlight.IRLaser)
+        {
+            return;
+        }
+
+        Vector3 origin = player.Transform.WeaponData.FirePort;
+        Vector3 direction = player.Transform.WeaponData.PointDirection;
+        if (direction == Vector3.zero)
+        {
+            return;
+        }
+
+        float beamLength = LaserTraceDistance;
+        if (hits.Length > LaserHitIndex && hits[LaserHitIndex].collider != null)
+        {
+            beamLength = Mathf.Min(beamLength, Vector3.Distance(origin, hits[LaserHitIndex].point));
+        }
+
+        for (float distance = LaserPathPointSpacing; distance < beamLength; distance += LaserPathPointSpacing)
+        {
+            lightPoints.Add(origin + (direction * distance));
         }
     }
 

@@ -437,7 +437,7 @@ public class BotComponent : BotComponentBase, ISPlayer
 
         if (Info.Profile.IsPlayerScav)
         {
-            return IsAssignedBrainAllowed(assignedBrainName, AIBrains.AllowedPlayerScavBrains, "PlayerScav");
+            return IsAssignedBrainAllowed(assignedBrainName, AIBrains.AllowedPlayerScavBrains, "PlayerScav", false);
         }
 
         if (Info.Profile.IsScav)
@@ -448,16 +448,29 @@ public class BotComponent : BotComponentBase, ISPlayer
         return true;
     }
 
-    private bool IsAssignedBrainAllowed(string assignedBrainName, IReadOnlyCollection<string> allowedBrainNames, string botCategory)
+    private bool IsAssignedBrainAllowed(
+        string assignedBrainName,
+        IReadOnlyCollection<string> allowedBrainNames,
+        string botCategory,
+        bool notify = true
+    )
     {
         if (allowedBrainNames.Contains(assignedBrainName))
         {
             return true;
         }
 
-        Logger.LogAndNotifyError(
-            $"{BotOwner.name} is a {botCategory} but does not have any of these BaseBrains: ${string.Join(", ", allowedBrainNames)}! Current Brain Assignment: [{assignedBrainName}] : Destroying SAIN for this bot..."
-        );
+        string message =
+            $"{BotOwner.name} is a {botCategory} but does not have any of these BaseBrains: ${string.Join(", ", allowedBrainNames)}! Current Brain Assignment: [{assignedBrainName}] : Destroying SAIN for this bot...";
+
+        if (notify)
+        {
+            Logger.LogAndNotifyError(message);
+        }
+        else
+        {
+            Logger.LogError(message);
+        }
 
         return false;
     }

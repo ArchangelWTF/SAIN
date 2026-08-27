@@ -8,6 +8,7 @@ using SAIN.Preset.Shared.Models.Enums;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.SAINComponent.Classes.Search;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace SAIN.SAINComponent.Classes.Decision;
 
@@ -19,6 +20,7 @@ public class EnemyDecisionClass : BotBase
     private const float FREEZE_MAX_DISTANCE = 70;
     private const float FREEZE_MIN_TIMESINCESEEN = 240f;
     private const float FREEZE_MAX_TIMESINCEHEARD = 80f;
+    private const float MOVE_TO_ENGAGE_MAX_TIME_SINCE_KNOWN = 60f;
 
     public SearchReasonsStruct DebugSearchReasons { get; private set; }
     public float FrozenDuration { get; private set; }
@@ -27,8 +29,18 @@ public class EnemyDecisionClass : BotBase
     public bool ShiftCoverComplete { get; set; }
     public bool? DebugShallSearch { get; set; }
 
+    public Vector3? FiringPosition
+    {
+        get { return _firingPositionFinder.Position; }
+    }
+
     public EnemyDecisionClass(BotComponent sain)
-        : base(sain) { }
+        : base(sain)
+    {
+        _firingPositionFinder = new FiringPositionFinder(sain);
+    }
+
+    private readonly FiringPositionFinder _firingPositionFinder;
 
     public bool GetDecision(out ECombatDecision result, Enemy enemy, EnemyList knownEnemies)
     {
@@ -121,6 +133,19 @@ public class EnemyDecisionClass : BotBase
             if (shallThrowNade)
             {
                 result = ECombatDecision.ThrowGrenade;
+                return true;
+            }
+
+            bool moveToEngage = ShallMoveToEngage(enemy, out reason);
+#if DEBUG
+            if (SAINPlugin.DebugMode)
+            {
+                DecisionReasons.AppendLine($"6. Shall Move To Engage: [{moveToEngage}, {reason}]");
+            }
+#endif
+            if (moveToEngage)
+            {
+                result = ECombatDecision.MoveToEngage;
                 return true;
             }
 
@@ -404,38 +429,39 @@ public class EnemyDecisionClass : BotBase
         return false;
     }
 
-    private bool shallMoveToEngage(Enemy enemy)
+    private bool ShallMoveToEngage(Enemy enemy, out string reason)
     {
-        if (Bot.Suppression.IsSuppressed)
+        if (enemy.IsVisible)
         {
+            reason = "enemyVisible";
             return false;
         }
-        if (!enemy.Seen || enemy.TimeSinceSeen < 8f)
+        if (Bot.Memory.Health.HealthStatus == ETagStatus.Dying)
         {
+            reason = "imDying";
             return false;
         }
-        if (enemy.IsVisible && enemy.EnemyLookingAtMe)
+        if (enemy.KnownPlaces.TimeSinceLastKnownUpdated > MOVE_TO_ENGAGE_MAX_TIME_SINCE_KNOWN)
         {
+            reason = "knownTooOld";
             return false;
         }
-        var decision = Bot.Decision.CurrentCombatDecision;
-        if (BotOwner.Memory.IsUnderFire && decision != ECombatDecision.MoveToEngage)
+
+        bool unreachable = enemy.Path.PathToEnemyStatus != NavMeshPathStatus.PathComplete;
+        if (!unreachable && !enemy.IsSniper)
         {
+            reason = "canWalkToEnemy";
             return false;
         }
-        if (decision == ECombatDecision.Retreat || (decision == ECombatDecision.SeekCover && Bot.Cover.CoverInUse == null))
+
+        if (!_firingPositionFinder.Find(enemy))
         {
+            reason = "noFiringPosition";
             return false;
         }
-        if (enemy.RealDistance > Bot.Info.WeaponInfo.EffectiveWeaponDistance && decision != ECombatDecision.MoveToEngage)
-        {
-            return true;
-        }
-        if (enemy.RealDistance > Bot.Info.WeaponInfo.EffectiveWeaponDistance * 0.66f && decision == ECombatDecision.MoveToEngage)
-        {
-            return true;
-        }
-        return false;
+
+        reason = unreachable ? "cantReachEnemy" : "sniperOutOfReach";
+        return true;
     }
 
     private bool shallShootDistantEnemy(Enemy enemy, out string reason)

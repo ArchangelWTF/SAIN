@@ -95,7 +95,7 @@ public sealed class SainMember
             {
                 instance = Activator.CreateInstance(type);
             }
-            catch {}
+            catch { }
             _cache[type] = instance;
             return instance;
         }

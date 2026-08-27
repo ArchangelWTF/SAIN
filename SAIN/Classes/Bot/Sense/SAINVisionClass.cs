@@ -44,8 +44,7 @@ public class SAINVisionClass : BotComponentClassBase
     {
         if (_nextUpdateVisibleDist < Time.time)
         {
-            _nextUpdateVisibleDist =
-                Time.time + (Bot.Flashed.IsFlashed ? VISIONDISTANCE_UPDATE_FREQ_FLASHED : VISIONDISTANCE_UPDATE_FREQ);
+            _nextUpdateVisibleDist = Time.time + (Bot.Flashed.IsFlashed ? VISIONDISTANCE_UPDATE_FREQ_FLASHED : VISIONDISTANCE_UPDATE_FREQ);
             var timeSettings = GlobalSettings.Look.Time;
             var lookSensor = BotOwner.LookSensor;
 

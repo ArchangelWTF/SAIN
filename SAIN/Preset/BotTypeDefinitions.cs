@@ -14,6 +14,9 @@ public sealed class BotType
     public string Description;
     public string Section;
     public WildSpawnType WildSpawnType;
+    public List<string> BrainsToApply;
+    public List<string> LayersToRemove;
+    public string BaseBrain;
 }
 
 public class BotTypeDefinitions
@@ -79,6 +82,9 @@ public class BotTypeDefinitions
                     Description = info.Description,
                     Section = info.Section,
                     WildSpawnType = info.WildSpawnType.ToEft(),
+                    BrainsToApply = info.BrainsToApply,
+                    LayersToRemove = info.LayersToRemove,
+                    BaseBrain = info.BaseBrain,
                 }
             );
         }

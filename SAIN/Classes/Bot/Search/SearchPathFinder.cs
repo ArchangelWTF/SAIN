@@ -60,19 +60,36 @@ public class SearchPathFinder : BotSubClass<SearchClass>
             return;
         }
 
-        if (enemy.Path.PathCornerCount > 2)
+        if (targetPlace.DistanceToBot <= ARRIVE_DISTANCE && enemy.Path.PathCornerCount <= 2)
         {
+            enemy.KnownPlaces.SetPlaceAsSearched(targetPlace);
+            Reset();
             return;
         }
 
-        float destinationDistance = targetPlace.DistanceToBot;
-        if (destinationDistance > 2f)
+        if (ReachedEndOfPartialPath(enemy))
         {
-            return;
+            enemy.KnownPlaces.SetPlaceAsSearched(targetPlace);
+            Reset();
         }
-        enemy.KnownPlaces.SetPlaceAsSearched(targetPlace);
-        Reset();
     }
+
+    private bool ReachedEndOfPartialPath(Enemy enemy)
+    {
+        if (enemy.Path.PathToEnemyStatus != NavMeshPathStatus.PathPartial)
+        {
+            return false;
+        }
+        int cornerCount = enemy.Path.PathCornerCount;
+        if (cornerCount < 1)
+        {
+            return false;
+        }
+        Vector3 pathEnd = enemy.Path.PathCorners[cornerCount - 1];
+        return (pathEnd - Bot.Position).sqrMagnitude <= ARRIVE_DISTANCE * ARRIVE_DISTANCE;
+    }
+
+    private const float ARRIVE_DISTANCE = 2f;
 
     public void Reset()
     {

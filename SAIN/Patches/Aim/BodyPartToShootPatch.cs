@@ -12,16 +12,11 @@ public class BodyPartToShootPatch : ModulePatch
     private static readonly HashSet<BodyPartType> _nonHeadshotBodyPartTypes =
     [
         BodyPartType.body,
-        BodyPartType.leftLeg,
-        BodyPartType.rightLeg,
     ];
 
     private static readonly HashSet<BodyPartType> _upperBodyPartTypes =
     [
         BodyPartType.head,
-        BodyPartType.rightArm,
-        BodyPartType.leftArm,
-        BodyPartType.body,
     ];
 
     protected override MethodBase GetTargetMethod()

@@ -75,6 +75,11 @@ jobs:
           -p:VersionPrefix=${{ steps.version.outputs.prefix }}
           -p:VersionSuffix=${{ steps.version.outputs.suffix }}
 
+      - name: Copy license
+        run: |
+          cp LICENSE "$PLUGIN_DIR/LICENSE"
+          cp LICENSE "$SERVER_MOD_DIR/LICENSE"
+
       - name: Package
         id: package
         shell: bash

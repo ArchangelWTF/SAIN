@@ -16,14 +16,27 @@ public class PlayerHurtPatch : ModulePatch
     [PatchPrefix]
     public static void PatchPrefix(Player __instance, float damage)
     {
-        if (
-            __instance?.HealthController?.IsAlive == true
-            && __instance.IsAI
-            && (!__instance.MovementContext.PhysicalConditionIs(EPhysicalCondition.OnPainkillers) || damage > 4f)
-        )
+        if (__instance?.HealthController?.IsAlive != true || !__instance.IsAI)
         {
-            __instance.Speaker?.Play(EPhraseTrigger.OnBeingHurt, __instance.HealthStatus, true, null);
+            return;
         }
+
+        if (SAINPlugin.LoadedPreset.GlobalSettings.Talk.DisableBotTalkPatching)
+        {
+            return;
+        }
+
+        if (!SAINEnableClass.GetSAIN(__instance.ProfileId, out BotComponent bot) || !bot.Talk.PlayerInEarshot)
+        {
+            return;
+        }
+
+        if (__instance.MovementContext.PhysicalConditionIs(EPhysicalCondition.OnPainkillers) && damage <= 4f)
+        {
+            return;
+        }
+
+        __instance.Speaker?.Play(EPhraseTrigger.OnBeingHurt, __instance.HealthStatus, true, null);
     }
 }
 

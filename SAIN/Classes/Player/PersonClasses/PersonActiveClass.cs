@@ -12,10 +12,7 @@ public class PersonActiveClass(PlayerComponent playerComponent)
 
     public void CheckActive(PlayerComponent playerComponent)
     {
-        if (IsAlive)
-        {
-            IsAlive = CheckAlive(playerComponent);
-        }
+        IsAlive = CheckAlive(playerComponent);
 
         bool wasActive = PlayerActive;
         PlayerActive = IsAlive && playerComponent.gameObject.activeInHierarchy;

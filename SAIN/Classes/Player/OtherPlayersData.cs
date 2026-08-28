@@ -50,48 +50,56 @@ public class OtherPlayersData : PlayerComponentBase
 
     private void PlayerAdded(PlayerComponent playerComp)
     {
-        if (playerComp == PlayerComponent)
+        GetOrAddData(playerComp);
+    }
+
+    /// <summary>
+    /// Fetches this player's data for <paramref name="playerComp"/>, creating it if it is missing.
+    /// </summary>
+    public OtherPlayerData GetOrAddData(PlayerComponent playerComp)
+    {
+        if (playerComp == null || playerComp == PlayerComponent)
         {
-            return;
+            return null;
         }
-        if (playerComp == null)
-        {
-            //Logger.LogWarning("Player Component is null. Cannot add other player data!");
-            return;
-        }
-        if (playerComp.Player?.HealthController?.IsAlive != true)
-        {
-            //Logger.LogWarning("Player is dead. Cannot add other player data!");
-            return;
-        }
+
         string profileId = playerComp.ProfileId;
-        if (profileId == PlayerComponent.ProfileId)
+
+        if (string.IsNullOrEmpty(profileId) || profileId == PlayerComponent.ProfileId)
         {
-            return;
+            return null;
         }
 
-        // Just in-case make sure we remove any data under this profile id
-        if (DataDictionary.TryGetValue(profileId, out OtherPlayerData Data))
+        if (DataDictionary.TryGetValue(profileId, out OtherPlayerData data))
         {
-            DataHashSet.Remove(Data);
-            DataDictionary.Remove(profileId);
-            //Logger.LogWarning($"Removed Existing Playerdata for profile ID [{profileId}] : Old Data Nickname: [{Data.OtherPlayerComponent?.Player?.Profile.Nickname}] : New Data Nickname: [{playerComp.Player?.Profile.Nickname}]");
+            if (data.OtherPlayerComponent == playerComp)
+            {
+                return data;
+            }
+
+            RemoveData(profileId, data);
         }
 
-        Data = new(profileId, playerComp);
-        DataHashSet.Add(Data);
-        DataDictionary.Add(profileId, Data);
-        DataList.Add(Data);
+        data = new OtherPlayerData(profileId, playerComp);
+        DataHashSet.Add(data);
+        DataList.Add(data);
+        DataDictionary.Add(profileId, data);
+        return data;
+    }
+
+    private void RemoveData(string profileId, OtherPlayerData data)
+    {
+        data.Dispose();
+        DataHashSet.Remove(data);
+        DataList.Remove(data);
+        DataDictionary.Remove(profileId);
     }
 
     private void PlayerRemoved(string profileId, PlayerComponent playerComp)
     {
-        if (DataDictionary.TryGetValue(profileId, out OtherPlayerData Data))
+        if (DataDictionary.TryGetValue(profileId, out OtherPlayerData data))
         {
-            Data.Dispose();
-            DataHashSet.Remove(Data);
-            DataDictionary.Remove(profileId);
-            DataList.Remove(Data);
+            RemoveData(profileId, data);
         }
     }
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using EFT;
 using SAIN.Classes;
 using SAIN.Components;
@@ -331,7 +331,7 @@ public class Enemy : BotBase, ISPlayer
         EnemyProfileId = enemyComponent.ProfileId;
         OwnerProfileId = bot.ProfileId;
 
-        EnemyPlayerData = bot.PlayerComponent.OtherPlayersData.DataDictionary[enemyComponent.ProfileId];
+        EnemyPlayerData = bot.PlayerComponent.OtherPlayersData.GetOrAddData(enemyComponent);
         UpdateDistAndDirection();
 
         var _enemyData = new EnemyData(this);

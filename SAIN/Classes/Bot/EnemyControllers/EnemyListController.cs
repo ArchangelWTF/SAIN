@@ -285,9 +285,10 @@ public class EnemyListController : BotSubClass<SAINEnemyController>, IBotClass
         {
             //Logger.LogDebug($"Got EnemyInfo from Bot's Group Enemies.");
             enemyInfo = BotOwner.EnemiesController.AddNew(BotOwner.BotsGroup, enemyPlayer, value);
-            if (enemyInfo != null)
+            BotEnemiesController controller = BotOwner.EnemiesController;
+            if (enemyInfo != null && controller._countEnemies < controller.SortedInfos.Length)
             {
-                //Logger.LogDebug($"Successfully Added new EnemyInfo.");
+                controller.SetInfo(enemyPlayer, enemyInfo);
             }
         }
         return enemyInfo;
@@ -295,6 +296,11 @@ public class EnemyListController : BotSubClass<SAINEnemyController>, IBotClass
 
     private Enemy createEnemy(PlayerComponent enemyPlayerComponent, EnemyInfo enemyInfo)
     {
+        if (Bot.PlayerComponent.OtherPlayersData.GetOrAddData(enemyPlayerComponent) == null)
+        {
+            return null;
+        }
+
         Enemy enemy = new(Bot, enemyPlayerComponent, enemyInfo);
         enemy.Init();
         Enemies.Add(enemy.EnemyProfileId, enemy);

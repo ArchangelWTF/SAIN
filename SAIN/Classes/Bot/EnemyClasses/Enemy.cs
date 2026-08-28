@@ -166,6 +166,8 @@ public class Enemy : BotBase, ISPlayer
     public SAINEnemyPath Path { get; }
     public EnemyInfo EnemyInfo { get; }
     public EnemyAim Aim { get; }
+
+    public EnemyAimTarget AimTarget { get; }
     public EnemyHearing Hearing { get; }
 
     public bool IsCurrentEnemy
@@ -212,11 +214,6 @@ public class Enemy : BotBase, ISPlayer
     }
 
     public bool WasValid { get; private set; } = true;
-
-    public Vector3 CenterMass
-    {
-        get { return FindCenterMass(EnemyPlayerComponent); }
-    }
 
     public bool FirstContactOccured
     {
@@ -346,6 +343,7 @@ public class Enemy : BotBase, ISPlayer
         Path = new SAINEnemyPath(_enemyData);
         KnownPlaces = new EnemyKnownPlaces(_enemyData);
         Aim = new EnemyAim(_enemyData);
+        AimTarget = new EnemyAimTarget(_enemyData);
         Hearing = new EnemyHearing(_enemyData);
 
         _nextCheckLookTime = Time.time + UnityEngine.Random.Range(0, 1f);
@@ -608,14 +606,6 @@ public class Enemy : BotBase, ISPlayer
         catch
         { // EFT code loves throwing random errors
         }
-    }
-
-    private static Vector3 FindCenterMass(PlayerComponent playerComp)
-    {
-        Vector3 headPos = playerComp.Player.MainParts[BodyPartType.head].Position;
-        Vector3 floorPos = playerComp.Position;
-        Vector3 centerMass = Vector3.Lerp(headPos, floorPos, SAINPlugin.LoadedPreset.GlobalSettings.Aiming.CenterMassVal);
-        return centerMass;
     }
 
     public void UpdateLastSeenPosition(Vector3 position, float currentTime)

@@ -8,7 +8,8 @@ public class RaycastResult
     public float TimeLastSuccess { get; private set; }
     public RaycastHit LastRaycastHit { get; private set; }
     public BodyPartCollider LastSuccessBodyPart { get; private set; }
-    public Vector3? LastSuccessPoint { get; private set; }
+
+    private Vector3 _lastSuccessLocalPoint;
 
     public void Update(Vector3 castPoint, BodyPartCollider bodyPartCollider, RaycastHit raycastHit, float time)
     {
@@ -18,13 +19,18 @@ public class RaycastResult
         if (raycastHit.collider == null)
         {
             LastSuccessBodyPart = bodyPartCollider;
-            LastSuccessPoint = castPoint;
+            _lastSuccessLocalPoint = bodyPartCollider.transform.InverseTransformPoint(castPoint);
             TimeLastSuccess = time;
         }
-        else
+    }
+
+    public Vector3? GetSuccessPoint()
+    {
+        var collider = LastSuccessBodyPart;
+        if (collider == null || collider.transform == null)
         {
-            LastSuccessBodyPart = null;
-            LastSuccessPoint = null;
+            return null;
         }
+        return collider.transform.TransformPoint(_lastSuccessLocalPoint);
     }
 }

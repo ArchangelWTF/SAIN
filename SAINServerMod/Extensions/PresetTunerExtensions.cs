@@ -167,11 +167,6 @@ public static class PresetTunerExtensions
 
                 var impossible = settings[ESainBotDifficulty.impossible];
                 impossible.Move.STRAFE_SPEED = 1.0f;
-
-                easy.Aiming.AimCenterMass = false;
-                normal.Aiming.AimCenterMass = false;
-                hard.Aiming.AimCenterMass = false;
-                impossible.Aiming.AimCenterMass = false;
             }
             if (
                 botsetting.Key.IsPMC()
@@ -282,11 +277,6 @@ public static class PresetTunerExtensions
             hard.Core.VisibleDistance = 250f;
             impossible.Core.VisibleDistance = 275f;
 
-            easy.Aiming.AimCenterMass = true;
-            normal.Aiming.AimCenterMass = true;
-            hard.Aiming.AimCenterMass = true;
-            impossible.Aiming.AimCenterMass = false;
-
             easy.Aiming.FasterCQBReactions = false;
             normal.Aiming.FasterCQBReactions = true;
             hard.Aiming.FasterCQBReactions = true;
@@ -338,11 +328,6 @@ public static class PresetTunerExtensions
                     hard.Core.VisibleDistance = 250f;
                     impossible.Core.VisibleDistance = 275f;
 
-                    easy.Aiming.AimCenterMass = true;
-                    normal.Aiming.AimCenterMass = true;
-                    hard.Aiming.AimCenterMass = true;
-                    impossible.Aiming.AimCenterMass = false;
-
                     break;
 
                 case ESainWildSpawnType.assault:
@@ -386,11 +371,6 @@ public static class PresetTunerExtensions
                     hard.Move.LEAN_TOGGLE = false;
                     impossible.Move.LEAN_TOGGLE = false;
 
-                    easy.Aiming.AimCenterMass = true;
-                    normal.Aiming.AimCenterMass = true;
-                    hard.Aiming.AimCenterMass = true;
-                    impossible.Aiming.AimCenterMass = true;
-
                     break;
 
                 case ESainWildSpawnType.arenaFighter:
@@ -402,11 +382,6 @@ public static class PresetTunerExtensions
                     normal.Move.STRAFE_SPEED = 0.75f;
                     hard.Move.STRAFE_SPEED = 0.8f;
                     impossible.Move.STRAFE_SPEED = 1f;
-
-                    easy.Aiming.AimCenterMass = false;
-                    normal.Aiming.AimCenterMass = false;
-                    hard.Aiming.AimCenterMass = false;
-                    impossible.Aiming.AimCenterMass = false;
 
                     break;
 
@@ -422,11 +397,6 @@ public static class PresetTunerExtensions
                     hard.Move.STRAFE_SPEED = 0.8f;
                     impossible.Move.STRAFE_SPEED = 1f;
 
-                    easy.Aiming.AimCenterMass = false;
-                    normal.Aiming.AimCenterMass = false;
-                    hard.Aiming.AimCenterMass = false;
-                    impossible.Aiming.AimCenterMass = false;
-
                     break;
 
                 case ESainWildSpawnType.bossKilla:
@@ -434,11 +404,6 @@ public static class PresetTunerExtensions
                 case ESainWildSpawnType.bossTagilla:
                 case ESainWildSpawnType.bossTagillaAgro:
                 case ESainWildSpawnType.bossKolontay:
-
-                    easy.Aiming.AimCenterMass = false;
-                    normal.Aiming.AimCenterMass = false;
-                    hard.Aiming.AimCenterMass = false;
-                    impossible.Aiming.AimCenterMass = false;
 
                     easy.Shoot.FireratMulti = 2f;
                     normal.Shoot.FireratMulti = 2f;
@@ -455,10 +420,6 @@ public static class PresetTunerExtensions
                 case ESainWildSpawnType.bossKojaniy:
                 case ESainWildSpawnType.bossPartisan:
 
-                    easy.Aiming.AimCenterMass = false;
-                    normal.Aiming.AimCenterMass = false;
-                    hard.Aiming.AimCenterMass = false;
-                    impossible.Aiming.AimCenterMass = false;
                     easy.Difficulty.ScatteringCoef = 0.5f;
                     normal.Difficulty.ScatteringCoef = 0.5f;
                     hard.Difficulty.ScatteringCoef = 0.5f;
@@ -487,11 +448,6 @@ public static class PresetTunerExtensions
                     hard.Move.STRAFE_SPEED = 0.8f;
                     impossible.Move.STRAFE_SPEED = 1f;
 
-                    easy.Aiming.AimCenterMass = false;
-                    normal.Aiming.AimCenterMass = false;
-                    hard.Aiming.AimCenterMass = false;
-                    impossible.Aiming.AimCenterMass = false;
-
                     break;
 
                 case ESainWildSpawnType.sectantWarrior:
@@ -502,10 +458,6 @@ public static class PresetTunerExtensions
                     hard.Move.STRAFE_SPEED = 1f;
                     impossible.Move.STRAFE_SPEED = 1f;
 
-                    easy.Aiming.AimCenterMass = false;
-                    normal.Aiming.AimCenterMass = false;
-                    hard.Aiming.AimCenterMass = false;
-                    impossible.Aiming.AimCenterMass = false;
                     break;
 
                 case ESainWildSpawnType.bossKnight:
@@ -516,11 +468,6 @@ public static class PresetTunerExtensions
                     normal.Move.STRAFE_SPEED = 1f;
                     hard.Move.STRAFE_SPEED = 1f;
                     impossible.Move.STRAFE_SPEED = 1f;
-
-                    easy.Aiming.AimCenterMass = false;
-                    normal.Aiming.AimCenterMass = false;
-                    hard.Aiming.AimCenterMass = false;
-                    impossible.Aiming.AimCenterMass = false;
 
                     easy.Aiming.AimForHead = true;
                     normal.Aiming.AimForHead = true;
@@ -627,11 +574,6 @@ public static class PresetTunerExtensions
                 impossible.Aiming.MAX_AIM_TIME = 1.0f;
                 impossible.Aiming.BASE_HIT_AFFECTION_DELAY_SEC = 0.25f;
                 impossible.Core.VisibleDistance = 275f;
-
-                easy.Aiming.AimCenterMass = false;
-                normal.Aiming.AimCenterMass = false;
-                hard.Aiming.AimCenterMass = false;
-                impossible.Aiming.AimCenterMass = false;
             }
         }
     }
@@ -642,7 +584,6 @@ public static class PresetTunerExtensions
 
         global.Shoot.BOT_RECOIL_COEF = 0.75f;
         global.Difficulty.ScatteringCoef = 0.55f;
-        global.Aiming.AimCenterMassGlobal = false;
         global.Difficulty.VisibleDistCoef = 1.25f;
         global.Difficulty.GainSightCoef = 1.25f;
         global.Difficulty.PRECISION_SPEED_COEF = 1.25f;
@@ -658,7 +599,6 @@ public static class PresetTunerExtensions
                 setting.Value.Core.VisibleAngle = 170f;
                 setting.Value.Shoot.FireratMulti = 1.5f;
                 setting.Value.Shoot.BurstMulti = 2f;
-                setting.Value.Aiming.AimCenterMass = false;
             }
         }
         foreach (var botsetting in botSettings)
@@ -732,7 +672,6 @@ public static class PresetTunerExtensions
         global.Difficulty.PRECISION_SPEED_COEF = 3f;
         global.Difficulty.ACCURACY_SPEED_COEF = 0.1f;
 
-        global.Aiming.AimCenterMassGlobal = false;
         global.Look.NotLooking.NotLookingToggle = false;
 
         botSettings.ApplyHarderPMCs();
@@ -744,7 +683,6 @@ public static class PresetTunerExtensions
                 setting.Value.Core.VisibleAngle = 180f;
                 setting.Value.Shoot.FireratMulti = 3f;
                 setting.Value.Shoot.BurstMulti = 3f;
-                setting.Value.Aiming.AimCenterMass = false;
                 setting.Value.Core.VisibleAngle = 180;
                 setting.Value.Aiming.AimForHead = true;
                 setting.Value.Aiming.AimForHeadChance = 66f;

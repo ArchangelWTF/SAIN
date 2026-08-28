@@ -1,6 +1,7 @@
 using System.Runtime.Serialization;
 using SAIN.Preset.Shared.Attributes;
 using SAIN.Preset.Shared.GlobalSettings;
+using SAIN.Preset.Shared.GlobalSettings.Categories;
 
 namespace SAIN.Preset.Shared.BotSettings.SAINSettings.Categories;
 
@@ -9,9 +10,15 @@ public class SAINAimingSettings : SAINSettingsBase<SAINAimingSettings>, ISAINSet
 {
     [DataMember]
     [Category("Aim Target")]
-    [Name("Always Aim Center Mass")]
-    [Description("Force this bot type to aim for center of mass.")]
-    public bool AimCenterMass = true;
+    [Name("Override Global Part Weights")]
+    [Description("Use this bot type's own aim target weights instead of the global ones.")]
+    public bool OverrideAimTargetWeights = false;
+
+    [DataMember]
+    [Category("Aim Target")]
+    [Name("Part Weights")]
+    [Description("Only used when Override Global Part Weights is enabled.")]
+    public AimTargetWeights AimTargetWeights = new();
 
     [DataMember]
     [Name("Can Aim for Headshots")]

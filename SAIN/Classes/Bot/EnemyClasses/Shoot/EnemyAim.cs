@@ -154,43 +154,22 @@ public class EnemyAim : EnemyBase
 
     private float CalcVisFactor()
     {
-        var enemyParts = Enemy.EnemyInfo.AllActiveParts;
-        if (enemyParts == null || enemyParts.Count < 1)
+        var parts = Enemy.Vision.EnemyParts.PartsArray;
+        if (parts.Length == 0)
         {
             return 1f;
         }
-        int visCount = 0;
-        int totalCount = 0;
-        foreach (var part in enemyParts)
-        {
-            totalCount++;
 
-            /*
-            if (part.Value.IsVisible)
+        int visCount = 0;
+        foreach (var part in parts)
+        {
+            if (part.CanBeSeen)
             {
                 visCount++;
             }
-            */
         }
 
-        totalCount++;
-
-        /*
-        var bodyPart = Enemy.EnemyInfo.BodyData().Value;
-        if (bodyPart.IsVisible)
-        {
-            visCount++;
-        }
-        */
-
-        float ratio = (float)visCount / (float)totalCount;
-
-        float min = AimSettings.ScatterMulti_PartVis;
-        float max = 1f;
-
-        float result = Mathf.Lerp(min, max, ratio);
-
-        return result;
+        return Mathf.Lerp(1f, AimSettings.ScatterMulti_PartVis, (float)visCount / parts.Length);
     }
 
     private float _visFactor;

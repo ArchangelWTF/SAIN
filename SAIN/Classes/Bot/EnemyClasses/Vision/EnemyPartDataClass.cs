@@ -21,6 +21,11 @@ public class EnemyPartDataClass
     public bool LineOfSight { get; private set; }
     public bool CanShoot { get; private set; }
 
+    public Vector3? ShootPoint
+    {
+        get { return CanShoot ? _raycastResults[(int)ERaycastCheck.Shoot].GetSuccessPoint() : null; }
+    }
+
     private readonly Dictionary<EBodyPartColliderType, BodyPartCollider> _colliderDictionary = [];
 
     public EnemyPartDataClass(EBodyPart bodyPart, BifacialTransform transform, List<BodyPartCollider> colliders)

@@ -132,4 +132,37 @@ public static class Extensions
     {
         return value.Round(1000);
     }
+
+    /// <summary>
+    /// The body part SAIN's own vision data is keyed by.
+    /// </summary>
+    public static EBodyPart ToBodyPart(this EAimTargetPart part)
+    {
+        return part switch
+        {
+            EAimTargetPart.Head => EBodyPart.Head,
+            EAimTargetPart.Chest => EBodyPart.Chest,
+            EAimTargetPart.Stomach => EBodyPart.Stomach,
+            EAimTargetPart.LeftArm => EBodyPart.LeftArm,
+            EAimTargetPart.RightArm => EBodyPart.RightArm,
+            EAimTargetPart.LeftLeg => EBodyPart.LeftLeg,
+            _ => EBodyPart.RightLeg,
+        };
+    }
+
+    /// <summary>
+    /// The body part EFT's own aiming code is keyed by.
+    /// </summary>
+    public static BodyPartType ToBodyPartType(this EAimTargetPart part)
+    {
+        return part switch
+        {
+            EAimTargetPart.Head => BodyPartType.head,
+            EAimTargetPart.LeftArm => BodyPartType.leftArm,
+            EAimTargetPart.RightArm => BodyPartType.rightArm,
+            EAimTargetPart.LeftLeg => BodyPartType.leftLeg,
+            EAimTargetPart.RightLeg => BodyPartType.rightLeg,
+            _ => BodyPartType.body,
+        };
+    }
 }

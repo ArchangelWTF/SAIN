@@ -169,7 +169,7 @@ public class SAINShootData : BotComponentClassBase
             return false;
         }
 
-        Vector3? target = GetAimTarget(Enemy, bot);
+        Vector3? target = GetAimTarget(Enemy);
         if (target != null && Enemy != null)
         {
             bot.BotLight.HandleLightForEnemy(Enemy);
@@ -304,43 +304,12 @@ public class SAINShootData : BotComponentClassBase
         return info != null && info.Durability > min && info.Weapon.ChamberAmmoCount > 0;
     }
 
-    private static Vector3? GetAimTarget(Enemy enemy, BotComponent bot)
+    private static Vector3? GetAimTarget(Enemy enemy)
     {
         if (enemy != null && enemy.IsVisible && enemy.CanShoot)
         {
-            //Vector3? test = enemy.Shoot.Targets.GetPointToShoot();
-            //if (test == null) {
-            //    Logger.LogWarning($"cant get point to shoot with new system! oh no!");
-            //}
-
-            Vector3? centerMass = FindCenterMassPoint(enemy, bot);
-            Vector3? partToShoot = GetEnemyPartToShoot(enemy.EnemyInfo);
-            Vector3? modifiedTarget = CheckYValue(centerMass, partToShoot);
-            Vector3? finalTarget = modifiedTarget ?? partToShoot ?? centerMass;
-
-            return finalTarget;
+            return enemy.AimTarget.GetPointToShoot() ?? GetEnemyPartToShoot(enemy.EnemyInfo);
         }
-        return null;
-    }
-
-    private static Vector3? CheckYValue(Vector3? centerMass, Vector3? partTarget)
-    {
-        if (centerMass != null && partTarget != null && centerMass.Value.y < partTarget.Value.y)
-        {
-            Vector3 newTarget = partTarget.Value;
-            newTarget.y = centerMass.Value.y;
-            return new Vector3?(newTarget);
-        }
-        return null;
-    }
-
-    private static Vector3? FindCenterMassPoint(Enemy enemy, BotComponent bot)
-    {
-        if (SAINPlugin.LoadedPreset.GlobalSettings.Aiming.AimCenterMassGlobal)
-        {
-            return enemy.CenterMass;
-        }
-
         return null;
     }
 

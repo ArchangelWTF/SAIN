@@ -12,12 +12,9 @@ public class AimSettings : SAINSettingsBase<AimSettings>, ISAINSettings
     public HitEffectSettings HitEffects = new();
 
     [DataMember]
-    [Name("Always Aim Center Mass Global")]
-    [Description(
-        "Force Bots to aim for center of mass. If this is disabled, all bots will have Always Aim Center Mass turned OFF, so their individual settings will be ignored."
-    )]
     [Category("Aim Target")]
-    public bool AimCenterMassGlobal = true;
+    [Name("Aim Target Selection")]
+    public AimTargetSettings AimTarget = new();
 
     [DataMember]
     [Category("Scatter Modifiers")]
@@ -184,18 +181,6 @@ public class AimSettings : SAINSettingsBase<AimSettings>, ISAINSettings
     [Advanced]
     [MinMax(25f, 200f, 10f)]
     public float IronSightScaleDistanceEnd = 75f;
-
-    [DataMember]
-    [Name("Center Mass Point")]
-    [Description(
-        "The maximum height that bots will target if Always Aim Center Mass is on. "
-            + "A value of 0 will be directly on the center your head, a value of 1 will be directly at the floor below you at your feet. "
-            + "If their aim target is above this, the height will be adjusted to be where this point is."
-    )]
-    [Category("Aim Target")]
-    [Advanced]
-    [MinMax(0f, 1f, 10000f)]
-    public float CenterMassVal = 0.3f;
 
     [DataMember]
     [Category("Time to Aim")]

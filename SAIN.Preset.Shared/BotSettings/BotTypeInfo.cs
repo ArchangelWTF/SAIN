@@ -21,7 +21,7 @@ public sealed class BotTypeInfo
 
     [DataMember]
     public string Description;
-    
+
     [DataMember]
     public string BotDbKey;
 

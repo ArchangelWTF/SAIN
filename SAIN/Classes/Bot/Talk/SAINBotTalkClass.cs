@@ -1,16 +1,51 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using EFT;
 using EFT.Ballistics;
 using SAIN.Components;
+using SAIN.Components.PlayerComponentSpace;
 using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes.Talk;
 
 public class SAINBotTalkClass : BotComponentClassBase
 {
+    private const float EARSHOT_DISTANCE = 150f;
+    private const float EARSHOT_CHECK_FREQ = 1f;
+
+    private float _nextEarshotCheckTime;
+    private bool _playerInEarshot;
+
     public bool CanTalk
     {
-        get { return Bot.Info.FileSettings.Mind.CanTalk && _timeCanTalk < Time.time; }
+        get { return Bot.Info.FileSettings.Mind.CanTalk && _timeCanTalk < Time.time && PlayerInEarshot; }
+    }
+
+    public bool PlayerInEarshot
+    {
+        get
+        {
+            if (_nextEarshotCheckTime > Time.time)
+            {
+                return _playerInEarshot;
+            }
+            _nextEarshotCheckTime = Time.time + EARSHOT_CHECK_FREQ;
+            _playerInEarshot = CheckPlayerInEarshot();
+            return _playerInEarshot;
+        }
+    }
+
+    private bool CheckPlayerInEarshot()
+    {
+        var others = Bot.PlayerComponent.OtherPlayersData.DataList;
+        for (int i = 0; i < others.Count; i++)
+        {
+            OtherPlayerData other = others[i];
+            if (other?.OtherPlayerComponent?.IsAI == false && other.DistanceData.Distance <= EARSHOT_DISTANCE)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public bool IsSpeaking

@@ -40,7 +40,7 @@ public class AimTargetSettings : SAINSettingsBase<AimTargetSettings>, ISAINSetti
 
     [DataMember]
     [Name("Limb Falloff - Start Distance")]
-    [Description("Distance at which bots start favouring the torso over limbs.")]
+    [Description("Distance at which bots start favouring the torso over the head and limbs.")]
     [MinMax(10f, 200f, 10f)]
     public float LimbFalloffStart = 45f;
 

@@ -97,7 +97,7 @@ public class EnemyAimTarget(EnemyData enemyData) : EnemyBase(enemyData, enemyDat
             if (CanShoot(part) && (canHead || part != EAimTargetPart.Head))
             {
                 weight = weights.For(part);
-                if (IsLimb(part))
+                if (IsSmallTarget(part))
                 {
                     weight *= limbScale;
                 }
@@ -151,9 +151,9 @@ public class EnemyAimTarget(EnemyData enemyData) : EnemyBase(enemyData, enemyDat
         return 1f - ((distance - start) / (end - start));
     }
 
-    private static bool IsLimb(EAimTargetPart part)
+    private static bool IsSmallTarget(EAimTargetPart part)
     {
-        return part is EAimTargetPart.LeftArm or EAimTargetPart.RightArm or EAimTargetPart.LeftLeg or EAimTargetPart.RightLeg;
+        return part != EAimTargetPart.Chest && part != EAimTargetPart.Stomach;
     }
 
     private bool CanShoot(EAimTargetPart part)
